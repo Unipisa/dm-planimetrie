@@ -14,6 +14,8 @@
         "vite": "^4.5.0"
     },
     "dependencies": {
+        "babylonjs": "^6.30.0",
+        "babylonjs-loaders": "^6.30.0",
         "preact": "^10.19.2",
         "three": "^0.158.0"
     }
