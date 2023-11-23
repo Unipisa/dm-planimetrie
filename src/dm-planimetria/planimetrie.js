@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { TransformControls } from 'three/addons/controls/TransformControls.js'
+import { TransformableBoundingBox } from './bbox'
 
 export class PlanimetriaViewer {
     constructor(el) {
@@ -54,34 +54,18 @@ export class PlanimetriaViewer {
     }
 
     mountBox() {
-        const highlightMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.25 })
+        // TODO: move
+        // const highlightMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.25 })
+        // const highlightGeometry = new THREE.BoxGeometry(1, 1, 1)
+        // const highlightBox = new THREE.Mesh(highlightGeometry, highlightMaterial)
 
-        // const pointMin = new THREE.SphereGeometry(0.1)
-        // const pointMax = new THREE.SphereGeometry(0.1)
+        const controls = new TransformableBoundingBox(this.camera, this.renderer, this.cameraControls)
 
-        const highlightGeometry = new THREE.BoxGeometry(1, 1, 1)
-
-        const highlightBox = new THREE.Mesh(highlightGeometry, highlightMaterial)
-
-        const controls = new TransformControls(this.camera, this.renderer.domElement)
-
-        controls.setMode('scale')
-        controls.attach(highlightBox)
         controls.addEventListener('change', () => {
             this.requestRender()
         })
-        controls.addEventListener('dragging-changed', e => (this.cameraControls.enabled = !e.value))
-
-        // const controlsMax = new TransformControls(this.camera, this.renderer.domElement)
-        // // controlsMax.attach(highlightBox.geometry.max)
-        // controlsMax.addEventListener('change', () => {
-        //     controlsMax.this.requestRender()
-        // })
-        // controlsMax.addEventListener('dragging-changed', e => (this.cameraControls.enabled = !e.value))
 
         this.scene.add(controls)
-        // this.scene.add(controlsMax)
-        this.scene.add(highlightBox)
     }
 
     requestRender() {
