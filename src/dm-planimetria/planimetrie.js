@@ -9,7 +9,7 @@ export class PlanimetriaViewer {
         this.renderRequested = false
 
         this.mountThreeCanvas()
-        this.mountBox()
+        this.mountWidget()
     }
 
     mountThreeCanvas() {
@@ -23,6 +23,9 @@ export class PlanimetriaViewer {
         this.camera.position.x = 0
         this.camera.position.y = 0
         this.camera.position.z = 10
+
+        this.camera.layers.enable(0)
+        this.camera.layers.enable(1)
 
         this.cameraControls = new OrbitControls(this.camera, this.el)
         this.cameraControls.addEventListener('change', () => this.requestRender())
@@ -53,19 +56,47 @@ export class PlanimetriaViewer {
         this.scene.add(directionalLight)
     }
 
-    mountBox() {
+    mountWidget() {
         // TODO: move
         // const highlightMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.25 })
         // const highlightGeometry = new THREE.BoxGeometry(1, 1, 1)
         // const highlightBox = new THREE.Mesh(highlightGeometry, highlightMaterial)
 
-        const controls = new TransformableBoundingBox(this.camera, this.renderer, this.cameraControls)
+        // const controls = new TransformableBoundingBox(this.camera, this.renderer, this.cameraControls)
 
-        controls.addEventListener('change', () => {
+        // controls.addEventListener('change', () => {
+        //     this.requestRender()
+        // })
+
+        // this.scene.add(controls)
+
+        this.raycaster = new THREE.Raycaster()
+        this.raycaster.layers.set(0)
+
+        const pointer = new THREE.Vector2()
+        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.01), new THREE.MeshBasicMaterial({ color: 0x333333 }))
+        sphere.layers.set(1)
+
+        window.addEventListener('pointermove', e => {
+            pointer.x = (e.clientX / window.innerWidth) * 2 - 1
+            pointer.y = -(e.clientY / window.innerHeight) * 2 + 1
+
+            this.raycaster.setFromCamera(pointer, this.camera)
+
+            console.time('computing intersections')
+            const intersections = this.raycaster.intersectObjects(this.scene.children, true)
+            console.timeEnd('computing intersections')
+
+            if (intersections.length > 0) {
+                const intersection = intersections[0]
+                console.log(intersection)
+                sphere.position.copy(intersection.point)
+            }
+
             this.requestRender()
         })
 
-        this.scene.add(controls)
+        this.scene.add(sphere)
     }
 
     requestRender() {
