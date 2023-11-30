@@ -1,0 +1,198 @@
+*,
+*::before,
+*::after {
+    font-family: inherit;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+
+    font-family: 'Inter', 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+img {
+    display: block;
+}
+
+// Sass Headings
+
+h1 {
+    font-size: 3rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1;
+
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+}
+
+//
+// Theme
+//
+
+button {
+    padding: 0.3rem 0.75rem;
+
+    border: 1px solid transparent;
+    border-radius: 0.3rem;
+
+    background-color: #ccc;
+    color: #333;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: #c0c0c0;
+    }
+
+    &:active {
+        background-color: #a0a0a0;
+    }
+
+    &.primary {
+        background-color: #007bff;
+        color: #fff;
+
+        &:hover {
+            background-color: #0069d9;
+        }
+
+        &:active {
+            background-color: #0056b3;
+        }
+    }
+}
+
+input[type='text'] {
+    padding: 0.3rem 0.5rem;
+
+    border: 1px solid #ccc;
+    border-radius: 0.3rem;
+
+    background-color: #fff;
+    color: #333;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+//
+// Structure
+//
+
+main.demo {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'content sidebar';
+
+    canvas {
+        grid-area: content;
+
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    aside {
+        max-width: 35rem;
+        height: 100vh;
+
+        grid-area: sidebar;
+
+        padding: 1rem 0 0 1rem;
+
+        background: #f8f8f8;
+
+        box-shadow: 0 0 3rem #00000022;
+
+        display: grid;
+        grid-template-rows: auto 1fr;
+
+        section:nth-child(2) {
+            overflow-y: scroll;
+        }
+
+        .rooms {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            padding: 0 0.5rem 1rem 0;
+
+            .buttons {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+
+                .separator {
+                    width: 1px;
+                    background-color: #ddd;
+                }
+            }
+
+            .room {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-rows: auto auto;
+                grid-template-areas:
+                    'label buttons'
+                    'code code';
+                grid-gap: 0.5rem;
+
+                padding: 0.5rem;
+
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+
+                background: #fff;
+
+                align-items: center;
+
+                .label {
+                    grid-area: label;
+
+                    input[type='text'] {
+                        width: 100%;
+                    }
+                }
+
+                .buttons {
+                    grid-area: buttons;
+
+                    display: flex;
+                    flex-direction: row;
+                    gap: 0.5rem;
+                }
+
+                .code {
+                    grid-area: code;
+
+                    code {
+                        display: block;
+
+                        font-size: 14px;
+                        font-family: 'Source Code Pro', monospace;
+                        text-wrap: wrap;
+                    }
+                }
+            }
+        }
+    }
+}

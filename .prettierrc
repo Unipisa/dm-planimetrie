@@ -1,0 +1,9 @@
+{
+    "printWidth": 160,
+    "singleQuote": true,
+    "quoteProps": "consistent",
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": false,
+    "arrowParens": "avoid"
+}
