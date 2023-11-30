@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { MapControls } from 'three/addons/controls/MapControls.js'
 
 function recursivelyRemoveLineSegments(object) {
     if (object.isLineSegments) {
@@ -12,10 +12,6 @@ function recursivelyRemoveLineSegments(object) {
     }
 }
 
-const STATE_VIEW = 'view'
-const STATE_POLYGON = 'polygon'
-const STATE_POLYGON_CLOSED = 'polygon-closed'
-
 export class PlanimetriaViewer extends THREE.EventDispatcher {
     constructor(el) {
         super()
@@ -23,7 +19,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.el = el
         this.renderRequested = false
 
-        this.state = STATE_VIEW
+        this.polygonClosed = false
 
         this.mountThreeCanvas()
         this.mountCursor()
@@ -31,13 +27,12 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
     }
 
     startPolygon() {
+        this.closed = false
         this.vertices.forEach(v => {
             this.scene.remove(v)
         })
         this.scene.remove(this.polyline)
         this.vertices = []
-
-        // TODO
     }
 
     mountThreeCanvas() {
@@ -56,7 +51,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.camera.layers.enable(1)
         this.camera.layers.enable(2)
 
-        this.cameraControls = new OrbitControls(this.camera, this.el)
+        this.cameraControls = new MapControls(this.camera, this.el)
         this.cameraControls.addEventListener('change', () => this.requestRender())
 
         this.raycaster = new THREE.Raycaster()
@@ -71,6 +66,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             dm.rotation.x = -Math.PI / 2
             const s = 0.0254 // one inch in meters
             dm.scale.set(s, s, s)
+            dm.zoomToCursor = true
             dm.position.x = -90
             dm.position.y = 2
             dm.position.z = -20
@@ -93,14 +89,14 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.scene.add(directionalLight)
     }
 
-    setPolyline(vertices, closed = false) {
+    setPolyline(vertices) {
         const positions = []
 
         for (let i = 0; i < vertices.length; i++) {
             positions.push(vertices[i].x, vertices[i].y, vertices[i].z)
         }
 
-        if (closed) {
+        if (this.closed) {
             positions.push(vertices[0].x, vertices[0].y, vertices[0].z)
         }
 
@@ -115,8 +111,6 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             const pointer = new THREE.Vector2()
             pointer.x = (e.clientX / this.el.offsetWidth) * 2 - 1
             pointer.y = -(e.clientY / this.el.offsetHeight) * 2 + 1
-
-            console.log(pointer)
 
             this.raycaster.setFromCamera(pointer, this.camera)
 
@@ -141,7 +135,6 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         let isMouseStill
         this.el.addEventListener('pointerdown', () => {
             isMouseStill = true
-            console.log('Mouse down')
         })
 
         this.el.addEventListener('pointerup', e => {
@@ -151,6 +144,10 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             const pointer = new THREE.Vector2()
             pointer.x = (e.clientX / this.el.offsetWidth) * 2 - 1
             pointer.y = -(e.clientY / this.el.offsetHeight) * 2 + 1
+
+            if (this.closed) {
+                this.startPolygon()
+            }
 
             this.raycaster.setFromCamera(pointer, this.camera)
 
@@ -165,7 +162,8 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
                 const intersection = intersections[0]
                 if (intersection.object === this.vertices[0]) {
                     const positions = this.vertices.map(m => m.position)
-                    this.setPolyline(positions, true)
+                    this.closed = true
+                    this.setPolyline(positions)
                     this.dispatchEvent({ type: 'polygon-closed', positions })
                 } else {
                     const vertex = new THREE.Mesh(new THREE.SphereGeometry(0.01), new THREE.MeshBasicMaterial({ color: 0xffff00 }))
@@ -178,7 +176,6 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
                         this.scene.add(this.polyline)
                     }
                     this.scene.add(vertex)
-                    console.log(vertex.position)
                 }
             }
 
