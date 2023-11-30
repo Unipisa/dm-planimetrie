@@ -5,6 +5,9 @@ export default defineConfig({
     build: {
         out: 'out',
         emptyOutDir: true,
+        rollupOptions: {
+            input: ['demo.html'],
+        },
     },
     server: {
         port: 3000,

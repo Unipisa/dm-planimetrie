@@ -153,7 +153,7 @@ main.demo {
                 grid-template-rows: auto auto;
                 grid-template-areas:
                     'label buttons'
-                    'code code';
+                    'coordinates coordinates';
                 grid-gap: 0.5rem;
 
                 padding: 0.5rem;
@@ -181,8 +181,8 @@ main.demo {
                     gap: 0.5rem;
                 }
 
-                .code {
-                    grid-area: code;
+                .coordinates {
+                    grid-area: coordinates;
 
                     code {
                         display: block;
