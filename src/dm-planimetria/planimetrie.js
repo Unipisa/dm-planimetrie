@@ -19,6 +19,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.el = el
         this.renderRequested = false
 
+        this.editing = false
         this.polygonClosed = false
 
         this.mountThreeCanvas()
@@ -27,7 +28,9 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
     }
 
     startPolygon() {
+        this.editing = true
         this.closed = false
+
         this.vertices.forEach(v => {
             this.scene.remove(v)
         })
@@ -42,7 +45,12 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
         this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
 
-        this.camera = new THREE.PerspectiveCamera(75, this.el.offsetWidth / this.el.offsetHeight, 0.1, 1000)
+        this.camera = new THREE.PerspectiveCamera(
+            75,
+            this.el.offsetWidth / this.el.offsetHeight,
+            0.1,
+            1000
+        )
         this.camera.position.x = 0
         this.camera.position.y = 0
         this.camera.position.z = 10
@@ -100,11 +108,17 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             positions.push(vertices[0].x, vertices[0].y, vertices[0].z)
         }
 
-        this.polyline.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+        this.polyline.geometry.setAttribute(
+            'position',
+            new THREE.Float32BufferAttribute(positions, 3)
+        )
     }
 
     mountCursor() {
-        this.cursor = new THREE.Mesh(new THREE.SphereGeometry(0.005), new THREE.MeshBasicMaterial({ color: 0x333333 }))
+        this.cursor = new THREE.Mesh(
+            new THREE.SphereGeometry(0.005),
+            new THREE.MeshBasicMaterial({ color: 0x333333 })
+        )
         this.cursor.layers.set(2)
 
         this.el.addEventListener('pointermove', e => {
@@ -129,16 +143,26 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
 
     mountPolylineWidget() {
         this.vertices = []
-        this.polyline = new THREE.Line(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 10 }))
+        this.polyline = new THREE.Line(
+            new THREE.BufferGeometry(),
+            new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 10 })
+        )
         this.polyline.layers.set(2)
 
         let isMouseStill
         this.el.addEventListener('pointerdown', () => {
             isMouseStill = true
         })
+        this.el.addEventListener('pointermove', () => {
+            isMouseStill = false
+        })
 
         this.el.addEventListener('pointerup', e => {
+            // discard drag events
             if (!isMouseStill) return
+            // discard if not editing
+            if (!this.editing) return
+            // discard non-left-click events
             if (e.button !== 0) return
 
             const pointer = new THREE.Vector2()
@@ -166,7 +190,10 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
                     this.setPolyline(positions)
                     this.dispatchEvent({ type: 'polygon-closed', positions })
                 } else {
-                    const vertex = new THREE.Mesh(new THREE.SphereGeometry(0.01), new THREE.MeshBasicMaterial({ color: 0xffff00 }))
+                    const vertex = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.01),
+                        new THREE.MeshBasicMaterial({ color: 0xffff00 })
+                    )
                     vertex.layers.set(1)
                     vertex.position.copy(intersection.point)
 
@@ -180,10 +207,6 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             }
 
             this.requestRender()
-        })
-
-        this.el.addEventListener('pointermove', () => {
-            isMouseStill = false
         })
     }
 

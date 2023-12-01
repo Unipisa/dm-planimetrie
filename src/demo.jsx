@@ -1,8 +1,10 @@
 import { render } from 'preact'
 
+import { effect, signal } from '@preact/signals'
+
 import './styles.scss'
-import { usePlanimetria } from './dm-planimetria'
 import { useState } from 'preact/hooks'
+import { PlanimetriaViewer } from './dm-planimetria/planimetrie.js'
 
 const RoomEditor = ({ name: externalName, polygon: externalPolygon, close, startPolygon }) => {
     const [name, setName] = useState(externalName)
@@ -49,81 +51,112 @@ const Room = ({ name, code, polygon, edit }) => {
     )
 }
 
-const App = () => {
-    const [editingRoom, setEditingRoom] = useState(null)
-    const [rooms, setRooms] = useState([
-        {
-            name: 'PHC',
-            code: '106',
-            polygon: [
-                [1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9],
-            ],
-        },
-        {
-            name: 'Aula 4',
-            code: '104',
-            polygon: [
-                [1, 2, 3],
-                [4, 5, 7],
-                [7, 8, 9],
-                [7, 8, 10],
-            ],
-        },
-    ])
+const planimetria = signal(null)
 
-    const [planimetria, onCanvasRef] = usePlanimetria({
-        onPolygonClosed(positions) {
-            console.log(positions)
+effect(() => {
+    if (planimetria.value !== null) {
+        planimetria.value.addEventListener('polygon-closed', ({ positions }) => {
+            console.log('polygon-closed', positions)
 
-            if (editingRoom !== null) {
-                setRooms([
-                    ...rooms.slice(0, editingRoom),
-                    { ...rooms[editingRoom], polygon: positions },
-                    ...rooms.slice(editingRoom + 1),
-                ])
+            if (editingRoomIndex.value !== null) {
+                rooms.value = [
+                    ...rooms.value.slice(0, editingRoomIndex.value),
+                    {
+                        ...rooms.value[editingRoomIndex.value],
+                        polygon: positions.map(v => [v.x, v.y, v.z]),
+                    },
+                    ...rooms.value.slice(editingRoomIndex.value + 1),
+                ]
             }
-        },
-    })
+        })
+    }
+})
 
-    console.log(editingRoom)
+const rooms = signal([
+    {
+        name: 'PHC',
+        code: '106',
+        polygon: [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ],
+    },
+    {
+        name: 'Aula 4',
+        code: '104',
+        polygon: [
+            [1, 2, 3],
+            [4, 5, 7],
+            [7, 8, 9],
+            [7, 8, 10],
+        ],
+    },
+])
+
+const editingRoomIndex = signal(null)
+
+const CanvasPlanimetria = ({}) => {
+    return (
+        <canvas
+            ref={$canvas => {
+                planimetria.value = new PlanimetriaViewer($canvas)
+            }}
+        />
+    )
+}
+
+const Sidebar = ({}) => {
+    const rooms2 = rooms.value
 
     return (
+        <aside>
+            <section>
+                <h1>DM Planimetrie</h1>
+                <h2>Data Insertion Tool</h2>
+                <p>This is a tool to insert data into the DM Planimetrie database.</p>
+                <p>Here is a short explanation of how it works:</p>
+                <ol>
+                    <li>TODO: Spiegare meglio, per ora è generato con copilot questo help</li>
+                    <li>Draw a polygon around the room</li>
+                    <li>Click on "Save"</li>
+                    <li>Copy the JSON code and paste it into the database</li>
+                </ol>
+            </section>
+            <section>
+                <h2>Rooms</h2>
+                <div class="rooms">
+                    {rooms2.map((room, i) =>
+                        editingRoomIndex.value === i ? (
+                            <RoomEditor
+                                {...room}
+                                close={() => {
+                                    editingRoomIndex.value = null
+                                }}
+                                startPolygon={() => {
+                                    planimetria.value.startPolygon()
+                                }}
+                            />
+                        ) : (
+                            <Room
+                                {...room}
+                                edit={() => {
+                                    editingRoomIndex.value = i
+                                }}
+                            />
+                        )
+                    )}
+                </div>
+            </section>
+        </aside>
+    )
+}
+
+const App = () => {
+    return (
         <main class="demo">
-            <canvas ref={onCanvasRef} />
-            <aside>
-                <section>
-                    <h1>DM Planimetrie</h1>
-                    <h2>Data Insertion Tool</h2>
-                    <p>This is a tool to insert data into the DM Planimetrie database.</p>
-                    <p>Here is a short explanation of how it works:</p>
-                    <ol>
-                        <li>TODO: Spiegare meglio, per ora è generato con copilot questo help</li>
-                        <li>Draw a polygon around the room</li>
-                        <li>Click on "Save"</li>
-                        <li>Copy the JSON code and paste it into the database</li>
-                    </ol>
-                </section>
-                <section>
-                    <h2>Rooms</h2>
-                    <div class="rooms">
-                        {rooms.map((room, i) =>
-                            editingRoom === i ? (
-                                <RoomEditor
-                                    {...room}
-                                    close={() => setEditingRoom(null)}
-                                    startPolygon={() => {
-                                        planimetria.startPolygon()
-                                    }}
-                                />
-                            ) : (
-                                <Room {...room} edit={() => setEditingRoom(i)} />
-                            )
-                        )}
-                    </div>
-                </section>
-            </aside>
+            <CanvasPlanimetria />
+            <Sidebar />
         </main>
     )
 }
