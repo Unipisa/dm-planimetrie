@@ -6,23 +6,41 @@ import './styles.scss'
 import { useState } from 'preact/hooks'
 import { PlanimetriaViewer } from './dm-planimetria/planimetrie.js'
 
-const RoomEditor = ({ name: externalName, polygon: externalPolygon, close, startPolygon }) => {
-    const [name, setName] = useState(externalName)
-    const [polygon, setPolygon] = useState(externalPolygon)
+const RoomEditor = ({ close }) => {
+    const { name, polygon } = editingRoom.value
 
     const handleOk = () => {
         // POST request to dm-manager
+        console.log('updating room polygon', { name, polygon })
+
+        rooms.value = [
+            ...rooms.value.slice(0, editingRoomIndex.value),
+            {
+                ...rooms.value[editingRoomIndex.value],
+                name,
+                polygon,
+            },
+            ...rooms.value.slice(editingRoomIndex.value + 1),
+        ]
+
         close()
     }
 
     return (
         <div class="room editing">
             <div class="label">
-                <input type="text" value={name} onInput={e => setName(e.target.value)} />
+                <input
+                    type="text"
+                    value={name}
+                    onInput={e => {
+                        editingRoom.value = {
+                            ...editingRoom.value,
+                            name: e.target.value,
+                        }
+                    }}
+                />
             </div>
             <div class="buttons">
-                <button onClick={startPolygon}>Retake Polygon</button>
-                <div class="separator"></div>
                 <button onClick={close}>Annulla</button>
                 <button onClick={handleOk} class="primary">
                     Ok
@@ -59,14 +77,10 @@ effect(() => {
             console.log('polygon-closed', positions)
 
             if (editingRoomIndex.value !== null) {
-                rooms.value = [
-                    ...rooms.value.slice(0, editingRoomIndex.value),
-                    {
-                        ...rooms.value[editingRoomIndex.value],
-                        polygon: positions.map(v => [v.x, v.y, v.z]),
-                    },
-                    ...rooms.value.slice(editingRoomIndex.value + 1),
-                ]
+                editingRoom.value = {
+                    ...editingRoom.value,
+                    polygon: positions.map(v => [v.x, v.y, v.z]),
+                }
             }
         })
     }
@@ -95,6 +109,7 @@ const rooms = signal([
 ])
 
 const editingRoomIndex = signal(null)
+const editingRoom = signal(null)
 
 const CanvasPlanimetria = ({}) => {
     return (
@@ -107,8 +122,6 @@ const CanvasPlanimetria = ({}) => {
 }
 
 const Sidebar = ({}) => {
-    const rooms2 = rooms.value
-
     return (
         <aside>
             <section>
@@ -126,15 +139,14 @@ const Sidebar = ({}) => {
             <section>
                 <h2>Rooms</h2>
                 <div class="rooms">
-                    {rooms2.map((room, i) =>
+                    {rooms.value.map((room, i) =>
                         editingRoomIndex.value === i ? (
                             <RoomEditor
                                 {...room}
                                 close={() => {
                                     editingRoomIndex.value = null
-                                }}
-                                startPolygon={() => {
-                                    planimetria.value.startPolygon()
+                                    editingRoom.value = null
+                                    planimetria.value.disableEditing()
                                 }}
                             />
                         ) : (
@@ -142,6 +154,8 @@ const Sidebar = ({}) => {
                                 {...room}
                                 edit={() => {
                                     editingRoomIndex.value = i
+                                    editingRoom.value = { ...room }
+                                    planimetria.value.enableEditing()
                                 }}
                             />
                         )

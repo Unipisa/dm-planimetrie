@@ -27,15 +27,23 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.mountPolylineWidget()
     }
 
-    startPolygon() {
+    enableEditing() {
         this.editing = true
-        this.closed = false
 
-        this.vertices.forEach(v => {
-            this.scene.remove(v)
-        })
+        this.resetState()
+    }
+
+    resetState() {
+        // remove previous objects from scene
+        this.vertices.forEach(v => this.scene.remove(v))
         this.scene.remove(this.polyline)
+
+        this.closed = false
         this.vertices = []
+    }
+
+    disableEditing() {
+        this.editing = false
     }
 
     mountThreeCanvas() {
@@ -170,7 +178,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             pointer.y = -(e.clientY / this.el.offsetHeight) * 2 + 1
 
             if (this.closed) {
-                this.startPolygon()
+                this.resetState()
             }
 
             this.raycaster.setFromCamera(pointer, this.camera)
