@@ -17,12 +17,12 @@ concurrency:
 
 jobs:
     deploy:
-        env:
-            BASE_URL: ${{ steps.deployment.outputs.page_url }}
         environment:
             name: github-pages
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
+        env:
+            BASE_URL: /${{ github.repository }}
         steps:
             - name: Checkout
               uses: actions/checkout@v3
