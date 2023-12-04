@@ -32,7 +32,8 @@ jobs:
             - name: Install dependencies
               run: npm install
             - name: Build
-              run: npm run build
+              # Run build using custom base path
+              run: npm run build -- --base '/dm-planimetrie'
             - name: Setup Pages
               uses: actions/configure-pages@v3
             - name: Upload artifact
