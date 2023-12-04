@@ -22,7 +22,7 @@ jobs:
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
         env:
-            BASE_URL: /${{ github.repository }}
+            BASE_URL: /dm-planimetrie
         steps:
             - name: Checkout
               uses: actions/checkout@v3
