@@ -74,7 +74,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
 
         const loader = new ColladaLoader()
 
-        loader.load('/dm.dae', collada => {
+        loader.load(`${process.env.BASE_URL}/dm.dae`, collada => {
             const dm = collada.scene.children[0]
 
             recursivelyRemoveLineSegments(dm)
