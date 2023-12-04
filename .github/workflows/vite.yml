@@ -16,7 +16,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    BASE_URL: ${{ github.server_url }}/${{ github.repository }}
+    BASE_URL: ${{ steps.deployment.outputs.page_url }}
 
 jobs:
     deploy:
