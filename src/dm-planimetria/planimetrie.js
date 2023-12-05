@@ -40,10 +40,13 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
 
         this.closed = false
         this.vertices = []
+
+        this.requestRender()
     }
 
     disableEditing() {
         this.editing = false
+        this.resetState()
     }
 
     mountThreeCanvas() {

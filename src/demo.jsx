@@ -3,7 +3,6 @@ import { render } from 'preact'
 import { effect, signal } from '@preact/signals'
 
 import './styles.scss'
-import { useState } from 'preact/hooks'
 import { PlanimetriaViewer } from './dm-planimetria/planimetrie.js'
 
 const RoomEditor = ({ close }) => {
