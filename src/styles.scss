@@ -167,6 +167,25 @@ main.demo {
 
                 .label {
                     grid-area: label;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+
+                    vertical-align: middle;
+
+                    .code {
+                        font-family: 'Source Code Pro', monospace;
+                        font-size: 15px;
+                        line-height: 1;
+
+                        padding: 0.25rem;
+
+                        border: 1px solid #ddd;
+
+                        border-radius: 0.25rem;
+
+                        user-select: all;
+                    }
 
                     input[type='text'] {
                         width: 100%;
@@ -191,6 +210,8 @@ main.demo {
                         font-size: 14px;
                         font-family: 'Source Code Pro', monospace;
                         text-wrap: wrap;
+
+                        user-select: all;
                     }
                 }
             }

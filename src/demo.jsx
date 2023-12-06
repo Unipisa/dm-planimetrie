@@ -1,27 +1,32 @@
 import { render } from 'preact'
+import { useEffect, useRef, useState } from 'preact/hooks'
 
-import { effect, signal } from '@preact/signals'
+import { signal } from '@preact/signals'
 
 import './styles.scss'
 import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
 
-const RoomEditor = ({ close }) => {
-    const { name, polygon } = editingRoom.value
+const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
+    const [editingRoom, setEditingRoom] = useState(room)
+
+    useEffect(() => {
+        const handler = ({ polygon }) => {
+            setEditingRoom(editingRoom => ({
+                ...editingRoom,
+                polygon: polygon.map(v => [v.x, v.y, v.z]),
+            }))
+        }
+
+        planimetriaRef.current.addEventListener('polygon-closed', handler)
+
+        // cleanup
+        return () => {
+            planimetriaRef.current.removeEventListener('polygon-closed', handler)
+        }
+    }, [])
 
     const handleOk = () => {
-        // POST request to dm-manager
-        console.log('updating room polygon', { name, polygon })
-
-        rooms.value = [
-            ...rooms.value.slice(0, editingRoomIndex.value),
-            {
-                ...rooms.value[editingRoomIndex.value],
-                name,
-                polygon,
-            },
-            ...rooms.value.slice(editingRoomIndex.value + 1),
-        ]
-
+        setRoom(editingRoom)
         close()
     }
 
@@ -30,12 +35,13 @@ const RoomEditor = ({ close }) => {
             <div class="label">
                 <input
                     type="text"
-                    value={name}
+                    placeholder={room.code}
+                    value={editingRoom.name}
                     onInput={e => {
-                        editingRoom.value = {
-                            ...editingRoom.value,
+                        setEditingRoom(editingRoom => ({
+                            ...editingRoom,
                             name: e.target.value,
-                        }
+                        }))
                     }}
                 />
             </div>
@@ -46,17 +52,18 @@ const RoomEditor = ({ close }) => {
                 </button>
             </div>
             <div class="coordinates">
-                <code>{JSON.stringify({ polygon })}</code>
+                <code>{JSON.stringify(editingRoom.polygon)}</code>
             </div>
         </div>
     )
 }
 
-const Room = ({ name, code, polygon, edit }) => {
+const Room = ({ room: { name, code, polygon }, edit }) => {
     return (
         <div class="room">
             <div class="label">
-                {name} - {code}
+                <div class="code">{code}</div>
+                <div class="name">{name}</div>
             </div>
             <div class="buttons">
                 <button onClick={edit}>Modifica</button>
@@ -68,59 +75,41 @@ const Room = ({ name, code, polygon, edit }) => {
     )
 }
 
-const planimetria = signal(null)
-
-effect(() => {
-    if (planimetria.value !== null) {
-        planimetria.value.addEventListener('polygon-closed', ({ positions }) => {
-            console.log('polygon-closed', positions)
-
-            if (editingRoomIndex.value !== null) {
-                editingRoom.value = {
-                    ...editingRoom.value,
-                    polygon: positions.map(v => [v.x, v.y, v.z]),
-                }
-            }
-        })
-    }
-})
-
-const rooms = signal([
-    {
-        name: 'PHC',
-        code: '106',
-        polygon: [
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9],
-        ],
-    },
-    {
-        name: 'Aula 4',
-        code: '104',
-        polygon: [
-            [1, 2, 3],
-            [4, 5, 7],
-            [7, 8, 9],
-            [7, 8, 10],
-        ],
-    },
-])
-
-const editingRoomIndex = signal(null)
-const editingRoom = signal(null)
-
-const CanvasPlanimetria = ({}) => {
+const CanvasPlanimetria = ({ planimetriaRef }) => {
     return (
         <canvas
             ref={$canvas => {
-                planimetria.value = new PlanimetriaViewer($canvas)
+                planimetriaRef.current = new PlanimetriaViewer($canvas)
             }}
         />
     )
 }
 
-const Sidebar = ({}) => {
+const Sidebar = ({ planimetriaRef }) => {
+    const [rooms, setRooms] = useState([
+        {
+            name: 'PHC',
+            code: '106',
+            polygon: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ],
+        },
+        {
+            name: 'Aula 4',
+            code: '104',
+            polygon: [
+                [1, 2, 3],
+                [4, 5, 7],
+                [7, 8, 9],
+                [7, 8, 10],
+            ],
+        },
+    ])
+
+    const [editingRoomIndex, setEditingRoomIndex] = useState(null)
+
     return (
         <aside>
             <section>
@@ -138,23 +127,25 @@ const Sidebar = ({}) => {
             <section>
                 <h2>Rooms</h2>
                 <div class="rooms">
-                    {rooms.value.map((room, i) =>
-                        editingRoomIndex.value === i ? (
+                    {rooms.map((room, i) =>
+                        editingRoomIndex === i ? (
                             <RoomEditor
-                                {...room}
+                                planimetriaRef={planimetriaRef}
+                                room={room}
+                                setRoom={room => {
+                                    setRooms([...rooms.slice(0, i), room, ...rooms.slice(i + 1)])
+                                }}
                                 close={() => {
-                                    editingRoomIndex.value = null
-                                    editingRoom.value = null
-                                    planimetria.value.disableEditing()
+                                    setEditingRoomIndex(null)
+                                    planimetriaRef.current.disableEditing()
                                 }}
                             />
                         ) : (
                             <Room
-                                {...room}
+                                room={room}
                                 edit={() => {
-                                    editingRoomIndex.value = i
-                                    editingRoom.value = { ...room }
-                                    planimetria.value.enableEditing()
+                                    setEditingRoomIndex(i)
+                                    planimetriaRef.current.enableEditing()
                                 }}
                             />
                         )
@@ -166,10 +157,12 @@ const Sidebar = ({}) => {
 }
 
 const App = () => {
+    const planimetriaRef = useRef(null)
+
     return (
         <main class="demo">
-            <CanvasPlanimetria />
-            <Sidebar />
+            <CanvasPlanimetria planimetriaRef={planimetriaRef} />
+            <Sidebar planimetriaRef={planimetriaRef} />
         </main>
     )
 }

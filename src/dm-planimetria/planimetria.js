@@ -118,19 +118,19 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
     }
 
     setPolyline(vertices) {
-        const positions = []
+        const polygon = []
 
         for (let i = 0; i < vertices.length; i++) {
-            positions.push(vertices[i].x, vertices[i].y, vertices[i].z)
+            polygon.push(vertices[i].x, vertices[i].y, vertices[i].z)
         }
 
         if (this.closed) {
-            positions.push(vertices[0].x, vertices[0].y, vertices[0].z)
+            polygon.push(vertices[0].x, vertices[0].y, vertices[0].z)
         }
 
         this.polyline.geometry.setAttribute(
             'position',
-            new THREE.Float32BufferAttribute(positions, 3)
+            new THREE.Float32BufferAttribute(polygon, 3)
         )
     }
 
@@ -178,10 +178,10 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             if (intersections.length > 0) {
                 const intersection = intersections[0]
                 if (intersection.object === this.vertices[0]) {
-                    const positions = this.vertices.map(m => m.position)
+                    const polygon = this.vertices.map(m => m.position)
                     this.closed = true
-                    this.setPolyline(positions)
-                    this.dispatchEvent({ type: 'polygon-closed', positions })
+                    this.setPolyline(polygon)
+                    this.dispatchEvent({ type: 'polygon-closed', polygon })
                 } else {
                     const vertex = new THREE.Mesh(
                         new THREE.SphereGeometry(0.01),
