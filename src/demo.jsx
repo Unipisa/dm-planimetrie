@@ -1,9 +1,8 @@
 import { render } from 'preact'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
-import { signal } from '@preact/signals'
-
 import './styles.scss'
+
 import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
 
 const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
