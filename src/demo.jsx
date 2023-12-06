@@ -3,7 +3,7 @@ import { render } from 'preact'
 import { effect, signal } from '@preact/signals'
 
 import './styles.scss'
-import { PlanimetriaViewer } from './dm-planimetria/planimetrie.js'
+import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
 
 const RoomEditor = ({ close }) => {
     const { name, polygon } = editingRoom.value

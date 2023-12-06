@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "Far partire un server web in questa directory. Ad esempio così:",
     "main": "index.html",
+    "type": "module",
     "scripts": {
         "dev": "vite",
         "build": "vite build"

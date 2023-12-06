@@ -183,6 +183,7 @@ main.demo {
 
                 .coordinates {
                     grid-area: coordinates;
+                    overflow-x: auto;
 
                     code {
                         display: block;

@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
 import { MapControls } from 'three/addons/controls/MapControls.js'
+import { Cursor3D } from './cursor.js'
 
 function recursivelyRemoveLineSegments(object) {
     if (object.isLineSegments) {
@@ -23,7 +24,15 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.polygonClosed = false
 
         this.mountThreeCanvas()
-        this.mountCursor()
+
+        this.cursor = new Cursor3D(this.el, this.camera, this.scene.children)
+        this.cursor.layers.set(2)
+        this.cursor.addEventListener('move', () => {
+            this.requestRender()
+        })
+
+        this.scene.add(this.cursor)
+
         this.mountPolylineWidget()
     }
 
@@ -123,33 +132,6 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             'position',
             new THREE.Float32BufferAttribute(positions, 3)
         )
-    }
-
-    mountCursor() {
-        this.cursor = new THREE.Mesh(
-            new THREE.SphereGeometry(0.005),
-            new THREE.MeshBasicMaterial({ color: 0x333333 })
-        )
-        this.cursor.layers.set(2)
-
-        this.el.addEventListener('pointermove', e => {
-            const pointer = new THREE.Vector2()
-            pointer.x = (e.clientX / this.el.offsetWidth) * 2 - 1
-            pointer.y = -(e.clientY / this.el.offsetHeight) * 2 + 1
-
-            this.raycaster.setFromCamera(pointer, this.camera)
-
-            this.raycaster.layers.set(0)
-            const intersections = this.raycaster.intersectObjects(this.scene.children, true)
-            if (intersections.length > 0) {
-                const intersection = intersections[0]
-                this.cursor.position.copy(intersection.point)
-            }
-
-            this.requestRender()
-        })
-
-        this.scene.add(this.cursor)
     }
 
     mountPolylineWidget() {
