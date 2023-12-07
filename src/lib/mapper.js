@@ -102,4 +102,4 @@ async function main() {
     await api.users['user-id-1'].put({ fullName: 'John Doe' })
 }
 
-main()
+// main()

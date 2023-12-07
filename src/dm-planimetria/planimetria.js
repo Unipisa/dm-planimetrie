@@ -117,6 +117,13 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.scene.add(directionalLight)
     }
 
+    setPolygon(polygon) {
+        this.resetState()
+        this.closed = true
+        this.setPolyline(polygon)
+        this.requestRender()
+    }
+
     setPolyline(vertices) {
         const polygon = []
 

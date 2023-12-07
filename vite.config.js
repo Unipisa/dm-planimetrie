@@ -13,11 +13,16 @@ export default defineConfig(({ mode, command }) => {
     const BASE_URL = process.env.BASE_URL || ''
     console.log(`[Vite] Base URL: ${BASE_URL}`)
 
+    // url to the planimetrie service
+    const PLANIMETRIE_API_URL = process.env.PLANIMETRIE_API_URL || 'http://localhost:3000'
+    console.log(`[Vite] Planimetrie URL: ${PLANIMETRIE_API_URL}`)
+
     return {
         base: BASE_URL + '/',
         define: {
             'process.env.NODE_ENV': JSON.stringify(mode),
             'process.env.BASE_URL': JSON.stringify(BASE_URL),
+            'process.env.PLANIMETRIE_API_URL': JSON.stringify(PLANIMETRIE_API_URL),
         },
         build: {
             outDir: 'out/',

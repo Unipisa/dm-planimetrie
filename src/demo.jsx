@@ -4,6 +4,40 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import './styles.scss'
 
 import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
+import { createObjectMapper } from './lib/mapper.js'
+
+const endpointPlanimetrie = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
+    async fetch(url, options) {
+        return {
+            json: async () => {
+                return {
+                    data: [
+                        {
+                            code: 'A1',
+                            name: 'Aula 1',
+                            polygon: [
+                                [0, 0, 0],
+                                [200, 0, 0],
+                                [100, 100, 0],
+                                [0, 100, 0],
+                            ],
+                        },
+                        {
+                            code: 'A2',
+                            name: 'Aula 2',
+                            polygon: [
+                                [0, 0, 0],
+                                [100, 0, 0],
+                                [100, 100, 0],
+                                [0, 100, 0],
+                            ],
+                        },
+                    ],
+                }
+            },
+        }
+    },
+})
 
 const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
     const [editingRoom, setEditingRoom] = useState(room)
@@ -24,7 +58,9 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
         }
     }, [])
 
-    const handleOk = () => {
+    const handleOk = async () => {
+        // call the API to save the room
+        await endpointPlanimetrie[editingRoom.code].post(editingRoom)
         setRoom(editingRoom)
         close()
     }
@@ -85,27 +121,13 @@ const CanvasPlanimetria = ({ planimetriaRef }) => {
 }
 
 const Sidebar = ({ planimetriaRef }) => {
-    const [rooms, setRooms] = useState([
-        {
-            name: 'PHC',
-            code: '106',
-            polygon: [
-                [1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9],
-            ],
-        },
-        {
-            name: 'Aula 4',
-            code: '104',
-            polygon: [
-                [1, 2, 3],
-                [4, 5, 7],
-                [7, 8, 9],
-                [7, 8, 10],
-            ],
-        },
-    ])
+    const [rooms, setRooms] = useState([])
+
+    useEffect(async () => {
+        // call the API to get the rooms
+        const { data: rooms } = await endpointPlanimetrie.get()
+        setRooms(rooms)
+    }, [])
 
     const [editingRoomIndex, setEditingRoomIndex] = useState(null)
 
@@ -145,6 +167,7 @@ const Sidebar = ({ planimetriaRef }) => {
                                 edit={() => {
                                     setEditingRoomIndex(i)
                                     planimetriaRef.current.enableEditing()
+                                    planimetriaRef.current.setPolygon(room.polygon)
                                 }}
                             />
                         )
