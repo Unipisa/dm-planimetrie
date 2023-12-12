@@ -1,7 +1,56 @@
+//@ts-check
+
+/**
+ * Converts a camelCase string to dash-case.
+ *
+ * @param {string} str
+ * @returns {string}
+ *
+ */
 function toDashCase(str) {
     return str.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 }
 
+/**
+ * @typedef {{
+ *  fetch?: (url: URL, options: RequestInit) => Promise<Response>,
+ *  before?: (data: any) => any,
+ *  after?: (data: any) => any,
+ *  headers?: Record<string, string>,
+ * }} MapperOptions
+ */
+
+/**
+ * Creates a proxy object that maps object properties to HTTP requests. The
+ * proxy object is a tree structure where each node is a path segment and each
+ * leaf is a HTTP request method. There are some special properties that are
+ * mapped to HTTP methods:
+ *
+ * - `get` - HTTP GET request
+ * - `put` - HTTP PUT request
+ * - `patch` - HTTP PATCH request
+ * - `delete` - HTTP DELETE request
+ * - `post` - HTTP POST request
+ *
+ * In case of the GET method, the query parameters are passed as an object to
+ * the function. Other methods accept a single object as an argument, which is
+ * sent as the request body (except for the DELETE method, which does not accept
+ * any data).
+ *
+ * The proxy object can be used to access a JSON REST API endpoint. The base path is
+ * specified as the first argument to the function. The second argument is an
+ * optional object with the following properties:
+ *
+ * - `fetch` - a custom fetch implementation, defaults to `window.fetch`
+ * - `before` - a function that pre-processes the request data
+ * - `after` - a function that post-processes the response data
+ * - `headers` - an object with additional headers to send with each request
+ *
+ * @param {string} basePath
+ * @param {MapperOptions} options
+ *
+ * @returns
+ */
 export function createObjectMapper(basePath, options = {}) {
     const handler = {
         get({ path }, prop) {
@@ -44,6 +93,13 @@ export function createObjectMapper(basePath, options = {}) {
     return createProxy()
 }
 
+/**
+ * @param {URL} url
+ * @param {'GET' | 'PUT' | 'PATCH' | 'DELETE' | 'POST'} method
+ * @param {MapperOptions} options
+ * @param {object} data
+ * @returns
+ */
 async function processRequest(url, method, options = {}, data = null) {
     const requestData = options.before?.(data) ?? data
 
@@ -63,18 +119,17 @@ async function processRequest(url, method, options = {}, data = null) {
     return options.after?.(responseData) ?? responseData
 }
 
-async function main() {
+async function example() {
     // Example usage:
     const api = createObjectMapper('https://example.org/base-path/', {
         // fetch: window.fetch,
+        // alternative fetch implementation for testing purposes
         async fetch(url, { headers, method, body }) {
             console.log('[Debug] fetch', url.toString(), { headers, method, body })
 
-            return {
-                json: async () => ({
-                    value: 'example data',
-                }),
-            }
+            return new Response(JSON.stringify({ value: 'example data' }), {
+                headers: { 'Content-Type': 'application/json' },
+            })
         },
         before: data => ({ ...data, timestamp: Date.now() }),
         // after: data => ({ ...data,  }),
@@ -102,4 +157,4 @@ async function main() {
     await api.users['user-id-1'].put({ fullName: 'John Doe' })
 }
 
-// main()
+// example()
