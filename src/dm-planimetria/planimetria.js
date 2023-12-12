@@ -70,6 +70,18 @@ function nearestVertexInGeometries(geometries, point) {
     return { vertex: minVertex, distance: minDistance }
 }
 
+function throttle(fn, delay) {
+    let lastCall = 0
+    return function (...args) {
+        const now = new Date().getTime()
+        if (now - lastCall < delay) {
+            return
+        }
+        lastCall = now
+        return fn(...args)
+    }
+}
+
 export class PlanimetriaViewer extends THREE.EventDispatcher {
     constructor(el) {
         super()
@@ -105,9 +117,11 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.scene.add(this.polyline)
 
         onMouseDownWhileStill(this.el, this.onCanvasClick.bind(this))
+
+        this.updateSnapping = throttle(this.updateSnapping.bind(this), 100)
     }
 
-    onCursorMove() {
+    updateSnapping() {
         console.time('nearestVertexInGeometries')
         const { vertex, distance } = nearestVertexInGeometries(
             this.geometries,
@@ -118,7 +132,10 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         console.log(vertex, distance)
 
         this.debugVertex.position.copy(vertex)
+    }
 
+    onCursorMove() {
+        this.updateSnapping()
         this.requestRender()
     }
 
@@ -235,9 +252,9 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
 
             this.scene.add(dm)
 
-            this.geometries = recursivelyFlattenGeometry(dm)
-
             this.requestRender()
+
+            this.geometries = recursivelyFlattenGeometry(dm)
 
             // Expose for debugging
             window.collada = collada
