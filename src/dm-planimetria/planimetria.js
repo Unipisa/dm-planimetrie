@@ -16,6 +16,60 @@ function recursivelyRemoveLineSegments(object3d) {
     }
 }
 
+/**
+ * Recursively get all geometries in the given object, applying the local matrix
+ * to each geometry and returning a list of updated float buffers
+ */
+function recursivelyFlattenGeometry(object3d) {
+    if (object3d.isMesh) {
+        const geometry = object3d.geometry.clone()
+        geometry.applyMatrix4(object3d.matrixWorld)
+
+        return [geometry]
+    } else {
+        return object3d.children.flatMap(child => {
+            return recursivelyFlattenGeometry(child)
+        })
+    }
+}
+
+window.recursivelyFlattenGeometry = recursivelyFlattenGeometry
+
+function nearestVertexInGeometry(geometry, point) {
+    const vertices = geometry.attributes.position.array
+
+    let minVertex = null
+    let minDistance = Number.POSITIVE_INFINITY
+
+    for (let i = 0; i < vertices.length; i += 3) {
+        const vertex = new THREE.Vector3(vertices[i], vertices[i + 1], vertices[i + 2])
+        const distance = vertex.distanceTo(point)
+
+        if (distance < minDistance) {
+            minDistance = distance
+            minVertex = vertex
+        }
+    }
+
+    return { vertex: minVertex, distance: minDistance }
+}
+
+function nearestVertexInGeometries(geometries, point) {
+    let minVertex = null
+    let minDistance = Number.POSITIVE_INFINITY
+
+    geometries.forEach(geometry => {
+        const { vertex, distance } = nearestVertexInGeometry(geometry, point)
+
+        if (distance < minDistance) {
+            minDistance = distance
+            minVertex = vertex
+        }
+    })
+
+    return { vertex: minVertex, distance: minDistance }
+}
+
 export class PlanimetriaViewer extends THREE.EventDispatcher {
     constructor(el) {
         super()
@@ -36,14 +90,36 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         // Add raycasted mouse cursor
         this.cursor = new Cursor3D(this.el, this.camera, this.scene.children)
         this.cursor.layers.set(2)
-        this.cursor.addEventListener('move', () => this.requestRender())
+        this.cursor.addEventListener('move', this.onCursorMove.bind(this))
         this.scene.add(this.cursor)
+
+        // Nearest vertex, debug
+        this.debugVertex = new THREE.Mesh(
+            new THREE.SphereGeometry(0.005),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        )
+        this.scene.add(this.debugVertex)
 
         // Add polyline widget
         this.polyline = new PolylineWidget(this.el, this.camera)
         this.scene.add(this.polyline)
 
         onMouseDownWhileStill(this.el, this.onCanvasClick.bind(this))
+    }
+
+    onCursorMove() {
+        console.time('nearestVertexInGeometries')
+        const { vertex, distance } = nearestVertexInGeometries(
+            this.geometries,
+            this.cursor.position
+        )
+        console.timeEnd('nearestVertexInGeometries')
+
+        console.log(vertex, distance)
+
+        this.debugVertex.position.copy(vertex)
+
+        this.requestRender()
     }
 
     // onPolylineVertexClicked({ index, mouseEvent: e }) {
@@ -155,7 +231,11 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             dm.position.y = 2
             dm.position.z = -20
 
+            dm.updateMatrixWorld()
+
             this.scene.add(dm)
+
+            this.geometries = recursivelyFlattenGeometry(dm)
 
             this.requestRender()
 
