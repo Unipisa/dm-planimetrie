@@ -7,7 +7,7 @@ import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
 import { createObjectMapper } from './lib/mapper.js'
 
 const endpointPlanimetrie = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
-    async fetch(url, options) {
+    async fetch(_url, _options) {
         return {
             json: async () => {
                 return {
@@ -16,20 +16,20 @@ const endpointPlanimetrie = createObjectMapper(process.env.PLANIMETRIE_API_URL +
                             code: 'A1',
                             name: 'Aula 1',
                             polygon: [
-                                [0, 0, 0],
-                                [200, 0, 0],
-                                [100, 100, 0],
-                                [0, 100, 0],
+                                { x: 0, y: 0, z: 0 },
+                                { x: 200, y: 0, z: 0 },
+                                { x: 100, y: 100, z: 0 },
+                                { x: 0, y: 100, z: 0 },
                             ],
                         },
                         {
                             code: 'A2',
                             name: 'Aula 2',
                             polygon: [
-                                [0, 0, 0],
-                                [100, 0, 0],
-                                [100, 100, 0],
-                                [0, 100, 0],
+                                { x: 0, y: 0, z: 0 },
+                                { x: 200, y: 0, z: 0 },
+                                { x: 100, y: 100, z: 0 },
+                                { x: 0, y: 100, z: 0 },
                             ],
                         },
                     ],
@@ -46,7 +46,7 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
         const handler = ({ polygon }) => {
             setEditingRoom(editingRoom => ({
                 ...editingRoom,
-                polygon: polygon.map(v => [v.x, v.y, v.z]),
+                polygon,
             }))
         }
 
@@ -158,7 +158,7 @@ const Sidebar = ({ planimetriaRef }) => {
                                 }}
                                 close={() => {
                                     setEditingRoomIndex(null)
-                                    planimetriaRef.current.disableEditing()
+                                    planimetriaRef.current.stopEditing()
                                 }}
                             />
                         ) : (
@@ -166,8 +166,7 @@ const Sidebar = ({ planimetriaRef }) => {
                                 room={room}
                                 edit={() => {
                                     setEditingRoomIndex(i)
-                                    planimetriaRef.current.enableEditing()
-                                    planimetriaRef.current.setPolygon(room.polygon)
+                                    planimetriaRef.current.startEditingWith(room.polygon)
                                 }}
                             />
                         )
