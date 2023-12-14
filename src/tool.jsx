@@ -92,7 +92,7 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
 
     const handleOk = async () => {
         // call the API to save the room
-        await endpointRef.current[editingRoom.code].post({
+        await endpointRef.current[editingRoom._id].post({
             notes: editingRoom.notes,
             polygon: JSON.stringify(editingRoom.polygon),
         })
