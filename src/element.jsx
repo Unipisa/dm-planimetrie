@@ -35,6 +35,48 @@ export const Planimetrie = ({}) => {
             <div class="overlay">
                 <div class="search"></div>
                 <div class="sidebar"></div>
+                <div class="layer-switcher">
+                    <div class="layer">
+                        <div class="row">
+                            <input type="checkbox" id="building-dm" />
+                            <label for="building-dm">Dip</label>
+                        </div>
+                        <div class="children">
+                            <div class="row">
+                                <input type="checkbox" id="dm-floor-1" checked disabled />
+                                <label for="dm-floor-1">Piano 1</label>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="dm-floor-2" checked disabled />
+                                <label for="dm-floor-2">Piano 2</label>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="dm-floor-3" checked disabled />
+                                <label for="dm-floor-3">Piano 3</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layer">
+                        <div class="row">
+                            <input type="checkbox" id="building-exdma" checked={true} />
+                            <label for="building-exdma">Ex-DMA</label>
+                        </div>
+                        <div class="children">
+                            <div class="row">
+                                <input type="checkbox" id="exdma-floor-1" checked={true} />
+                                <label for="exdma-floor-1">Piano 1</label>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="exdma-floor-2" checked={false} />
+                                <label for="exdma-floor-2">Piano 2</label>
+                            </div>
+                            <div class="row">
+                                <input type="checkbox" id="exdma-floor-3" checked={false} />
+                                <label for="exdma-floor-3">Piano 3</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )
