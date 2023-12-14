@@ -105,13 +105,20 @@ async function processRequest(url, method, options = {}, data = null) {
 
     const fetchFn = options.fetch ?? window.fetch
 
+    console.log('[Debug] fetch', url.toString(), { method, options })
+
     const response = await fetchFn(url, {
+        mode: 'cors',
         method,
         headers: {
             'Content-Type': 'application/json',
             ...(options.headers || {}),
         },
-        body: JSON.stringify(requestData),
+        ...(method === 'GET'
+            ? {}
+            : {
+                  body: JSON.stringify(requestData),
+              }),
     })
 
     const responseData = await response.json()

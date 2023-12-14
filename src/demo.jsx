@@ -6,38 +6,70 @@ import './styles.scss'
 import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
 import { createObjectMapper } from './lib/mapper.js'
 
-const endpointPlanimetrie = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
-    async fetch(_url, _options) {
-        return {
-            json: async () => {
-                return {
-                    data: [
-                        {
-                            code: 'A1',
-                            name: 'Aula 1',
-                            polygon: [
-                                { x: 0, y: 0, z: 0 },
-                                { x: 200, y: 0, z: 0 },
-                                { x: 100, y: 100, z: 0 },
-                                { x: 0, y: 100, z: 0 },
-                            ],
-                        },
-                        {
-                            code: 'A2',
-                            name: 'Aula 2',
-                            polygon: [
-                                { x: 0, y: 0, z: 0 },
-                                { x: 200, y: 0, z: 0 },
-                                { x: 100, y: 100, z: 0 },
-                                { x: 0, y: 100, z: 0 },
-                            ],
-                        },
-                    ],
-                }
-            },
+// const endpointPlanimetrie = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
+//     async fetch(_url, _options) {
+//         return {
+//             json: async () => {
+//                 return {
+//                     data: [
+//                         {
+//                             code: 'A1',
+//                             name: 'Aula 1',
+//                             polygon: [
+//                                 { x: 0, y: 0, z: 0 },
+//                                 { x: 200, y: 0, z: 0 },
+//                                 { x: 100, y: 100, z: 0 },
+//                                 { x: 0, y: 100, z: 0 },
+//                             ],
+//                         },
+//                         {
+//                             code: 'A2',
+//                             name: 'Aula 2',
+//                             polygon: [
+//                                 { x: 0, y: 0, z: 0 },
+//                                 { x: 200, y: 0, z: 0 },
+//                                 { x: 100, y: 100, z: 0 },
+//                                 { x: 0, y: 100, z: 0 },
+//                             ],
+//                         },
+//                     ],
+//                 }
+//             },
+//         }
+//     },
+// })
+
+const useLocalState = (key, defaultValue) => {
+    const [state, setState] = useState(() => {
+        const value = localStorage.getItem(key)
+        if (value === null) {
+            return defaultValue
         }
-    },
-})
+
+        return JSON.parse(value)
+    })
+
+    useEffect(() => {
+        localStorage.setItem(key, JSON.stringify(state))
+    }, [state])
+
+    return [state, setState]
+}
+
+const useEndpointRef = key => {
+    const endpointRef = useRef(null)
+
+    // when the key changes, update the endpoint object mapper
+    useEffect(() => {
+        endpointRef.current = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
+            headers: {
+                ['Authorization']: `Bearer ${key}`,
+            },
+        })
+    }, [key])
+
+    return endpointRef
+}
 
 const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
     const [editingRoom, setEditingRoom] = useState(room)
@@ -71,11 +103,11 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
                 <input
                     type="text"
                     placeholder={room.code}
-                    value={editingRoom.name}
+                    value={editingRoom.notes}
                     onInput={e => {
                         setEditingRoom(editingRoom => ({
                             ...editingRoom,
-                            name: e.target.value,
+                            notes: e.target.value,
                         }))
                     }}
                 />
@@ -86,26 +118,30 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
                     Ok
                 </button>
             </div>
-            <div class="coordinates">
-                <code>{JSON.stringify(editingRoom.polygon)}</code>
-            </div>
+            {editingRoom.polygon && (
+                <div class="coordinates">
+                    <code>{JSON.stringify(editingRoom.polygon)}</code>
+                </div>
+            )}
         </div>
     )
 }
 
-const Room = ({ room: { name, code, polygon }, edit }) => {
+const Room = ({ room: { notes, code, polygon }, edit }) => {
     return (
         <div class="room">
             <div class="label">
                 <div class="code">{code}</div>
-                <div class="name">{name}</div>
+                <div class="name">{notes}</div>
             </div>
             <div class="buttons">
                 <button onClick={edit}>Modifica</button>
             </div>
-            <div class="coordinates">
-                <code>{JSON.stringify(polygon)}</code>
-            </div>
+            {polygon && (
+                <div class="coordinates">
+                    <code>{JSON.stringify(polygon)}</code>
+                </div>
+            )}
         </div>
     )
 }
@@ -121,33 +157,61 @@ const CanvasPlanimetria = ({ planimetriaRef }) => {
 }
 
 const Sidebar = ({ planimetriaRef }) => {
+    const [enableKey, setEnableKey] = useState(false)
+    const [apiKey, setApiKey] = useLocalState('dm-planimetrie.apiKey', '')
     const [rooms, setRooms] = useState([])
-
-    useEffect(async () => {
-        // call the API to get the rooms
-        const { data: rooms } = await endpointPlanimetrie.get()
-        setRooms(rooms)
-    }, [])
-
     const [editingRoomIndex, setEditingRoomIndex] = useState(null)
+
+    const endpointRef = useEndpointRef(apiKey)
+
+    const loadRooms = async () => {
+        // call the API to get the rooms
+        const { data: rooms } = await endpointRef.current.get()
+        setRooms(rooms)
+    }
 
     return (
         <aside>
             <section>
                 <h1>DM Planimetrie</h1>
-                <h2>Data Insertion Tool</h2>
-                <p>This is a tool to insert data into the DM Planimetrie database.</p>
-                <p>Here is a short explanation of how it works:</p>
+                <h2>Strumento per inserimento dati</h2>
+                <p>Breve spiegazione di come funziona</p>
                 <ol>
-                    <li>TODO: Spiegare meglio, per ora è generato con copilot questo help</li>
-                    <li>Draw a polygon around the room</li>
-                    <li>Click on "Save"</li>
-                    <li>Copy the JSON code and paste it into the database</li>
+                    <li>Inserisci una chiave API</li>
+                    <li>Clicca "modifica" una stanza</li>
+                    <li>Disegna un poligono</li>
+                    <li>Per accettarlo premi "Ok"</li>
+                    <li>
+                        Per comodità si può cambiare il nome della stanza, l'unica cosa importante
+                        che identifica le varie stanze è il codice
+                    </li>
                 </ol>
+            </section>
+            <section>
+                <h2>Chiave API</h2>
+                <p>
+                    Per poter modificare le stanze è necessario inserire una chiave API di{' '}
+                    <a href="https://github.com/Unipisa/dm-manager">dm-manager</a>.
+                </p>
+                <div class="row">
+                    <input
+                        type="password"
+                        autoComplete="off"
+                        placeholder="API Key"
+                        value={apiKey}
+                        onInput={e => setApiKey(e.target.value)}
+                    />
+                    <button onClick={loadRooms}>Carica Stanze</button>
+                </div>
             </section>
             <section>
                 <h2>Rooms</h2>
                 <div class="rooms">
+                    {rooms.length === 0 && (
+                        <div class="no-rooms">
+                            <p>Nessuna stanza da mostrare</p>
+                        </div>
+                    )}
                     {rooms.map((room, i) =>
                         editingRoomIndex === i ? (
                             <RoomEditor

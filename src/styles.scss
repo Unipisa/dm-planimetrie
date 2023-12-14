@@ -48,7 +48,7 @@ button {
     border: 1px solid transparent;
     border-radius: 0.3rem;
 
-    background-color: #ccc;
+    background: #ddd;
     color: #333;
 
     cursor: pointer;
@@ -75,7 +75,8 @@ button {
     }
 }
 
-input[type='text'] {
+input[type='text'],
+input[type='password'] {
     padding: 0.3rem 0.5rem;
 
     border: 1px solid #ccc;
@@ -118,14 +119,28 @@ main.demo {
 
         padding: 1rem 0 0 1rem;
 
-        background: #f8f8f8;
+        background: #fdfdfd;
 
         box-shadow: 0 0 3rem #00000022;
 
         display: grid;
-        grid-template-rows: auto 1fr;
+        grid-template-rows: auto auto 1fr;
 
-        section:nth-child(2) {
+        .row {
+            padding: 1rem 1rem 1rem 0;
+
+            display: flex;
+            flex-direction: row;
+            gap: 0.5rem;
+
+            align-items: center;
+
+            input {
+                flex-grow: 1;
+            }
+        }
+
+        section:nth-child(3) {
             overflow-y: scroll;
         }
 
@@ -150,10 +165,11 @@ main.demo {
             .room {
                 display: grid;
                 grid-template-columns: 1fr auto;
-                grid-template-rows: auto auto;
-                grid-template-areas:
-                    'label buttons'
-                    'coordinates coordinates';
+                grid-template-rows: auto;
+
+                grid-auto-rows: auto;
+
+                grid-template-areas: 'label buttons';
                 grid-gap: 0.5rem;
 
                 padding: 0.5rem;
@@ -187,7 +203,7 @@ main.demo {
                         user-select: all;
                     }
 
-                    input[type='text'] {
+                    input {
                         width: 100%;
                     }
                 }
@@ -203,6 +219,8 @@ main.demo {
                 .coordinates {
                     grid-area: coordinates;
                     overflow-x: auto;
+
+                    grid-column: span 2;
 
                     code {
                         display: block;

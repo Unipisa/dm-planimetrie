@@ -14,7 +14,9 @@ export default defineConfig(({ mode, command }) => {
     console.log(`[Vite] Base URL: ${BASE_URL}`)
 
     // url to the planimetrie service
-    const PLANIMETRIE_API_URL = process.env.PLANIMETRIE_API_URL || 'http://localhost:3000'
+    const PLANIMETRIE_API_URL =
+        process.env.PLANIMETRIE_API_URL ||
+        'https://manage.develop.lb.cs.dm.unipi.it/api/v0/process/planimetrie'
     console.log(`[Vite] Planimetrie URL: ${PLANIMETRIE_API_URL}`)
 
     return {

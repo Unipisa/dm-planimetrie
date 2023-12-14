@@ -122,14 +122,21 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
     }
 
     updateSnapping() {
-        console.time('nearestVertexInGeometries')
+        if (!this.geometries) return
+
+        // console.time('nearestVertexInGeometries')
         const { vertex, distance } = nearestVertexInGeometries(
             this.geometries,
             this.cursor.position
         )
-        console.timeEnd('nearestVertexInGeometries')
+        // console.timeEnd('nearestVertexInGeometries')
 
-        console.log(vertex, distance)
+        // console.log(vertex, distance)
+
+        this.snapVertex = vertex
+        this.snapDistance = distance
+
+        this.debugVertex.visible = distance < 0.1
 
         this.debugVertex.position.copy(vertex)
     }
@@ -184,7 +191,12 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
                     }
                 } else {
                     // the model was clicked
-                    this.currentPolygon.push(intersection.point)
+                    if (this.snapDistance < 0.1) {
+                        this.currentPolygon.push(this.snapVertex)
+                    } else {
+                        this.currentPolygon.push(intersection.point)
+                    }
+
                     this.polyline.setPolyline(this.currentPolygon)
                 }
 
@@ -199,7 +211,12 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
             if (intersections.length > 0) {
                 const intersection = intersections[0]
 
-                this.currentPolygon.push(intersection.point)
+                if (this.snapDistance < 0.1) {
+                    this.currentPolygon.push(this.snapVertex)
+                } else {
+                    this.currentPolygon.push(intersection.point)
+                }
+
                 this.polyline.setPolyline(this.currentPolygon)
             } else {
                 this.polyline.setPolyline([])
@@ -217,9 +234,9 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
 
         this.camera = new THREE.PerspectiveCamera(
-            75,
+            90,
             this.el.offsetWidth / this.el.offsetHeight,
-            0.1,
+            0.01,
             1000
         )
 
@@ -292,8 +309,8 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
 
     startEditingWith(polygon) {
         this.state = 'polygon'
-        this.currentPolygon = polygon
-        this.polyline.setPolyline(polygon, true)
+        this.currentPolygon = polygon ?? []
+        this.polyline.setPolyline(polygon ?? [], true)
 
         this.requestRender()
     }
@@ -342,8 +359,12 @@ class PolylineWidget extends THREE.Object3D {
 
         this.polyline = new THREE.Line(
             new THREE.BufferGeometry(),
-            new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 10 })
+            new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 5 })
         )
+
+        // render this object as overlay
+        this.polyline.material.depthTest = false
+        this.polyline.renderOrder = 1
 
         this.polyline.layers.set(2)
 
@@ -387,6 +408,10 @@ class PolylineWidget extends THREE.Object3D {
                 )
                 vertexSphere.layers.set(1)
                 vertexSphere.position.copy(v)
+
+                // render this object as overlay
+                vertexSphere.material.depthTest = false
+                vertexSphere.renderOrder = 1
 
                 return vertexSphere
             })
