@@ -192,12 +192,23 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
                 } else {
                     // the model was clicked
                     if (this.snapDistance < 0.1) {
-                        this.currentPolygon.push(this.snapVertex)
+                        if (this.snapVertex.equals(this.currentPolygon[0])) {
+                            // the first vertex was snapped to
+                            this.state = 'polygon'
+                            this.polyline.setPolyline(this.currentPolygon, true)
+
+                            this.dispatchEvent({
+                                type: 'polygon-closed',
+                                polygon: this.currentPolygon,
+                            })
+                        } else {
+                            this.currentPolygon.push(this.snapVertex)
+                            this.polyline.setPolyline(this.currentPolygon)
+                        }
                     } else {
                         this.currentPolygon.push(intersection.point)
+                        this.polyline.setPolyline(this.currentPolygon)
                     }
-
-                    this.polyline.setPolyline(this.currentPolygon)
                 }
 
                 this.requestRender()
