@@ -146,7 +146,7 @@ const Room = ({ room: { notes, code, polygon }, edit }) => {
     )
 }
 
-const CanvasPlanimetria = ({ planimetriaRef }) => {
+export const CanvasPlanimetria = ({ planimetriaRef }) => {
     return (
         <canvas
             ref={$canvas => {

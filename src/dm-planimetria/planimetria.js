@@ -228,7 +228,7 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
 
     #mountThreeCanvas() {
         this.scene = new THREE.Scene()
-        this.scene.background = new THREE.Color(0x282828)
+        this.scene.background = new THREE.Color(0xffffff)
 
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
         this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)

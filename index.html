@@ -16,6 +16,7 @@
 
             html,
             body {
+                height: 100%;
                 min-height: 100%;
                 overflow: hidden;
             }
@@ -23,11 +24,32 @@
             img {
                 display: block;
             }
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            a {
+                display: inline-block;
+                padding: 1rem;
+                margin: 1rem;
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+                text-decoration: none;
+                color: #333;
+
+                font-size: 20px;
+            }
+
+            a:hover {
+                background-color: #eee;
+            }
         </style>
     </head>
     <body>
-        <script>
-            window.location.href = './demo.html'
-        </script>
+        <a href="/demo/">DM-Planimetrie &rsaquo; Demo</a>
+        <a href="/tool.html">DM-Planimetrie &rsaquo; Tool</a>
     </body>
 </html>

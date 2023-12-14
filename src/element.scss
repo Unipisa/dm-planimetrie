@@ -1,0 +1,58 @@
+.dm-planimetrie {
+    display: grid;
+
+    width: 100%;
+    height: 100%;
+
+    border: 1px solid royalblue;
+
+    position: relative;
+
+    canvas {
+        width: 100%;
+        height: 100%;
+
+        background: #ddd4ff;
+    }
+
+    .overlay {
+        position: absolute;
+        inset: 0;
+
+        width: 100%;
+        height: 100%;
+
+        pointer-events: none;
+
+        & > * {
+            position: absolute;
+            // border: 1px solid red;
+            // background: rgba(255, 0, 0, 0.2);
+        }
+
+        .search {
+            top: 1rem;
+            left: 1rem;
+
+            width: calc(100% - 30% - 2rem);
+            height: 2.25rem;
+
+            border-radius: 0.3rem;
+
+            border: 1px solid #d8d8d8;
+            box-shadow: 0 0 0.5rem #00000022;
+            background: #fff;
+        }
+
+        .sidebar {
+            top: 0;
+            right: 0;
+
+            width: 30%;
+            height: 100%;
+
+            background: #fff;
+            border-left: 1px solid royalblue;
+        }
+    }
+}
