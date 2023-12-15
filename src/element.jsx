@@ -14,7 +14,7 @@ import { useRef } from 'preact/hooks'
 //                 },
 //             })
 //         },
-//         setHighlightedRoom: code => {
+//         setHighlightedRooms: (ids) => {
 //             planimetriaRef.current.highlightRoom(code)
 //         },
 //     }
