@@ -71,7 +71,7 @@ const useEndpointRef = key => {
     return endpointRef
 }
 
-const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
+const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
     const [editingRoom, setEditingRoom] = useState(room)
 
     useEffect(() => {
@@ -92,7 +92,10 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
 
     const handleOk = async () => {
         // call the API to save the room
-        await endpointPlanimetrie[editingRoom.code].post(editingRoom)
+        await endpointRef.current[editingRoom._id].post({
+            notes: editingRoom.notes,
+            polygon: JSON.stringify(editingRoom.polygon),
+        })
         setRoom(editingRoom)
         close()
     }
@@ -114,7 +117,7 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close }) => {
             </div>
             <div class="buttons">
                 <button onClick={close}>Annulla</button>
-                <button onClick={handleOk} class="primary">
+                <button onClick={() => handleOk()} class="primary">
                     Ok
                 </button>
             </div>
@@ -157,7 +160,6 @@ export const CanvasPlanimetria = ({ planimetriaRef }) => {
 }
 
 const Sidebar = ({ planimetriaRef }) => {
-    const [enableKey, setEnableKey] = useState(false)
     const [apiKey, setApiKey] = useLocalState('dm-planimetrie.apiKey', '')
     const [rooms, setRooms] = useState([])
     const [editingRoomIndex, setEditingRoomIndex] = useState(null)
@@ -224,6 +226,7 @@ const Sidebar = ({ planimetriaRef }) => {
                                     setEditingRoomIndex(null)
                                     planimetriaRef.current.stopEditing()
                                 }}
+                                endpointRef={endpointRef}
                             />
                         ) : (
                             <Room
