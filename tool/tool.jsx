@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 
 import './styles.scss'
 
-import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
-import { createObjectMapper } from './lib/mapper.js'
+import { PlanimetriaViewer } from '../src/dm-planimetria/planimetria.js'
+import { createObjectMapper } from '../src/lib/mapper.js'
 
 const useLocalState = (key, defaultValue) => {
     const [state, setState] = useState(() => {
