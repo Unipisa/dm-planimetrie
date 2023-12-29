@@ -152,6 +152,11 @@ const Sidebar = ({ planimetriaRef }) => {
     const endpointRef = useEndpointRef(apiKey)
 
     const loadRooms = async () => {
+        if (apiKey.trim() === '') {
+            alert('Devi una chiave API per dm-manager!')
+            return
+        }
+
         // call the API to get the rooms
         const { data: rooms } = await endpointRef.current.get()
         setRooms(
