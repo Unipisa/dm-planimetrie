@@ -153,7 +153,7 @@ const Sidebar = ({ planimetriaRef }) => {
 
     const loadRooms = async () => {
         if (apiKey.trim() === '') {
-            alert('Devi una chiave API per dm-manager!')
+            alert('Devi inserire una chiave API per dm-manager!')
             return
         }
 
