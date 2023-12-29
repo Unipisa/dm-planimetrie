@@ -9,17 +9,41 @@ It uses modern web technologies like Vite and React, and SCSS for styling.
 ## Project Structure
 
 -   `src/`: Contains the source code for the application.
+
 -   `public/`: Contains static files like images and 3D models.
+
 -   `demo/`: Contains a prototype of the final widget.
+
+-   `tool/`: Contains a tool for editing the planimetry.
+
 -   `.github/`: Contains GitHub workflow files for deploying the site to Github Pages
 
-## Getting Started
+## Development
 
 To get started with this project, follow these steps:
 
-1. Clone the repository to your local machine.
-2. Navigate to the project directory.
-3. Install the required dependencies by running `npm install`.
-4. Start the development server by running `npm run dev`.
+```bash
+# Clone the project
+$ git clone https://github.com/Unipisa/dm-planimetrie
+$ cd dm-planimetrie
 
-After starting the server, you can view the application by opening your web browser and navigating to `http://localhost:3000/`.
+# Install the required dependencies
+$ npm install
+
+# Start the ViteJS development server
+$ npm run dev
+```
+
+After starting the server, you can view the application by opening your web browser and navigating to `http://localhost:3000/`
+
+- [http://localhost:3000/demo/](http://localhost:3000/demo/) - The demo widget
+
+- [http://localhost:3000/tool/](http://localhost:3000/tool/) - The tool for editing the planimetry
+
+## Deployment
+
+This project is [automatically deployed to GitHub Pages]() using GitHub Actions. To locally build the project, run the following command:
+
+```bash
+$ npm run build
+```
