@@ -53,6 +53,10 @@ button {
 
     cursor: pointer;
 
+    &.icon {
+        padding: 0.3rem;
+    }
+
     &:hover {
         background-color: #c0c0c0;
     }
@@ -73,6 +77,19 @@ button {
             background-color: #0056b3;
         }
     }
+
+    &.danger {
+        background-color: #ff0000;
+        color: #fff;
+
+        &:hover {
+            background-color: #d90000;
+        }
+
+        &:active {
+            background-color: #b30000;
+        }
+    }
 }
 
 input[type='text'],
@@ -88,6 +105,17 @@ input[type='password'] {
     &:focus {
         outline: none;
     }
+}
+
+//
+// Components
+//
+
+.material-symbols-outlined {
+    display: grid;
+    place-content: center;
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 200, 'opsz' 20;
+    font-size: 20px;
 }
 
 //

@@ -379,6 +379,8 @@ class PolylineWidget extends THREE.Object3D {
 
         this.polyline.layers.set(2)
 
+        this.add(this.polyline)
+
         this.vertexSpheres = []
     }
 
@@ -389,12 +391,13 @@ class PolylineWidget extends THREE.Object3D {
      * the polyline is not closed.
      */
     setPolyline(vertices, closed = false) {
-        this.vertexSpheres.forEach(s => this.remove(s))
+        // clear old vertex spheres
+        this.remove(...this.vertexSpheres)
         this.vertexSpheres = []
-        this.remove(this.polyline)
+
+        this.polyline.visible = false
 
         // recreate the polyline geometry
-
         if (vertices.length >= 2) {
             const polygon = vertices.map(v => [v.x, v.y, v.z]).flat()
             if (closed) {
@@ -406,11 +409,10 @@ class PolylineWidget extends THREE.Object3D {
                 new THREE.Float32BufferAttribute(polygon, 3)
             )
 
-            this.add(this.polyline)
+            this.polyline.visible = true
         }
 
         // create spheres for each vertex
-
         if (vertices.length > 0) {
             this.vertexSpheres = vertices.map(v => {
                 const vertexSphere = new THREE.Mesh(

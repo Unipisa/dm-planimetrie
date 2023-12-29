@@ -6,39 +6,6 @@ import './styles.scss'
 import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
 import { createObjectMapper } from './lib/mapper.js'
 
-// const endpointPlanimetrie = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
-//     async fetch(_url, _options) {
-//         return {
-//             json: async () => {
-//                 return {
-//                     data: [
-//                         {
-//                             code: 'A1',
-//                             name: 'Aula 1',
-//                             polygon: [
-//                                 { x: 0, y: 0, z: 0 },
-//                                 { x: 200, y: 0, z: 0 },
-//                                 { x: 100, y: 100, z: 0 },
-//                                 { x: 0, y: 100, z: 0 },
-//                             ],
-//                         },
-//                         {
-//                             code: 'A2',
-//                             name: 'Aula 2',
-//                             polygon: [
-//                                 { x: 0, y: 0, z: 0 },
-//                                 { x: 200, y: 0, z: 0 },
-//                                 { x: 100, y: 100, z: 0 },
-//                                 { x: 0, y: 100, z: 0 },
-//                             ],
-//                         },
-//                     ],
-//                 }
-//             },
-//         }
-//     },
-// })
-
 const useLocalState = (key, defaultValue) => {
     const [state, setState] = useState(() => {
         const value = localStorage.getItem(key)
@@ -71,6 +38,27 @@ const useEndpointRef = key => {
     return endpointRef
 }
 
+const Room = ({ room: { notes, code, polygon }, edit }) => {
+    return (
+        <div class="room">
+            <div class="label">
+                <div class="code">{code}</div>
+                <div class="name">{notes}</div>
+            </div>
+            <div class="buttons">
+                <button class="icon" onClick={edit}>
+                    <div class="material-symbols-outlined">edit</div>
+                </button>
+            </div>
+            {polygon && (
+                <div class="coordinates">
+                    <code>{JSON.stringify(polygon)}</code>
+                </div>
+            )}
+        </div>
+    )
+}
+
 const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
     const [editingRoom, setEditingRoom] = useState(room)
 
@@ -100,6 +88,13 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
         close()
     }
 
+    const handleDelete = async () => {
+        setEditingRoom(editingRoom => ({
+            ...editingRoom,
+            polygon: null,
+        }))
+    }
+
     return (
         <div class="room editing">
             <div class="label">
@@ -116,33 +111,23 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
                 />
             </div>
             <div class="buttons">
-                <button onClick={close}>Annulla</button>
-                <button onClick={() => handleOk()} class="primary">
-                    Ok
+                <button class="icon" onClick={close}>
+                    <div class="material-symbols-outlined">close</div>
+                </button>
+                <button onClick={() => handleOk()} class="icon primary">
+                    <div class="material-symbols-outlined">check</div>
+                </button>
+                <button
+                    onClick={() => handleDelete()}
+                    class="icon danger"
+                    title="Resetta il poligono per questa stanza a vuoto"
+                >
+                    <div class="material-symbols-outlined">delete</div>
                 </button>
             </div>
             {editingRoom.polygon && (
                 <div class="coordinates">
                     <code>{JSON.stringify(editingRoom.polygon)}</code>
-                </div>
-            )}
-        </div>
-    )
-}
-
-const Room = ({ room: { notes, code, polygon }, edit }) => {
-    return (
-        <div class="room">
-            <div class="label">
-                <div class="code">{code}</div>
-                <div class="name">{notes}</div>
-            </div>
-            <div class="buttons">
-                <button onClick={edit}>Modifica</button>
-            </div>
-            {polygon && (
-                <div class="coordinates">
-                    <code>{JSON.stringify(polygon)}</code>
                 </div>
             )}
         </div>
@@ -169,7 +154,12 @@ const Sidebar = ({ planimetriaRef }) => {
     const loadRooms = async () => {
         // call the API to get the rooms
         const { data: rooms } = await endpointRef.current.get()
-        setRooms(rooms)
+        setRooms(
+            rooms.map(room => ({
+                ...room,
+                polygon: room.polygon ? JSON.parse(room.polygon) : null,
+            }))
+        )
     }
 
     return (
