@@ -23,7 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             BASE_URL: /dm-planimetrie
-            PLANIMETRIE_API_URL: https://manage.develop.lb.cs.dm.unipi.it/api/v0/public/planimetrie
+            PLANIMETRIE_API_URL: https://manage.develop.lb.cs.dm.unipi.it/api/v0/process/planimetrie
         steps:
             - name: Checkout
               uses: actions/checkout@v3
