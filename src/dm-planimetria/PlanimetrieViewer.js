@@ -2,7 +2,6 @@ import * as THREE from 'three'
 
 import { updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
 
-import { onMouseDownWhileStill } from '../lib/utils.js'
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { Canvas3D } from './Canvas3D.js'
 
@@ -11,7 +10,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         super()
 
         this.raycaster = new THREE.Raycaster()
-        this.scene = this.#createScene(el)
+        this.scene = this.#createScene()
 
         // Create renderer
         this.canvas3d = new Canvas3D(el, this.scene)
@@ -19,7 +18,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         this.canvas3d.requestRender()
     }
 
-    #createScene(el) {
+    #createScene() {
         const scene = new THREE.Scene()
         scene.background = new THREE.Color(0xffffff)
 
@@ -29,7 +28,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         })
         scene.add(model)
 
-        onMouseDownWhileStill(el, this.onCanvasClick.bind(this))
+        this.canvas3d.addEventListener('click', ({ event }) => this.onCanvasClick(event))
 
         return scene
     }

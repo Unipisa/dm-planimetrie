@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 
 import { MapControls } from 'three/addons/controls/MapControls.js'
+import { onMouseDownWhileStill } from '../lib/utils.js'
 
-export class Canvas3D {
+export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
 
     constructor(el, scene) {
@@ -36,5 +37,13 @@ export class Canvas3D {
     #createCameraControls() {
         this.cameraControls = new MapControls(this.camera, this.el)
         this.cameraControls.addEventListener('change', () => this.requestRender())
+
+        // register a click listener that works nicely with the camera controls
+        onMouseDownWhileStill(el, e => {
+            this.dispatchEvent({
+                type: 'click',
+                event: e,
+            })
+        })
     }
 }
