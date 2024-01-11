@@ -1,4 +1,6 @@
-import { PlanimetriaViewer } from './dm-planimetria/planimetria.js'
+import { BsLayers, BsSearch } from 'react-icons/bs'
+
+import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
 import './element.scss'
 
 import { useRef } from 'preact/hooks'
@@ -23,19 +25,29 @@ import { useRef } from 'preact/hooks'
 // export const Planimetrie = ({ planimetria, onRoomClick }) => {
 
 export const Planimetrie = ({}) => {
-    const planimetriaRef = useRef(null)
+    const planimetrieRef = useRef(null)
 
     return (
         <div class="dm-planimetrie">
             <canvas
                 ref={$canvas => {
-                    planimetriaRef.current = new PlanimetriaViewer($canvas)
+                    planimetrieRef.current = new PlanimetrieViewer($canvas)
+                    window.planimetrie = planimetrieRef.current
                 }}
             />
             <div class="overlay">
-                <div class="search"></div>
+                <div class="search">
+                    <input type="text" />
+                    <div class="icon">
+                        <BsSearch />
+                    </div>
+                </div>
                 <div class="sidebar"></div>
                 <div class="layer-switcher">
+                    <div class="title">
+                        <BsLayers />
+                        Livelli
+                    </div>
                     <div class="layer">
                         <div class="row">
                             <input type="checkbox" id="building-dm" />

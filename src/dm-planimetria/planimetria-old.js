@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
 import { MapControls } from 'three/addons/controls/MapControls.js'
-import { Cursor3D } from './cursor.js'
+import { Cursor3D } from './Cursor3D.js'
 
 /**
  * @param {THREE.Object3D} object3d

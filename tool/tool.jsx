@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 
 import './styles.scss'
 
-import { PlanimetriaViewer } from '../src/dm-planimetria/planimetria.js'
+import { PlanimetriaViewer } from '../src/dm-planimetria/planimetria-next.js'
 import { createObjectMapper } from '../src/lib/mapper.js'
 
 const useLocalState = (key, defaultValue) => {
@@ -219,7 +219,7 @@ const Sidebar = ({ planimetriaRef }) => {
                                 }}
                                 close={() => {
                                     setEditingRoomIndex(null)
-                                    planimetriaRef.current.stopEditing()
+                                    planimetriaRef.current.cancelEditing()
                                 }}
                                 endpointRef={endpointRef}
                             />
@@ -228,7 +228,7 @@ const Sidebar = ({ planimetriaRef }) => {
                                 room={room}
                                 edit={() => {
                                     setEditingRoomIndex(i)
-                                    planimetriaRef.current.startEditingWith(room.polygon)
+                                    planimetriaRef.current.startEditingWith(room.polygon ?? [])
                                 }}
                             />
                         )

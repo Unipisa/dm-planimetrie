@@ -8,6 +8,8 @@ input[type='password'] {
     background-color: #fff;
     color: #333;
 
+    width: 100%;
+
     &:focus {
         outline: none;
     }
@@ -55,6 +57,13 @@ input[type='checkbox'] {
     }
 }
 
+.icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-content: center;
+}
+
 .dm-planimetrie {
     display: grid;
 
@@ -80,6 +89,8 @@ input[type='checkbox'] {
         pointer-events: none;
         user-select: none;
 
+        overflow: hidden;
+
         & > * {
             position: absolute;
             pointer-events: visible;
@@ -95,8 +106,16 @@ input[type='checkbox'] {
             border-radius: 0.3rem;
 
             border: 1px solid #d8d8d8;
-            box-shadow: 0 0 0.5rem #00000022;
+            box-shadow: 0 0 1rem #00000010;
             background: #fff;
+
+            display: flex;
+
+            input[type='text'] {
+                border: none;
+                height: 100%;
+                font-size: 18px;
+            }
         }
 
         .layer-switcher {
@@ -109,13 +128,22 @@ input[type='checkbox'] {
             border-radius: 0.3rem;
 
             border: 1px solid #d8d8d8;
-            box-shadow: 0 0 0.5rem #00000022;
+            box-shadow: 0 0 1rem #00000010;
             background: #fff;
 
             display: flex;
             flex-direction: column;
 
             gap: 0.25rem;
+
+            .title {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                font-size: 15px;
+                font-weight: 600;
+            }
 
             .layer {
                 display: flex;
@@ -148,7 +176,8 @@ input[type='checkbox'] {
             height: 100%;
 
             background: #fff;
-            border-left: 1px solid royalblue;
+            border-left: 1px solid #d8d8d8;
+            box-shadow: 0 0 1rem #00000010;
         }
     }
 }
