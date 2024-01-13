@@ -7,11 +7,15 @@ export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
 
     constructor(el, scene) {
+        super()
+
         this.el = el
         this.scene = scene
 
         const { offsetWidth: width, offsetHeight: height } = el
         this.camera = new THREE.PerspectiveCamera(90, width / height, 0.01, 1000)
+        this.camera.layers.enableAll()
+
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
 
         this.#createCameraControls()
@@ -39,7 +43,7 @@ export class Canvas3D extends THREE.EventDispatcher {
         this.cameraControls.addEventListener('change', () => this.requestRender())
 
         // register a click listener that works nicely with the camera controls
-        onMouseDownWhileStill(el, e => {
+        onMouseDownWhileStill(this.el, e => {
             this.dispatchEvent({
                 type: 'click',
                 event: e,

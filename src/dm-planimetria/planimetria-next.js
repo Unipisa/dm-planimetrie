@@ -2,14 +2,11 @@ import * as THREE from 'three'
 
 import { Cursor3D } from './Cursor3D.js'
 
-import {
-    Canvas3D,
-    nearestVertexInGeometries,
-    updateRaycasterFromMouseEvent,
-} from '../lib/three-utils.js'
+import { nearestVertexInGeometries, updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
 import { onMouseDownWhileStill, throttle } from '../lib/utils.js'
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { PolylineWidget } from './PolylineWidget.js'
+import { Canvas3D } from './Canvas3D.js'
 
 export class PlanimetriaViewer extends THREE.EventDispatcher {
     // UI State
@@ -30,13 +27,12 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.cursorWidget = null
 
         // Create object graph
-
+        
         this.raycaster = this.#createRaycaster()
-        this.camera = this.#createCamera(el)
         this.scene = this.#createScene(el, this.camera)
-
+        
         // Create renderer
-        this.canvas3d = new Canvas3D(el, this.scene, this.camera)
+        this.canvas3d = new Canvas3D(el, this.scene)
     }
 
     onCanvasClick(e) {

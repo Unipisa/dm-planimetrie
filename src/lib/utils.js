@@ -1,3 +1,5 @@
+import { useState } from 'preact/hooks'
+
 /**
  * Helper to throttle a function. The `fn` function will be called at most once
  * every `delay` milliseconds.
@@ -27,4 +29,9 @@ export const onMouseDownWhileStill = (el, onStillClick) => {
     el.addEventListener('pointerdown', () => (isMouseStill = true))
     el.addEventListener('pointermove', () => (isMouseStill = false))
     el.addEventListener('pointerup', e => isMouseStill && onStillClick(e))
+}
+
+export const useToggle = initialState => {
+    const [value, setValue] = useState(initialState)
+    return [value, () => setValue(v => !v)]
 }

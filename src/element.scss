@@ -64,6 +64,11 @@ input[type='checkbox'] {
     place-content: center;
 }
 
+pre,
+code {
+    font-family: monospace;
+}
+
 .dm-planimetrie {
     display: grid;
 
@@ -178,6 +183,8 @@ input[type='checkbox'] {
             background: #fff;
             border-left: 1px solid #d8d8d8;
             box-shadow: 0 0 1rem #00000010;
+
+            overflow: auto;
         }
     }
 }

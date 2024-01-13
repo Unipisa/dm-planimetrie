@@ -1,7 +1,11 @@
 import * as THREE from 'three'
 
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
-import { recursivelyFlattenGeometry, recursivelyRemoveLineSegments } from '../lib/three-utils.js'
+import {
+    recursivelyFlattenGeometry,
+    recursivelyRemoveLineSegments,
+    recursivelyTraverse,
+} from '../lib/three-utils.js'
 
 const loadModelDM = cb => {
     const loader = new ColladaLoader()
@@ -9,6 +13,28 @@ const loadModelDM = cb => {
         const dm = collada.scene.children[0]
 
         recursivelyRemoveLineSegments(dm)
+        // recursivelyTraverse(dm, object3d => {
+        //     if (object3d instanceof THREE.Mesh) {
+        //         if (Array.isArray(object3d.material)) {
+        //             object3d.material = object3d.material.map(
+        //                 material =>
+        //                     new THREE.MeshPhongMaterial({
+        //                         color: material.color,
+        //                         reflectivity: 1,
+        //                         shininess: 1,
+        //                         flatShading: false,
+        //                     })
+        //             )
+        //         } else {
+        //             object3d.material = new THREE.MeshPhongMaterial({
+        //                 color: object3d.material.color,
+        //                 reflectivity: 1,
+        //                 shininess: 1,
+        //                 flatShading: false,
+        //             })
+        //         }
+        //     }
+        // })
 
         /** one inch in meters */
         const INCH_TO_METER = 0.0254
@@ -51,5 +77,19 @@ export class PlanimetrieModel extends THREE.Object3D {
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
         directionalLight.position.set(1, 2, 3).normalize()
         this.add(directionalLight)
+
+        // Extra lights
+
+        // const light1 = new THREE.DirectionalLight(0xffffff, 1)
+        // light1.position.set(0, 200, 0)
+        // this.add(light1)
+
+        // const light2 = new THREE.DirectionalLight(0xffffff, 1)
+        // light2.position.set(100, 200, 100)
+        // this.add(light2)
+
+        // const light3 = new THREE.DirectionalLight(0xffffff, 1)
+        // light3.position.set(-100, -200, -100)
+        // this.add(light3)
     }
 }

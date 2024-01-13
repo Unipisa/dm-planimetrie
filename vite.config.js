@@ -14,17 +14,16 @@ export default defineConfig(({ mode, command }) => {
     const plugins = [preactPlugin(), rewriteHtmlLinksPlugin(BASE_URL)]
 
     // url to the planimetrie service (no trailing slash)
-    const PLANIMETRIE_API_URL =
-        process.env.PLANIMETRIE_API_URL ||
-        'https://manage.develop.lb.cs.dm.unipi.it/api/v0/process/planimetrie'
-    console.log(`[Vite] Planimetrie URL: ${PLANIMETRIE_API_URL}`)
+    const MANAGE_API_URL =
+        process.env.MANAGE_API_URL || 'https://manage.develop.lb.cs.dm.unipi.it/api/v0'
+    console.log(`[Vite] Manage API: ${MANAGE_API_URL}`)
 
     return {
         base: BASE_URL + '/',
         define: {
             'process.env.NODE_ENV': JSON.stringify(mode),
             'process.env.BASE_URL': JSON.stringify(BASE_URL),
-            'process.env.PLANIMETRIE_API_URL': JSON.stringify(PLANIMETRIE_API_URL),
+            'process.env.MANAGE_API_URL': JSON.stringify(MANAGE_API_URL),
         },
         build: {
             outDir: 'out/',

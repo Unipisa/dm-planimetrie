@@ -28,11 +28,14 @@ const useEndpointRef = key => {
 
     // when the key changes, update the endpoint object mapper
     useEffect(() => {
-        endpointRef.current = createObjectMapper(process.env.PLANIMETRIE_API_URL + '/', {
-            headers: {
-                ['Authorization']: `Bearer ${key}`,
-            },
-        })
+        endpointRef.current = createObjectMapper(
+            process.env.MANAGE_API_URL + '/process/planimetrie/',
+            {
+                headers: {
+                    ['Authorization']: `Bearer ${key}`,
+                },
+            }
+        )
     }, [key])
 
     return endpointRef

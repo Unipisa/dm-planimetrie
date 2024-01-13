@@ -34,6 +34,21 @@ export const recursivelyFlattenGeometry = object3d => {
     }
 }
 
+/**
+ * Recursively traverse all objects
+ *
+ * @param {THREE.Object3D} object3d
+ * @param {(object3d: THREE.Object3D) => void} cb
+ */
+export const recursivelyTraverse = (object3d, cb) => {
+    cb(object3d)
+    object3d.children.forEach(child => recursivelyTraverse(child, cb))
+}
+
+//
+//
+//
+
 window.recursivelyFlattenGeometry = recursivelyFlattenGeometry
 
 /**
@@ -92,8 +107,9 @@ export const makeRenderOnTop = object => {
 
 export const updateRaycasterFromMouseEvent = (raycaster, mouseEvent, camera) => {
     const pointer = new THREE.Vector2()
-    pointer.x = (mouseEvent.clientX / mouseEvent.target.offsetWidth) * 2 - 1
-    pointer.y = -(mouseEvent.clientY / mouseEvent.target.offsetHeight) * 2 + 1
+
+    pointer.x = (mouseEvent.offsetX / mouseEvent.target.offsetWidth) * 2 - 1
+    pointer.y = -(mouseEvent.offsetY / mouseEvent.target.offsetHeight) * 2 + 1
 
     raycaster.setFromCamera(pointer, camera)
 }
