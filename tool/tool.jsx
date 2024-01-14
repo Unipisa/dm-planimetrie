@@ -116,9 +116,6 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
                 />
             </div>
             <div class="buttons">
-                <button class="icon" onClick={close}>
-                    <LuX />
-                </button>
                 <button onClick={() => handleOk()} class="icon primary">
                     <LuCheck />
                 </button>
@@ -128,6 +125,9 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
                     title="Resetta il poligono per questa stanza a vuoto"
                 >
                     <LuTrash />
+                </button>
+                <button class="icon" onClick={close}>
+                    <LuX />
                 </button>
             </div>
             {editingRoom.polygon && (
