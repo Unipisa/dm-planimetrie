@@ -6,7 +6,7 @@ import './styles.scss'
 import { PlanimetriaViewer } from '../src/dm-planimetria/planimetria-next.js'
 import { createObjectMapper } from '../src/lib/mapper.js'
 
-import { LuCheck, LuCross, LuDelete, LuPencil, LuTrash, LuX } from 'react-icons/lu'
+import { LuCheck, LuPencil, LuTrash, LuX } from 'react-icons/lu'
 
 const useLocalState = (key, defaultValue) => {
     const [state, setState] = useState(() => {
