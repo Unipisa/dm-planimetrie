@@ -19,7 +19,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         this.scene = this.#createScene()
 
         // Create renderer
-        this.canvas3d = new Canvas3D(el, this.scene)
+        this.canvas3d = new Canvas3D(el)
         this.canvas3d.addEventListener('click', ({ event }) => this.#onCanvasClick(event))
 
         const updateRaycast = throttle(e => {
@@ -43,6 +43,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
 
         this.canvas3d.camera.position.set(5, 5, 3.5)
 
+        this.canvas3d.setScene(this.scene)
         this.canvas3d.requestRender()
     }
 
@@ -128,7 +129,7 @@ class PlanimetriaRoom extends THREE.Object3D {
     })
 
     static selectedMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffaa33,
+        color: 0xffe332,
         side: THREE.DoubleSide,
         transparent: true,
         opacity: 0.35,

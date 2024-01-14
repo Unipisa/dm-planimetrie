@@ -6,6 +6,8 @@ import './styles.scss'
 import { PlanimetriaViewer } from '../src/dm-planimetria/planimetria-next.js'
 import { createObjectMapper } from '../src/lib/mapper.js'
 
+import { LuCheck, LuCross, LuDelete, LuPencil, LuTrash, LuX } from 'react-icons/lu'
+
 const useLocalState = (key, defaultValue) => {
     const [state, setState] = useState(() => {
         const value = localStorage.getItem(key)
@@ -50,7 +52,7 @@ const Room = ({ room: { notes, code, polygon }, edit }) => {
             </div>
             <div class="buttons">
                 <button class="icon" onClick={edit}>
-                    <div class="material-symbols-outlined">edit</div>
+                    <LuPencil />
                 </button>
             </div>
             {polygon && (
@@ -115,17 +117,17 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
             </div>
             <div class="buttons">
                 <button class="icon" onClick={close}>
-                    <div class="material-symbols-outlined">close</div>
+                    <LuX />
                 </button>
                 <button onClick={() => handleOk()} class="icon primary">
-                    <div class="material-symbols-outlined">check</div>
+                    <LuCheck />
                 </button>
                 <button
                     onClick={() => handleDelete()}
                     class="icon danger"
                     title="Resetta il poligono per questa stanza a vuoto"
                 >
-                    <div class="material-symbols-outlined">delete</div>
+                    <LuTrash />
                 </button>
             </div>
             {editingRoom.polygon && (
@@ -163,10 +165,12 @@ const Sidebar = ({ planimetriaRef }) => {
         // call the API to get the rooms
         const { data: rooms } = await endpointRef.current.get()
         setRooms(
-            rooms.map(room => ({
-                ...room,
-                polygon: room.polygon ? JSON.parse(room.polygon) : null,
-            }))
+            rooms
+                .map(room => ({
+                    ...room,
+                    polygon: room.polygon ? JSON.parse(room.polygon) : null,
+                }))
+                .sort((a, b) => a.code.localeCompare(b.code))
         )
     }
 

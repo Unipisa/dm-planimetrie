@@ -6,22 +6,49 @@ import { onMouseDownWhileStill } from '../lib/utils.js'
 export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
 
-    constructor(el, scene) {
+    #scene = null
+
+    constructor(el) {
         super()
 
         this.el = el
-        this.scene = scene
 
         const { offsetWidth: width, offsetHeight: height } = el
+
         this.camera = new THREE.PerspectiveCamera(90, width / height, 0.01, 1000)
+        this.cameraControls = this.#createCameraControls(this.el, this.camera)
         this.camera.layers.enableAll()
 
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
+    }
 
-        this.#createCameraControls()
+    #renderCanvas() {
+        this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
+        this.renderer.setPixelRatio(2) // for more crisp rendering
+        this.renderer.render(this.#scene, this.camera)
+        this.cameraControls.update()
+    }
+
+    #createCameraControls(el, camera) {
+        const cameraControls = new MapControls(camera, el)
+        cameraControls.addEventListener('change', () => this.requestRender())
+
+        // register a click listener that works nicely with the camera controls
+        onMouseDownWhileStill(el, e => {
+            this.dispatchEvent({
+                type: 'click',
+                event: e,
+            })
+        })
+
+        return cameraControls
     }
 
     requestRender() {
+        if (!this.#scene) {
+            throw new Error(`first you must set a scene`)
+        }
+
         if (!this.#renderRequested) {
             this.#renderRequested = true
 
@@ -32,22 +59,11 @@ export class Canvas3D extends THREE.EventDispatcher {
         }
     }
 
-    #renderCanvas() {
-        this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
-        this.renderer.render(this.scene, this.camera)
-        this.cameraControls.update()
-    }
-
-    #createCameraControls() {
-        this.cameraControls = new MapControls(this.camera, this.el)
-        this.cameraControls.addEventListener('change', () => this.requestRender())
-
-        // register a click listener that works nicely with the camera controls
-        onMouseDownWhileStill(this.el, e => {
-            this.dispatchEvent({
-                type: 'click',
-                event: e,
-            })
-        })
+    // TODO: Is there a better way to organize this? For now this class owns the
+    // camera but the scene can also depend on it like in our situation where
+    // the scene depends on the camera because the Cursor3D needs it to raycast
+    // it's position from the camera viewpoint.
+    setScene(scene) {
+        this.#scene = scene
     }
 }

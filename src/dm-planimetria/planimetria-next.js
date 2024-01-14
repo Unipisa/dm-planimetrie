@@ -26,19 +26,23 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         /** @type {Cursor3D} */
         this.cursorWidget = null
 
-        // Create object graph
-        
-        this.raycaster = this.#createRaycaster()
-        this.scene = this.#createScene(el, this.camera)
-        
         // Create renderer
-        this.canvas3d = new Canvas3D(el, this.scene)
+        this.canvas3d = new Canvas3D(el)
+
+        // Create object graph
+        this.raycaster = this.#createRaycaster()
+        this.scene = this.#createScene(el, this.canvas3d.camera)
+
+        this.canvas3d.camera.position.set(5, 5, 3.5)
+
+        this.canvas3d.setScene(this.scene)
+        this.canvas3d.requestRender()
     }
 
     onCanvasClick(e) {
         if (e.button !== 0) return // discard non-left-click events
 
-        updateRaycasterFromMouseEvent(this.raycaster, e, this.camera)
+        updateRaycasterFromMouseEvent(this.raycaster, e, this.canvas3d.camera)
 
         const { drawState, polygon } = mouseClickReducer(
             { drawState: this.drawState, polygon: this.polygon },
@@ -65,13 +69,13 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         this.#updateState({ drawState, polygon })
     }
 
-    #createCamera({ offsetWidth: width, offsetHeight: height }) {
-        const camera = new THREE.PerspectiveCamera(90, width / height, 0.01, 1000)
-        camera.position.set(0, 0, 10)
-        camera.layers.enableAll()
+    // #createCamera({ offsetWidth: width, offsetHeight: height }) {
+    //     const camera = new THREE.PerspectiveCamera(90, width / height, 0.01, 1000)
+    //     camera.position.set(0, 0, 10)
+    //     camera.layers.enableAll()
 
-        return camera
-    }
+    //     return camera
+    // }
 
     #createRaycaster() {
         const raycaster = new THREE.Raycaster()
@@ -127,11 +131,8 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
         return scene
     }
 
-    //
-    // Public API
-    //
-
     #render() {
+        console.log(this.drawState, this.polygon)
         this.polylineWidget.setPolyline(this.polygon, this.drawState === 'closed')
     }
 
@@ -139,11 +140,15 @@ export class PlanimetriaViewer extends THREE.EventDispatcher {
      * @param {PlanimetriaState} state
      */
     #updateState({ drawState, polygon }) {
-        if (drawState) this.drawState = drawState
-        if (polygon) this.polygon = polygon.map(v => v.clone())
+        if (drawState !== undefined) this.drawState = drawState
+        if (polygon !== undefined) this.polygon = polygon.map(v => v.clone())
 
         this.#render()
     }
+
+    //
+    // Public API
+    //
 
     startEditing() {
         this.#updateState({

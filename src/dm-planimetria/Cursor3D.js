@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
 
 /**
  * A 3D cursor that follows the mouse pointer and uses a raycaster to detect
@@ -41,11 +42,7 @@ export class Cursor3D extends THREE.Object3D {
 
     setupEvents() {
         this.el.addEventListener('pointermove', e => {
-            const pointer = new THREE.Vector2()
-            pointer.x = (e.clientX / this.el.offsetWidth) * 2 - 1
-            pointer.y = -(e.clientY / this.el.offsetHeight) * 2 + 1
-
-            this.raycaster.setFromCamera(pointer, this.camera)
+            updateRaycasterFromMouseEvent(this.raycaster, e, this.camera)
 
             const intersections = this.raycaster.intersectObjects(this.objects, true)
             if (intersections.length > 0) {
@@ -55,7 +52,7 @@ export class Cursor3D extends THREE.Object3D {
                 this.position.copy(intersection.point)
             }
 
-            this.dispatchEvent({ type: 'move', pointer })
+            this.dispatchEvent({ type: 'move' })
         })
     }
 }

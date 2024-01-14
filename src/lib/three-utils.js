@@ -105,6 +105,11 @@ export const makeRenderOnTop = object => {
     object.renderOrder = 1
 }
 
+/**
+ * @param {THREE.Raycaster} raycaster
+ * @param {MouseEvent} mouseEvent
+ * @param {THREE.Camera} camera
+ */
 export const updateRaycasterFromMouseEvent = (raycaster, mouseEvent, camera) => {
     const pointer = new THREE.Vector2()
 

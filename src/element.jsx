@@ -1,6 +1,6 @@
 import { memo } from 'preact/compat'
 
-import { BsLayers, BsSearch } from 'react-icons/bs'
+import { LuLayers, LuSearch } from 'react-icons/lu'
 
 import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
 import './element.scss'
@@ -98,7 +98,7 @@ export const Planimetrie = ({}) => {
                 <div class="search">
                     <input type="text" />
                     <div class="icon">
-                        <BsSearch />
+                        <LuSearch />
                     </div>
                 </div>
                 <div class="sidebar">
@@ -114,7 +114,7 @@ export const Planimetrie = ({}) => {
                 </div>
                 <div class="layer-switcher">
                     <div class="title">
-                        <BsLayers />
+                        <LuLayers />
                         Livelli
                     </div>
                     <div class="layer">
