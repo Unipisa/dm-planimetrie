@@ -110,7 +110,10 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
     #updateSelection() {
         this.#roomsGroup.children.forEach(roomObj => {
             roomObj.setSelected(this.#selectedRooms.has(roomObj.room._id))
+            roomObj.visible ||= roomObj.selected
         })
+
+        this.canvas3d.requestRender()
     }
 }
 

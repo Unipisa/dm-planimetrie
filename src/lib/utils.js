@@ -1,4 +1,5 @@
-import { useState } from 'preact/hooks'
+import Fuse from 'fuse.js'
+import { useEffect, useState } from 'preact/hooks'
 
 /**
  * Helper to throttle a function. The `fn` function will be called at most once
@@ -34,4 +35,22 @@ export const onMouseDownWhileStill = (el, onStillClick) => {
 export const useToggle = initialState => {
     const [value, setValue] = useState(initialState)
     return [value, () => setValue(v => !v)]
+}
+
+export const useFuse = (items, options) => {
+    const [fuse] = useState(() => new Fuse(items, options))
+    const [query, setQuery] = useState('')
+    const [results, setResults] = useState([])
+
+    useEffect(() => {
+        if (fuse) {
+            fuse.setCollection(items)
+        }
+    }, [items])
+
+    useEffect(() => {
+        setResults(fuse.search(query))
+    }, [query])
+
+    return [results, query, setQuery]
 }

@@ -6,7 +6,7 @@ import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
 import './element.scss'
 
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import { useToggle } from './lib/utils.js'
+import { useFuse, useToggle } from './lib/utils.js'
 import { createObjectMapper } from './lib/mapper.js'
 
 // export const usePlanimetrie = () => {
@@ -63,7 +63,7 @@ export const Planimetrie = ({}) => {
 
     useEffect(() => {
         if (planimetrieRef.current && rooms && rooms.length > 0) {
-            console.log('setRooms', rooms)
+            // console.log('setRooms', rooms)
             planimetrieRef.current.setRooms(rooms)
         }
     }, [rooms, planimetrieRef.current])
@@ -91,15 +91,39 @@ export const Planimetrie = ({}) => {
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible] = useToggle(true)
     const [exdmaFloor3Visible, toggleExdmaFloor3Visible] = useToggle(true)
 
+    const [results, query, setQuery] = useFuse(rooms, {
+        includeScore: true,
+        includeMatches: true,
+        keys: ['code', 'notes'],
+    })
+
+    console.log(results)
+
+    const selectId = id => {
+        planimetrieRef.current.toggleRoomSelection(id, true)
+    }
+
     return (
         <div class="dm-planimetrie">
             <Canvas3D planimetrieRef={planimetrieRef} />
             <div class="overlay">
                 <div class="search">
-                    <input type="text" />
-                    <div class="icon">
-                        <LuSearch />
+                    <div class="search-field">
+                        <input type="text" value={query} onInput={e => setQuery(e.target.value)} />
+                        <div class="icon">
+                            <LuSearch />
+                        </div>
                     </div>
+                    {query.trim().length > 0 && (
+                        <div class="search-results">
+                            {results.slice(0, 5).map(({ item: { _id, code, notes } }) => (
+                                <div class="result" onClick={() => selectId(_id)}>
+                                    <div class="code">{code}</div>
+                                    <div class="notes">{notes}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
                 <div class="sidebar">
                     <pre>

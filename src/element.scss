@@ -102,24 +102,82 @@ code {
         }
 
         .search {
+            position: relative;
+
             top: 1rem;
             left: 1rem;
 
             width: calc(100% - 30% - 2rem);
             height: 2.25rem;
 
-            border-radius: 0.3rem;
+            .search-field {
+                position: relative;
 
-            border: 1px solid #d8d8d8;
-            box-shadow: 0 0 1rem #00000010;
-            background: #fff;
+                border: 1px solid #d8d8d8;
+                box-shadow: 0 0 1rem #00000010;
+                background: #fff;
 
-            display: flex;
+                border-radius: 0.3rem;
 
-            input[type='text'] {
-                border: none;
-                height: 100%;
-                font-size: 18px;
+                display: flex;
+
+                z-index: 2;
+
+                input[type='text'] {
+                    border: none;
+                    font-size: 18px;
+                }
+            }
+
+            .search-results {
+                position: absolute;
+                width: 100%;
+                top: calc(100% - 1px);
+
+                z-index: 1;
+
+                border: 1px solid #d8d8d8;
+                box-shadow: 0 0 1rem #00000010;
+                background: #fff;
+                border-bottom-left-radius: 0.3rem;
+                border-bottom-right-radius: 0.3rem;
+
+                display: flex;
+                flex-direction: column;
+
+                overflow: hidden;
+
+                .result {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+
+                    gap: 0.5rem;
+
+                    padding: 0.5rem 0.35rem;
+
+                    cursor: pointer;
+
+                    &:hover {
+                        background: #f4f4f4;
+                    }
+
+                    .code {
+                        font-family: 'Source Code Pro', monospace;
+                        font-size: 15px;
+                        line-height: 1;
+
+                        padding: 0.25rem;
+
+                        border: 1px solid #ddd;
+
+                        border-radius: 0.25rem;
+
+                        user-select: all;
+                    }
+                    .notes {
+                    }
+                }
             }
         }
 
