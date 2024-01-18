@@ -9,24 +9,22 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useFuse, useToggle } from './lib/utils.js'
 import { createObjectMapper } from './lib/mapper.js'
 
-// export const usePlanimetrie = () => {
-//     const planimetriaRef = useRef(null)
+const HighlightedText = ({ indices, value }) => {
+    const parts = []
+    let lastIndex = 0
 
-//     return {
-//         mount: $canvas => {
-//             planimetriaRef.current = new PlanimetriaViewer($canvas, {
-//                 onRoomClick(code) {
-//                     console.log('onRoomClick', code)
-//                 },
-//             })
-//         },
-//         setHighlightedRooms: (ids) => {
-//             planimetriaRef.current.highlightRoom(code)
-//         },
-//     }
-// }
+    for (const [start, end] of indices) {
+        parts.push({ text: value.slice(lastIndex, start), highlight: false })
+        parts.push({ text: value.slice(start, end + 1), highlight: true })
+        lastIndex = end + 1
+    }
 
-// export const Planimetrie = ({ planimetria, onRoomClick }) => {
+    parts.push({ text: value.slice(lastIndex), highlight: false })
+
+    return parts.map(({ text, highlight }) => (
+        <span class={highlight ? 'highlight' : ''}>{text}</span>
+    ))
+}
 
 const Canvas3D = memo(({ planimetrieRef }) => {
     return (
@@ -63,7 +61,6 @@ export const Planimetrie = ({}) => {
 
     useEffect(() => {
         if (planimetrieRef.current && rooms && rooms.length > 0) {
-            // console.log('setRooms', rooms)
             planimetrieRef.current.setRooms(rooms)
         }
     }, [rooms, planimetrieRef.current])
@@ -116,12 +113,38 @@ export const Planimetrie = ({}) => {
                     </div>
                     {query.trim().length > 0 && (
                         <div class="search-results">
-                            {results.slice(0, 5).map(({ item: { _id, code, notes } }) => (
-                                <div class="result" onClick={() => selectId(_id)}>
-                                    <div class="code">{code}</div>
-                                    <div class="notes">{notes}</div>
-                                </div>
-                            ))}
+                            {results.slice(0, 5).map(({ item: { _id, code, notes }, matches }) => {
+                                const codeIndices = matches.find(
+                                    ({ key }) => key === 'code'
+                                )?.indices
+                                const notesIndices = matches.find(
+                                    ({ key }) => key === 'notes'
+                                )?.indices
+                                return (
+                                    <div class="result" onClick={() => selectId(_id)}>
+                                        <div class="code">
+                                            {codeIndices ? (
+                                                <HighlightedText
+                                                    indices={codeIndices}
+                                                    value={code}
+                                                />
+                                            ) : (
+                                                code
+                                            )}
+                                        </div>
+                                        <div class="notes">
+                                            {notesIndices ? (
+                                                <HighlightedText
+                                                    indices={notesIndices}
+                                                    value={notes}
+                                                />
+                                            ) : (
+                                                notes
+                                            )}
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                     )}
                 </div>
