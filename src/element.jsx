@@ -94,8 +94,6 @@ export const Planimetrie = ({}) => {
         keys: ['code', 'notes'],
     })
 
-    console.log(results)
-
     const selectId = id => {
         planimetrieRef.current.toggleRoomSelection(id, true)
     }
@@ -176,10 +174,10 @@ export const Planimetrie = ({}) => {
                         </div>
                         <div class="children">
                             {[
-                                { value: dipFloor1Visible, toggle: toggleDipFloor1Visible },
-                                { value: dipFloor2Visible, toggle: toggleDipFloor2Visible },
-                                { value: dipFloor3Visible, toggle: toggleDipFloor3Visible },
-                            ].map(({ value, toggle }, i) => (
+                                { text: 'Piano Terra', value: dipFloor1Visible, toggle: toggleDipFloor1Visible },
+                                { text: '1° Piano', value: dipFloor2Visible, toggle: toggleDipFloor2Visible },
+                                { text: '2° Piano', value: dipFloor3Visible, toggle: toggleDipFloor3Visible },
+                            ].map(({ text, value, toggle }, i) => (
                                 <div class="row">
                                     <input
                                         type="checkbox"
@@ -188,7 +186,7 @@ export const Planimetrie = ({}) => {
                                         onInput={() => toggle()}
                                         disabled={!dipVisible}
                                     />
-                                    <label for={`dm-floor-${i + 1}`}>Piano {i + 1}</label>
+                                    <label for={`dm-floor-${i + 1}`}>{text}</label>
                                 </div>
                             ))}
                         </div>
@@ -205,10 +203,10 @@ export const Planimetrie = ({}) => {
                         </div>
                         <div class="children">
                             {[
-                                { value: exdmaFloor1Visible, toggle: toggleExdmaFloor1Visible },
-                                { value: exdmaFloor2Visible, toggle: toggleExdmaFloor2Visible },
-                                { value: exdmaFloor3Visible, toggle: toggleExdmaFloor3Visible },
-                            ].map(({ value, toggle }, i) => (
+                                { text: 'Piano Terra', value: exdmaFloor1Visible, toggle: toggleExdmaFloor1Visible },
+                                { text: '1° Piano', value: exdmaFloor2Visible, toggle: toggleExdmaFloor2Visible },
+                                { text: '2° Piano', value: exdmaFloor3Visible, toggle: toggleExdmaFloor3Visible },
+                            ].map(({ text, value, toggle }, i) => (
                                 <div class="row">
                                     <input
                                         type="checkbox"
@@ -217,7 +215,7 @@ export const Planimetrie = ({}) => {
                                         onInput={() => toggle()}
                                         disabled={!exdmaVisible}
                                     />
-                                    <label for={`exdma-floor-${i + 1}`}>Piano {i + 1}</label>
+                                    <label for={`exdma-floor-${i + 1}`}>{text}</label>
                                 </div>
                             ))}
                         </div>
