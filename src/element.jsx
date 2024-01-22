@@ -1,3 +1,4 @@
+import register from 'preact-custom-element'
 import { memo } from 'preact/compat'
 
 import { LuLayers, LuSearch } from 'react-icons/lu'
@@ -8,6 +9,7 @@ import './element.scss'
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useFuse, useToggle } from './lib/utils.js'
 import { createObjectMapper } from './lib/mapper.js'
+import { render } from 'preact'
 
 const HighlightedText = ({ indices, value }) => {
     const parts = []
@@ -225,3 +227,20 @@ export const Planimetrie = ({}) => {
         </div>
     )
 }
+
+window.customElements.define('dm-planimetrie', PlanimetrieElement, { shadow: true })
+
+class PlanimetrieElement extends HTMLElement {
+    constructor() {
+        this.attachShadow({ mode: 'open' })
+    }
+
+    connectedCallback() {
+        render(<Planimetrie selectedRooms={[]} />, this.shadowRoot)
+    }
+
+    selectRooms(ids) {
+        render(<Planimetrie selectedRooms={ids} />, this.shadowRoot)
+    }
+}
+

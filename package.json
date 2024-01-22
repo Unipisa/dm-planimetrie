@@ -6,7 +6,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "build:library": "vite build -c vite-library.config.js"
     },
     "author": "Antonio De Lucreziis",
     "license": "MIT",
@@ -21,6 +22,7 @@
         "@preact/signals": "^1.2.2",
         "fuse.js": "^7.0.0",
         "preact": "^10.19.2",
+        "preact-custom-element": "^4.3.0",
         "react-icons": "^5.0.1",
         "three": "^0.158.0"
     }
