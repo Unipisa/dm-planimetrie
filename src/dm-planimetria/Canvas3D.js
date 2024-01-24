@@ -30,9 +30,9 @@ export class Canvas3D extends THREE.EventDispatcher {
 
     #renderCanvas() {
         this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
-        this.renderer.setPixelRatio(2) // for more crisp rendering
-        this.renderer.render(this.#scene, this.camera)
+        this.renderer.setPixelRatio(2) // for crispier rendering
         this.cameraControls.update()
+        this.renderer.render(this.#scene, this.camera)
     }
 
     #createCameraControls(el, camera) {

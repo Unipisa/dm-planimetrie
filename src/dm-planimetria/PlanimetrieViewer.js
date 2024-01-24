@@ -6,6 +6,12 @@ import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { Canvas3D } from './Canvas3D.js'
 import { throttle } from '../lib/utils.js'
 
+const computeBarycenter = object3d => {
+    const box = new THREE.Box3().setFromObject(object3d)
+    const barycenter = new THREE.Vector3()
+    return box.getCenter(barycenter)
+}
+
 export class PlanimetrieViewer extends THREE.EventDispatcher {
     /** @type {THREE.Group} */
     #roomsGroup = null
@@ -112,6 +118,27 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
             roomObj.setSelected(this.#selectedRooms.has(roomObj.room._id))
             roomObj.visible ||= roomObj.selected
         })
+
+        let barycenter = new THREE.Vector3()
+        this.#roomsGroup.children
+            .filter(roomObj => roomObj.selected)
+            .forEach(roomObj => barycenter.add(roomObj.position))
+
+        barycenter.divideScalar(this.#selectedRooms.size)
+
+        const maxDistance = this.#roomsGroup.children
+            .filter(roomObj => roomObj.selected)
+            .reduce(
+                (max, roomObj) => Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
+                0
+            )
+
+        this.canvas3d.camera.position.copy(
+            barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
+        )
+
+        this.canvas3d.camera.lookAt(barycenter)
+        this.canvas3d.camera.updateProjectionMatrix()
 
         this.canvas3d.requestRender()
     }
