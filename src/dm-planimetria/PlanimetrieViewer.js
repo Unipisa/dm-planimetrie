@@ -6,8 +6,8 @@ import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { Canvas3D } from './Canvas3D.js'
 import { throttle } from '../lib/utils.js'
 
-const computeBarycenter = object3d => {
-    const box = new THREE.Box3().setFromObject(object3d)
+const computeBarycenter = roomObj => {
+    const box = new THREE.Box3().setFromPoints(roomObj.room.polygon)
     const barycenter = new THREE.Vector3()
     return box.getCenter(barycenter)
 }
@@ -119,26 +119,31 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
             roomObj.visible ||= roomObj.selected
         })
 
-        let barycenter = new THREE.Vector3()
-        this.#roomsGroup.children
-            .filter(roomObj => roomObj.selected)
-            .forEach(roomObj => barycenter.add(roomObj.position))
+        if (this.#selectedRooms.size > 0) {
+            let barycenter = new THREE.Vector3()
+            this.#roomsGroup.children
+                .filter(roomObj => roomObj.selected)
+                .forEach(roomObj => barycenter.add(roomObj.position))
 
-        barycenter.divideScalar(this.#selectedRooms.size)
+            barycenter.divideScalar(this.#selectedRooms.size)
 
-        const maxDistance = this.#roomsGroup.children
-            .filter(roomObj => roomObj.selected)
-            .reduce(
-                (max, roomObj) => Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
-                0
+            console.log(this.#roomsGroup.children[0])
+
+            const maxDistance = this.#roomsGroup.children
+                .filter(roomObj => roomObj.selected)
+                .reduce(
+                    (max, roomObj) =>
+                        Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
+                    0.5
+                )
+
+            this.canvas3d.camera.position.copy(
+                barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
             )
 
-        this.canvas3d.camera.position.copy(
-            barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
-        )
-
-        this.canvas3d.camera.lookAt(barycenter)
-        this.canvas3d.camera.updateProjectionMatrix()
+            console.log(barycenter)
+            this.canvas3d.camera.lookAt(barycenter)
+        }
 
         this.canvas3d.requestRender()
     }
