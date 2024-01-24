@@ -22,8 +22,8 @@ jobs:
             url: ${{ steps.deployment.outputs.page_url }}
         runs-on: ubuntu-latest
         env:
-            BASE_URL: /dm-planimetrie
-            PLANIMETRIE_API_URL: https://manage.develop.lb.cs.dm.unipi.it/api/v0/process/planimetrie
+            BASE_URL: https://unipisa.github.io/dm-planimetrie
+            MANAGE_API_URL: https://manage.develop.lb.cs.dm.unipi.it/api/v0
         steps:
             - name: Checkout
               uses: actions/checkout@v3

@@ -65,3 +65,28 @@ function planimetrie_shortcode( $atts ) {
 
 add_shortcode('planimetrie', 'planimetrie_shortcode');
 ```
+
+```js
+const element = document.querySelector('dm-planimetrie');
+element.setSelection(['id1', 'id2', 'id3']);
+```
+
+## React Usage (dm-manager?)
+
+```jsx
+const PlanimetrieWrapper = () => {
+    const ref = useRef(null);
+    const [selectedIds, setSelectedIds] = useState([]);
+
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.setSelection(selectedIds);
+        }
+    }, [selectedIds]);
+
+    return (
+        <dm-planimetrie ref={ref}> />
+    );
+};
+
+```

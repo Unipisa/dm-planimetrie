@@ -262,9 +262,7 @@ export const Planimetrie = ({}) => {
     )
 }
 
-window.customElements.define('dm-planimetrie', PlanimetrieElement, { shadow: true })
-
-class PlanimetrieElement extends HTMLElement {
+export class PlanimetrieElement extends HTMLElement {
     constructor() {
         this.attachShadow({ mode: 'open' })
     }
@@ -289,3 +287,5 @@ class PlanimetrieElement extends HTMLElement {
         this.#render({ selectedIds })
     }
 }
+
+window.customElements.define('dm-planimetrie', PlanimetrieElement, { shadow: true })

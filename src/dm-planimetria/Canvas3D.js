@@ -65,8 +65,6 @@ export class Canvas3D extends THREE.EventDispatcher {
             throw new Error(`first you must set a scene`)
         }
 
-        console.log('rendering')
-
         if (!this.#renderRequested) {
             this.#renderRequested = true
 
