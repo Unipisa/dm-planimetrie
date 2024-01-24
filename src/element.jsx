@@ -270,10 +270,22 @@ class PlanimetrieElement extends HTMLElement {
     }
 
     connectedCallback() {
-        render(<Planimetrie selectedRooms={[]} />, this.shadowRoot)
+        // initial selection is passed as query string as ?s=<id1>&s=<id2>&...
+        const url = new URL(location.href)
+        const initialSelection = url.searchParams.getAll('s')
+
+        this.#render({ selectedIds: initialSelection })
     }
 
-    selectRooms(ids) {
-        render(<Planimetrie selectedRooms={ids} />, this.shadowRoot)
+    #render({ selectedIds }) {
+        render(<Planimetrie selectedRooms={selectedIds} />, this.shadowRoot)
+    }
+
+    /**
+     * @param {string[]} selectedIds
+     * @returns {void}
+     */
+    setSelection(selectedIds) {
+        this.#render({ selectedIds })
     }
 }
