@@ -6,7 +6,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "npm run build:pages && npm run build:library",
+        "build:pages": "vite build -c vite.config.js",
         "build:library": "vite build -c vite-library.config.js"
     },
     "author": "Antonio De Lucreziis",
