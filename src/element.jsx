@@ -4,7 +4,8 @@ import { memo } from 'preact/compat'
 import { LuLayers, LuSearch } from 'react-icons/lu'
 
 import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
-import './element.scss'
+
+import styles from './element.scss?inline'
 
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { useFuse, useToggle } from './lib/utils.js'
@@ -101,130 +102,163 @@ export const Planimetrie = ({}) => {
     }
 
     return (
-        <div class="dm-planimetrie">
-            <Canvas3D planimetrieRef={planimetrieRef} />
-            <div class="overlay">
-                <div class="search">
-                    <div class="search-field">
-                        <input type="text" value={query} onInput={e => setQuery(e.target.value)} />
-                        <div class="icon">
-                            <LuSearch />
+        <>
+            <style>{styles}</style>
+            <div class="dm-planimetrie">
+                <Canvas3D planimetrieRef={planimetrieRef} />
+                <div class="overlay">
+                    <div class="search">
+                        <div class="search-field">
+                            <input
+                                type="text"
+                                value={query}
+                                onInput={e => setQuery(e.target.value)}
+                            />
+                            <div class="icon">
+                                <LuSearch />
+                            </div>
                         </div>
+                        {query.trim().length > 0 && (
+                            <div class="search-results">
+                                {results
+                                    .slice(0, 5)
+                                    .map(({ item: { _id, code, notes }, matches }) => {
+                                        const codeIndices = matches.find(
+                                            ({ key }) => key === 'code'
+                                        )?.indices
+                                        const notesIndices = matches.find(
+                                            ({ key }) => key === 'notes'
+                                        )?.indices
+                                        return (
+                                            <div class="result" onClick={() => selectId(_id)}>
+                                                <div class="code">
+                                                    {codeIndices ? (
+                                                        <HighlightedText
+                                                            indices={codeIndices}
+                                                            value={code}
+                                                        />
+                                                    ) : (
+                                                        code
+                                                    )}
+                                                </div>
+                                                <div class="notes">
+                                                    {notesIndices ? (
+                                                        <HighlightedText
+                                                            indices={notesIndices}
+                                                            value={notes}
+                                                        />
+                                                    ) : (
+                                                        notes
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                            </div>
+                        )}
                     </div>
-                    {query.trim().length > 0 && (
-                        <div class="search-results">
-                            {results.slice(0, 5).map(({ item: { _id, code, notes }, matches }) => {
-                                const codeIndices = matches.find(
-                                    ({ key }) => key === 'code'
-                                )?.indices
-                                const notesIndices = matches.find(
-                                    ({ key }) => key === 'notes'
-                                )?.indices
-                                return (
-                                    <div class="result" onClick={() => selectId(_id)}>
-                                        <div class="code">
-                                            {codeIndices ? (
-                                                <HighlightedText
-                                                    indices={codeIndices}
-                                                    value={code}
-                                                />
-                                            ) : (
-                                                code
-                                            )}
-                                        </div>
-                                        <div class="notes">
-                                            {notesIndices ? (
-                                                <HighlightedText
-                                                    indices={notesIndices}
-                                                    value={notes}
-                                                />
-                                            ) : (
-                                                notes
-                                            )}
-                                        </div>
+                    <div class="sidebar">
+                        <pre>
+                            <code>
+                                {JSON.stringify(
+                                    rooms.filter(({ _id }) => selection.has(_id)),
+                                    null,
+                                    2
+                                )}
+                            </code>
+                        </pre>
+                    </div>
+                    <div class="layer-switcher">
+                        <div class="title">
+                            <LuLayers />
+                            Livelli
+                        </div>
+                        <div class="layer">
+                            <div class="row">
+                                <input
+                                    type="checkbox"
+                                    id="building-dm"
+                                    checked={dipVisible}
+                                    onInput={() => toggleDipVisible()}
+                                />
+                                <label for="building-dm">Dip</label>
+                            </div>
+                            <div class="children">
+                                {[
+                                    {
+                                        text: 'Piano Terra',
+                                        value: dipFloor1Visible,
+                                        toggle: toggleDipFloor1Visible,
+                                    },
+                                    {
+                                        text: '1° Piano',
+                                        value: dipFloor2Visible,
+                                        toggle: toggleDipFloor2Visible,
+                                    },
+                                    {
+                                        text: '2° Piano',
+                                        value: dipFloor3Visible,
+                                        toggle: toggleDipFloor3Visible,
+                                    },
+                                ].map(({ text, value, toggle }, i) => (
+                                    <div class="row">
+                                        <input
+                                            type="checkbox"
+                                            id={`dm-floor-${i + 1}`}
+                                            checked={value}
+                                            onInput={() => toggle()}
+                                            disabled={!dipVisible}
+                                        />
+                                        <label for={`dm-floor-${i + 1}`}>{text}</label>
                                     </div>
-                                )
-                            })}
+                                ))}
+                            </div>
                         </div>
-                    )}
-                </div>
-                <div class="sidebar">
-                    <pre>
-                        <code>
-                            {JSON.stringify(
-                                rooms.filter(({ _id }) => selection.has(_id)),
-                                null,
-                                2
-                            )}
-                        </code>
-                    </pre>
-                </div>
-                <div class="layer-switcher">
-                    <div class="title">
-                        <LuLayers />
-                        Livelli
-                    </div>
-                    <div class="layer">
-                        <div class="row">
-                            <input
-                                type="checkbox"
-                                id="building-dm"
-                                checked={dipVisible}
-                                onInput={() => toggleDipVisible()}
-                            />
-                            <label for="building-dm">Dip</label>
-                        </div>
-                        <div class="children">
-                            {[
-                                { text: 'Piano Terra', value: dipFloor1Visible, toggle: toggleDipFloor1Visible },
-                                { text: '1° Piano', value: dipFloor2Visible, toggle: toggleDipFloor2Visible },
-                                { text: '2° Piano', value: dipFloor3Visible, toggle: toggleDipFloor3Visible },
-                            ].map(({ text, value, toggle }, i) => (
-                                <div class="row">
-                                    <input
-                                        type="checkbox"
-                                        id={`dm-floor-${i + 1}`}
-                                        checked={value}
-                                        onInput={() => toggle()}
-                                        disabled={!dipVisible}
-                                    />
-                                    <label for={`dm-floor-${i + 1}`}>{text}</label>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    <div class="layer">
-                        <div class="row">
-                            <input
-                                type="checkbox"
-                                id="building-exdma"
-                                checked={exdmaVisible}
-                                onInput={() => toggleExdmaVisible()}
-                            />
-                            <label for="building-exdma">Ex-DMA</label>
-                        </div>
-                        <div class="children">
-                            {[
-                                { text: 'Piano Terra', value: exdmaFloor1Visible, toggle: toggleExdmaFloor1Visible },
-                                { text: '1° Piano', value: exdmaFloor2Visible, toggle: toggleExdmaFloor2Visible },
-                                { text: '2° Piano', value: exdmaFloor3Visible, toggle: toggleExdmaFloor3Visible },
-                            ].map(({ text, value, toggle }, i) => (
-                                <div class="row">
-                                    <input
-                                        type="checkbox"
-                                        id={`exdma-floor-${i + 1}`}
-                                        checked={value}
-                                        onInput={() => toggle()}
-                                        disabled={!exdmaVisible}
-                                    />
-                                    <label for={`exdma-floor-${i + 1}`}>{text}</label>
-                                </div>
-                            ))}
+                        <div class="layer">
+                            <div class="row">
+                                <input
+                                    type="checkbox"
+                                    id="building-exdma"
+                                    checked={exdmaVisible}
+                                    onInput={() => toggleExdmaVisible()}
+                                />
+                                <label for="building-exdma">Ex-DMA</label>
+                            </div>
+                            <div class="children">
+                                {[
+                                    {
+                                        text: 'Piano Terra',
+                                        value: exdmaFloor1Visible,
+                                        toggle: toggleExdmaFloor1Visible,
+                                    },
+                                    {
+                                        text: '1° Piano',
+                                        value: exdmaFloor2Visible,
+                                        toggle: toggleExdmaFloor2Visible,
+                                    },
+                                    {
+                                        text: '2° Piano',
+                                        value: exdmaFloor3Visible,
+                                        toggle: toggleExdmaFloor3Visible,
+                                    },
+                                ].map(({ text, value, toggle }, i) => (
+                                    <div class="row">
+                                        <input
+                                            type="checkbox"
+                                            id={`exdma-floor-${i + 1}`}
+                                            checked={value}
+                                            onInput={() => toggle()}
+                                            disabled={!exdmaVisible}
+                                        />
+                                        <label for={`exdma-floor-${i + 1}`}>{text}</label>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 
@@ -243,4 +277,3 @@ class PlanimetrieElement extends HTMLElement {
         render(<Planimetrie selectedRooms={ids} />, this.shadowRoot)
     }
 }
-
