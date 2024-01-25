@@ -127,21 +127,18 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
 
             barycenter.divideScalar(this.#selectedRooms.size)
 
-            console.log(this.#roomsGroup.children[0])
-
             const maxDistance = this.#roomsGroup.children
                 .filter(roomObj => roomObj.selected)
                 .reduce(
                     (max, roomObj) =>
                         Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
-                    0.5
+                    2
                 )
 
             this.canvas3d.camera.position.copy(
                 barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
             )
 
-            console.log(barycenter)
             this.canvas3d.camera.lookAt(barycenter)
         }
 
