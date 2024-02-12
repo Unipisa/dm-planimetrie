@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 
 import './styles.scss'
 
-import { PlanimetriaTool } from '../src/dm-planimetria/PlanimetrieTool.js'
+import { PlanimetrieTool } from '../src/dm-planimetria/PlanimetrieTool.js'
 import { createObjectMapper } from '../src/lib/mapper.js'
 
 import { LuCheck, LuPencil, LuTrash, LuX } from 'react-icons/lu'
@@ -143,7 +143,7 @@ export const CanvasPlanimetria = ({ planimetriaRef }) => {
     return (
         <canvas
             ref={$canvas => {
-                planimetriaRef.current = new PlanimetriaTool($canvas)
+                planimetriaRef.current = new PlanimetrieTool($canvas)
             }}
         />
     )

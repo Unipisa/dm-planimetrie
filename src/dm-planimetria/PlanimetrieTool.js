@@ -14,7 +14,7 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
     /** @type {THREE.Vector3[]} */
     polygon = []
 
-    constructor() {
+    constructor(el) {
         super()
 
         // Create renderer
