@@ -266,7 +266,7 @@ export class PlanimetrieElement extends HTMLElement {
     constructor() {
         super()
         this.style.display = 'block'
-        this.style.height = '800px'
+        this.style.height = '720px'
         this.style.maxHeight = '100%'
         this.attachShadow({ mode: 'open' })
     }
