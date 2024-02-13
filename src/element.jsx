@@ -264,6 +264,8 @@ export const Planimetrie = ({}) => {
 
 export class PlanimetrieElement extends HTMLElement {
     constructor() {
+        super()
+
         this.attachShadow({ mode: 'open' })
     }
 
