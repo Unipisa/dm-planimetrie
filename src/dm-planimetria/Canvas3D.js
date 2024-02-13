@@ -105,7 +105,7 @@ export class Canvas3D extends THREE.EventDispatcher {
 
         const raycaster = new THREE.Raycaster()
         raycaster.layers.mask = layers.mask
-        raycaster.setFromCamera(this.#rescaledMousePosition, camera)
+        raycaster.setFromCamera(this.#rescaledMousePosition, this.camera)
 
         return raycaster.intersectObject(object, recursive)
     }
@@ -129,7 +129,7 @@ export class Canvas3D extends THREE.EventDispatcher {
 
         const raycaster = new THREE.Raycaster()
         raycaster.layers.mask = layers.mask
-        raycaster.setFromCamera(this.#rescaledMousePosition, camera)
+        raycaster.setFromCamera(this.#rescaledMousePosition, this.camera)
 
         return raycaster.intersectObjects(objects, recursive)
     }
