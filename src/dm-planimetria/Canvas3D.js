@@ -73,6 +73,11 @@ export class Canvas3D extends THREE.EventDispatcher {
         const oldPosition = this.camera.position.clone()
         const oldTarget = this.cameraControls.target.clone()
 
+        if (oldPosition.distanceTo(position) < 1e-3 && oldTarget.distanceTo(target) < 1e-3) {
+            this.moveCamera(position, target)
+            return
+        }
+
         const startTime = new Date().getTime()
 
         // custom easing function, "fast then slow"

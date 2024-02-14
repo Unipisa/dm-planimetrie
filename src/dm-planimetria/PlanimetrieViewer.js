@@ -151,6 +151,8 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
                 )
 
             const dir = this.canvas3d.camera.position.clone().sub(barycenter).normalize()
+            dir.y = Math.max(0.5, dir.y)
+            dir.normalize()
 
             const newPosition = barycenter.clone().add(dir.multiplyScalar(maxDistance))
             const newTarget = barycenter.clone()
