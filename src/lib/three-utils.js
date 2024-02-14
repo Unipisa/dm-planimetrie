@@ -5,12 +5,14 @@ import * as THREE from 'three'
  *
  * @param {THREE.Object3D} object3d
  */
-export const recursivelyRemoveLineSegments = object3d => {
+export const colorizeLineSegments = object3d => {
     if (object3d.isLineSegments) {
-        object3d.parent.remove(object3d)
+        object3d.material = new THREE.LineBasicMaterial({
+            color: 0x000000
+        });
     } else {
         object3d.children.forEach(child => {
-            recursivelyRemoveLineSegments(child)
+            colorizeLineSegments(child)
         })
     }
 }

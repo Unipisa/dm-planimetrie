@@ -1,6 +1,6 @@
 import { memo } from 'preact/compat'
 
-import { LuLayers, LuSearch } from 'react-icons/lu'
+import { LuHelpCircle, LuInfo, LuLayers, LuSearch } from 'react-icons/lu'
 
 import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
 
@@ -171,16 +171,18 @@ export const Planimetrie = ({}) => {
                             </div>
                         )}
                     </div>
-                    <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden')}>
-                        <pre>
-                            <code>
-                                {JSON.stringify(
-                                    rooms.filter(({ _id }) => selection.has(_id)),
-                                    null,
-                                    2
-                                )}
-                            </code>
-                        </pre>
+                    <div className="sidebar-container">
+                        <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden')}>
+                            <pre>
+                                <code>
+                                    {JSON.stringify(
+                                        rooms.filter(({ _id }) => selection.has(_id)),
+                                        null,
+                                        2
+                                    )}
+                                </code>
+                            </pre>
+                        </div>
                     </div>
                     <div class="layer-switcher">
                         <div class="title">
@@ -275,8 +277,11 @@ export const Planimetrie = ({}) => {
                         </div>
                     </div>
                     <div className="help-message">
-                        Clicca e trascina per spostarti, trascina col tasto destro per orbitare e
-                        usa la rotellina del mouse per zoomare.
+                        <LuHelpCircle />
+                        <span>
+                            Clicca e trascina per spostarti, trascina col tasto destro per orbitare
+                            e usa la rotellina del mouse per zoomare.
+                        </span>
                     </div>
                 </div>
             </div>

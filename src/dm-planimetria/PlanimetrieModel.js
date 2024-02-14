@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
 import {
     recursivelyFlattenGeometry,
-    recursivelyRemoveLineSegments,
+    colorizeLineSegments,
     recursivelyTraverse,
 } from '../lib/three-utils.js'
 
@@ -12,7 +12,7 @@ const loadModelDM = cb => {
     loader.load(`${process.env.BASE_URL}/dm.dae`, collada => {
         const dm = collada.scene.children[0]
 
-        recursivelyRemoveLineSegments(dm)
+        colorizeLineSegments(dm)
         // recursivelyTraverse(dm, object3d => {
         //     if (object3d instanceof THREE.Mesh) {
         //         if (Array.isArray(object3d.material)) {

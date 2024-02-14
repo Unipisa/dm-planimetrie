@@ -157,11 +157,12 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
             const newTarget = barycenter.clone()
             const startTime = new Date().getTime()
 
-            const duration = 500
+            const duration = 750
+            const f = t => t * (2 - t)
 
             const updateCamera = t => {
-                const lerpedPos = oldPosition.clone().lerp(newPosition, t)
-                const lerpedTarget = oldTarget.clone().lerp(newTarget, t)
+                const lerpedPos = oldPosition.clone().lerp(newPosition, f(f(t)))
+                const lerpedTarget = oldTarget.clone().lerp(newTarget, f(f(t)))
                 this.canvas3d.moveCamera(lerpedPos, lerpedTarget)
             }
 
