@@ -147,12 +147,16 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
                 .reduce(
                     (max, roomObj) =>
                         Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
-                    1.5
+                    1.0
                 )
 
-            const dir = this.canvas3d.camera.position.clone().sub(barycenter).normalize()
-            dir.y = Math.max(0.5, dir.y)
-            dir.normalize()
+            const dir = this.canvas3d.camera.position
+                .clone()
+                .sub(barycenter)
+                .setComponent(1, 0)
+                .normalize()
+                .setComponent(1, Math.tan(Math.PI / 4))
+                .normalize()
 
             const newPosition = barycenter.clone().add(dir.multiplyScalar(maxDistance))
             const newTarget = barycenter.clone()
