@@ -8,6 +8,8 @@ $unipi-400: mix($unipi-500, #fff, $weight: 10%);
     --unipi-300: #{$unipi-300};
     --unipi-400: #{$unipi-400};
     --unipi-500: #{$unipi-500};
+
+    --border-radius: 0.3rem;
 }
 
 *,
@@ -90,6 +92,15 @@ code {
     font-family: monospace;
 }
 
+.panel-card {
+    // border: 1px solid #d8d8d8;
+
+    border: 2px solid var(--unipi-500);
+    box-shadow: 0 0 1rem #00000020;
+    background: #fff;
+    border-radius: 2px;
+}
+
 .dm-planimetrie {
     display: grid;
 
@@ -134,11 +145,7 @@ code {
             .search-field {
                 position: relative;
 
-                border: 1px solid #d8d8d8;
-                box-shadow: 0 0 1rem #00000010;
-                background: #fff;
-
-                border-radius: 0.3rem;
+                @extend .panel-card;
 
                 display: flex;
 
@@ -157,11 +164,10 @@ code {
 
                 z-index: 1;
 
-                border: 1px solid #d8d8d8;
-                box-shadow: 0 0 1rem #00000010;
-                background: #fff;
-                border-bottom-left-radius: 0.3rem;
-                border-bottom-right-radius: 0.3rem;
+                @extend .panel-card;
+
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
 
                 display: flex;
                 flex-direction: column;
@@ -220,11 +226,11 @@ code {
             padding: 0.75rem;
             padding-right: 1.5rem;
 
-            border-radius: 0.3rem;
+            @extend .panel-card;
 
-            border: 1px solid #d8d8d8;
-            box-shadow: 0 0 1rem #00000010;
-            background: #fff;
+            background: var(--unipi-500);
+            color: #fff;
+            border: none;
 
             display: flex;
             flex-direction: column;
@@ -289,9 +295,12 @@ code {
             width: 30%;
             height: 100%;
 
-            background: #fff;
-            border-left: 1px solid #d8d8d8;
-            box-shadow: 0 0 1rem #00000010;
+            @extend .panel-card;
+            border-radius: 0;
+
+            border-right: none;
+            border-top: none;
+            border-bottom: none;
 
             overflow: auto;
 
