@@ -8,7 +8,7 @@ import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
 import styles from './element.scss?inline'
 
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import { useFuse, useToggle } from './lib/utils.js'
+import { clsx, useFuse, useToggle } from './lib/utils.js'
 import { createObjectMapper } from './lib/mapper.js'
 import { render } from 'preact'
 
@@ -107,7 +107,7 @@ export const Planimetrie = ({}) => {
             <div class="dm-planimetrie">
                 <Canvas3D planimetrieRef={planimetrieRef} />
                 <div class="overlay">
-                    <div class="search">
+                    <div class={clsx('search', selection.size > 0 ? 'contracted' : 'expanded')}>
                         <div class="search-field">
                             <input
                                 type="text"
@@ -157,7 +157,7 @@ export const Planimetrie = ({}) => {
                             </div>
                         )}
                     </div>
-                    <div class="sidebar">
+                    <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden')}>
                         <pre>
                             <code>
                                 {JSON.stringify(
@@ -181,7 +181,9 @@ export const Planimetrie = ({}) => {
                                     checked={dipVisible}
                                     onInput={() => toggleDipVisible()}
                                 />
-                                <label for="building-dm">Dip</label>
+                                <label for="building-dm">
+                                    Dipartimento di Matematica, Edifici A e B
+                                </label>
                             </div>
                             <div class="children">
                                 {[
@@ -222,7 +224,9 @@ export const Planimetrie = ({}) => {
                                     checked={exdmaVisible}
                                     onInput={() => toggleExdmaVisible()}
                                 />
-                                <label for="building-exdma">Ex-DMA</label>
+                                <label for="building-exdma">
+                                    Dipartimento di Matematica, Edificio ex-Albergo
+                                </label>
                             </div>
                             <div class="children">
                                 {[

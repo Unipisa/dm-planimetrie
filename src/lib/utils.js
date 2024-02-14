@@ -54,3 +54,5 @@ export const useFuse = (items, options) => {
 
     return [results, query, setQuery]
 }
+
+export const clsx = (...args) => args.filter(Boolean).join(' ')

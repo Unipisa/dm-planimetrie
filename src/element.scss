@@ -1,3 +1,15 @@
+@use 'sass:color';
+
+$unipi-500: #003c71;
+$unipi-300: mix($unipi-500, #fff, $weight: 20%);
+$unipi-400: mix($unipi-500, #fff, $weight: 10%);
+
+:root {
+    --unipi-300: #{$unipi-300};
+    --unipi-400: #{$unipi-400};
+    --unipi-500: #{$unipi-500};
+}
+
 *,
 *::before,
 *::after {
@@ -24,7 +36,7 @@ input[type='password'] {
 }
 
 input[type='checkbox'] {
-    border: 1px solid #ccc;
+    border: 2px solid var(--unipi-500);
     border-radius: 0.125rem;
 
     background-color: #fff;
@@ -43,12 +55,12 @@ input[type='checkbox'] {
     }
 
     &:checked {
-        background-color: #007bff;
         color: #fff;
+        background: var(--unipi-500);
     }
 
     &:checked:hover {
-        background-color: #0069d9;
+        background: var(--unipi-500);
     }
 
     &:disabled {
@@ -56,7 +68,8 @@ input[type='checkbox'] {
         color: #aaa;
 
         &:checked {
-            background: #9fcdff;
+            // background: #9fcdff;
+            background: var(--unipi-500);
         }
 
         & + label {
@@ -192,14 +205,20 @@ code {
                     }
                 }
             }
+
+            transition: all 150ms ease-in;
+
+            &.expanded {
+                width: calc(100% - 2rem);
+            }
         }
 
         .layer-switcher {
             left: 1rem;
             bottom: 1rem;
 
-            padding: 0.5rem;
-            padding-right: 2rem;
+            padding: 0.75rem;
+            padding-right: 1.5rem;
 
             border-radius: 0.3rem;
 
@@ -217,7 +236,7 @@ code {
                 align-items: center;
                 gap: 0.5rem;
 
-                font-size: 15px;
+                font-size: 16px;
                 font-weight: 600;
             }
 
@@ -242,6 +261,25 @@ code {
                     align-items: start;
                 }
             }
+
+            // Animation
+            // height: calc(19px + 1rem);
+            // transition: height 100ms ease-in;
+
+            // overflow: hidden;
+
+            // .layer {
+            //     transition: opacity 100ms ease-in;
+            //     opacity: 0;
+            // }
+
+            // &:hover {
+            //     height: 272px;
+
+            //     .layer {
+            //         opacity: 1;
+            //     }
+            // }
         }
 
         .sidebar {
@@ -256,6 +294,18 @@ code {
             box-shadow: 0 0 1rem #00000010;
 
             overflow: auto;
+
+            transition: all 150ms ease-in;
+
+            &.hidden {
+                opacity: 0;
+                transform: translate(100%, 0);
+            }
+
+            &.shown {
+                opacity: 1;
+                transform: translate(0, 0);
+            }
         }
     }
 }
