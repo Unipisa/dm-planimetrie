@@ -1,23 +1,6 @@
 import * as THREE from 'three'
 
 /**
- * Recursively remove all line segments from the given object.
- *
- * @param {THREE.Object3D} object3d
- */
-export const colorizeLineSegments = object3d => {
-    if (object3d.isLineSegments) {
-        object3d.material = new THREE.LineBasicMaterial({
-            color: 0x000000
-        });
-    } else {
-        object3d.children.forEach(child => {
-            colorizeLineSegments(child)
-        })
-    }
-}
-
-/**
  * Recursively get all geometries in the given object, applying the local matrix
  * to each geometry and returning a list of updated float buffers
  *

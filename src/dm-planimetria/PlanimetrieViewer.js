@@ -114,9 +114,9 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
     toggleRoomSelection(id, force = null) {
         const prevSize = this.#selectedRooms.size
 
-            ; (force === null ? !this.#selectedRooms.has(id) : force)
-                ? this.#selectedRooms.add(id)
-                : this.#selectedRooms.delete(id)
+        ;(force === null ? !this.#selectedRooms.has(id) : force)
+            ? this.#selectedRooms.add(id)
+            : this.#selectedRooms.delete(id)
 
         if (prevSize !== this.#selectedRooms.size) {
             this.dispatchEvent({
@@ -147,36 +147,15 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
                 .reduce(
                     (max, roomObj) =>
                         Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
-                    1
+                    1.5
                 )
 
+            const dir = this.canvas3d.camera.position.clone().sub(barycenter).normalize()
 
-            const oldPosition = this.canvas3d.camera.position.clone()
-            const oldTarget = this.canvas3d.cameraControls.target.clone()
-            const newPosition = barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
+            const newPosition = barycenter.clone().add(dir.multiplyScalar(maxDistance))
             const newTarget = barycenter.clone()
-            const startTime = new Date().getTime()
 
-            const duration = 750
-            const f = t => t * (2 - t)
-
-            const updateCamera = t => {
-                const lerpedPos = oldPosition.clone().lerp(newPosition, f(f(t)))
-                const lerpedTarget = oldTarget.clone().lerp(newTarget, f(f(t)))
-                this.canvas3d.moveCamera(lerpedPos, lerpedTarget)
-            }
-
-            const animate = () => {
-                const t = new Date().getTime() - startTime
-                updateCamera(t / duration)
-                if (t < duration) {
-                    requestAnimationFrame(animate)
-                }
-            }
-
-            requestAnimationFrame(animate)
-
-            // this.canvas3d.moveCamera(cameraPosition, cameraTarget)
+            this.canvas3d.animateCamera(newPosition, newTarget, 750)
         }
 
         this.canvas3d.requestRender()

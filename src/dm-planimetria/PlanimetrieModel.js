@@ -1,42 +1,24 @@
 import * as THREE from 'three'
 
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
-import {
-    recursivelyFlattenGeometry,
-    colorizeLineSegments,
-    recursivelyTraverse,
-} from '../lib/three-utils.js'
+import { recursivelyFlattenGeometry, recursivelyTraverse } from '../lib/three-utils.js'
 
 const loadModelDM = cb => {
     const loader = new ColladaLoader()
     loader.load(`${process.env.BASE_URL}/dm.dae`, collada => {
         const dm = collada.scene.children[0]
 
-        colorizeLineSegments(dm)
-        // recursivelyTraverse(dm, object3d => {
-        //     if (object3d instanceof THREE.Mesh) {
-        //         if (Array.isArray(object3d.material)) {
-        //             object3d.material = object3d.material.map(
-        //                 material =>
-        //                     new THREE.MeshPhongMaterial({
-        //                         color: material.color,
-        //                         reflectivity: 1,
-        //                         shininess: 1,
-        //                         flatShading: false,
-        //                     })
-        //             )
-        //         } else {
-        //             object3d.material = new THREE.MeshPhongMaterial({
-        //                 color: object3d.material.color,
-        //                 reflectivity: 1,
-        //                 shininess: 1,
-        //                 flatShading: false,
-        //             })
-        //         }
-        //     }
-        // })
+        // Makes all line segments in the model black
+        recursivelyTraverse(dm, object3d => {
+            if (object3d.isLineSegments) {
+                object3d.material = new THREE.LineBasicMaterial({ color: 0x000000 })
+            }
+        })
 
-        /** one inch in meters */
+        //
+        // Model Alignment
+        //
+
         const INCH_TO_METER = 0.0254
 
         dm.rotation.x = -Math.PI / 2
@@ -44,7 +26,7 @@ const loadModelDM = cb => {
 
         dm.zoomToCursor = true
 
-        // sketchup model alignment (plz don't change this)
+        // SketchUp model alignment (plz don't change this)
         dm.position.x = -90
         dm.position.y = 2
         dm.position.z = -20

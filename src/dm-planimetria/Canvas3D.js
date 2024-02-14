@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 import { MapControls } from 'three/addons/controls/MapControls.js'
-import { onMouseDownWhileStill } from '../lib/utils.js'
+import { clamp, onMouseDownWhileStill } from '../lib/utils.js'
 
 export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
@@ -62,11 +62,42 @@ export class Canvas3D extends THREE.EventDispatcher {
         return cameraControls
     }
 
-    moveCamera(position, target) {
+    moveCamera(position, target = null) {
         this.cameraControls.object.position.copy(position)
-        this.cameraControls.target.copy(target)
+        if (target) this.cameraControls.target.copy(target)
 
         this.requestRender()
+    }
+
+    animateCamera(position, target = null, duration = 1000) {
+        const oldPosition = this.camera.position.clone()
+        const oldTarget = this.cameraControls.target.clone()
+
+        const startTime = new Date().getTime()
+
+        // custom easing function, "fast then slow"
+        const easeOut1 = t => t * (2 - t)
+        const easeOut2 = t => easeOut1(easeOut1(t))
+
+        const animate = () => {
+            const t = clamp(0, (new Date().getTime() - startTime) / duration, 1)
+
+            this.moveCamera(
+                oldPosition.clone().lerp(position, easeOut2(t)),
+                target ? oldTarget.clone().lerp(target, easeOut2(t)) : oldTarget
+            )
+
+            if (t < 1) {
+                requestAnimationFrame(animate)
+            } else {
+                // in this case updateCamera was already called with 1 and we can exit
+                this.cameraControls.enabled = true
+            }
+        }
+
+        // disable orbit controls to prevent user interaction while animating
+        this.cameraControls.enabled = false
+        requestAnimationFrame(animate)
     }
 
     requestRender() {

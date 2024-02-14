@@ -56,3 +56,5 @@ export const useFuse = (items, options) => {
 }
 
 export const clsx = (...args) => args.filter(Boolean).join(' ')
+
+export const clamp = (min, value, max) => Math.min(max, Math.min(value, max))
