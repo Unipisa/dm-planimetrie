@@ -1,16 +1,8 @@
 @use 'sass:color';
 
 $unipi-500: #003c71;
-$unipi-300: mix($unipi-500, #fff, $weight: 20%);
-$unipi-400: mix($unipi-500, #fff, $weight: 10%);
-
-:root {
-    --unipi-300: #{$unipi-300};
-    --unipi-400: #{$unipi-400};
-    --unipi-500: #{$unipi-500};
-
-    --border-radius: 0.3rem;
-}
+$unipi-300: mix($unipi-500, #fff, $weight: 80%);
+$unipi-400: mix($unipi-500, #fff, $weight: 90%);
 
 *,
 *::before,
@@ -38,10 +30,10 @@ input[type='password'] {
 }
 
 input[type='checkbox'] {
-    border: 2px solid var(--unipi-500);
-    border-radius: 0.125rem;
+    border-radius: 1px;
 
     background-color: #fff;
+    border: 2px solid #fff;
     color: #333;
 
     display: grid;
@@ -56,13 +48,16 @@ input[type='checkbox'] {
         outline: none;
     }
 
+    &:hover {
+        background: #bbb;
+    }
+
     &:checked {
-        color: #fff;
-        background: var(--unipi-500);
+        background: rgb(34, 84, 234);
     }
 
     &:checked:hover {
-        background: var(--unipi-500);
+        background: rgb(88, 125, 236);
     }
 
     &:disabled {
@@ -70,12 +65,11 @@ input[type='checkbox'] {
         color: #aaa;
 
         &:checked {
-            // background: #9fcdff;
-            background: var(--unipi-500);
+            background: rgb(112, 132, 195);
         }
 
         & + label {
-            color: #aaa;
+            opacity: 0.6;
         }
     }
 }
@@ -102,6 +96,12 @@ code {
 }
 
 .dm-planimetrie {
+    --unipi-300: #{$unipi-300};
+    --unipi-400: #{$unipi-400};
+    --unipi-500: #{$unipi-500};
+
+    --border-radius: 0.3rem;
+
     display: grid;
 
     width: 100%;
@@ -126,7 +126,7 @@ code {
         pointer-events: none;
         user-select: none;
 
-        overflow: hidden;
+        // overflow: hidden;
 
         & > * {
             position: absolute;
@@ -315,6 +315,18 @@ code {
                 opacity: 1;
                 transform: translate(0, 0);
             }
+        }
+
+        .help-message {
+            position: absolute;
+            top: 100%;
+            left: 0;
+
+            width: 100%;
+            padding: 0.25rem;
+
+            color: #777;
+            font-size: 14px;
         }
     }
 }

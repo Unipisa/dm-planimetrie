@@ -1,4 +1,3 @@
-import register from 'preact-custom-element'
 import { memo } from 'preact/compat'
 
 import { LuLayers, LuSearch } from 'react-icons/lu'
@@ -48,6 +47,7 @@ export const Planimetrie = ({}) => {
     const [rooms, setRooms] = useState([])
     const [selection, setSelection] = useState(new Set())
 
+    /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
 
     useEffect(async () => {
@@ -80,6 +80,20 @@ export const Planimetrie = ({}) => {
             }
         }
     }, [planimetrieRef.current, onSelectionChanged])
+
+    useEffect(() => {
+        if (planimetrieRef.current) {
+            const listener = e => {
+                if (e.key === 'Escape') {
+                    planimetrieRef.current.clearSelection()
+                }
+            }
+            document.addEventListener('keydown', listener)
+            return () => {
+                document.removeEventListener('keydown', listener)
+            }
+        }
+    }, [planimetrieRef.current])
 
     const [dipVisible, toggleDipVisible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible] = useToggle(true)
@@ -122,7 +136,7 @@ export const Planimetrie = ({}) => {
                             <div class="search-results">
                                 {results
                                     .slice(0, 5)
-                                    .map(({ item: { _id, code, notes }, matches }) => {
+                                    .map(({ item: { _id: id, code, notes }, matches }) => {
                                         const codeIndices = matches.find(
                                             ({ key }) => key === 'code'
                                         )?.indices
@@ -130,7 +144,7 @@ export const Planimetrie = ({}) => {
                                             ({ key }) => key === 'notes'
                                         )?.indices
                                         return (
-                                            <div class="result" onClick={() => selectId(_id)}>
+                                            <div class="result" onClick={() => selectId(id)}>
                                                 <div class="code">
                                                     {codeIndices ? (
                                                         <HighlightedText
@@ -259,6 +273,10 @@ export const Planimetrie = ({}) => {
                                 ))}
                             </div>
                         </div>
+                    </div>
+                    <div className="help-message">
+                        Clicca e trascina per spostarti, trascina col tasto destro per orbitare e
+                        usa la rotellina del mouse per zoomare.
                     </div>
                 </div>
             </div>

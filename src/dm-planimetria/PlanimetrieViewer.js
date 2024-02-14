@@ -47,7 +47,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
             this.canvas3d.requestRender()
         })
 
-        this.canvas3d.camera.position.set(5, 5, 3.5)
+        this.canvas3d.camera.position.set(-0.3, 5.5, -7)
 
         this.canvas3d.setScene(this.scene)
         this.canvas3d.requestRender()
@@ -96,12 +96,27 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         this.canvas3d.requestRender()
     }
 
+    clearSelection() {
+        const prevSize = this.#selectedRooms.size
+
+        this.#selectedRooms.clear()
+
+        if (prevSize !== this.#selectedRooms.size) {
+            this.dispatchEvent({
+                type: 'selection-changed',
+                ids: this.#selectedRooms,
+            })
+        }
+
+        this.#updateSelection()
+    }
+
     toggleRoomSelection(id, force = null) {
         const prevSize = this.#selectedRooms.size
 
-        ;(force === null ? !this.#selectedRooms.has(id) : force)
-            ? this.#selectedRooms.add(id)
-            : this.#selectedRooms.delete(id)
+            ; (force === null ? !this.#selectedRooms.has(id) : force)
+                ? this.#selectedRooms.add(id)
+                : this.#selectedRooms.delete(id)
 
         if (prevSize !== this.#selectedRooms.size) {
             this.dispatchEvent({
@@ -123,7 +138,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
             let barycenter = new THREE.Vector3()
             this.#roomsGroup.children
                 .filter(roomObj => roomObj.selected)
-                .forEach(roomObj => barycenter.add(roomObj.position))
+                .forEach(roomObj => barycenter.add(computeBarycenter(roomObj)))
 
             barycenter.divideScalar(this.#selectedRooms.size)
 
@@ -132,14 +147,35 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
                 .reduce(
                     (max, roomObj) =>
                         Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
-                    2
+                    1
                 )
 
-            this.canvas3d.camera.position.copy(
-                barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
-            )
 
-            this.canvas3d.camera.lookAt(barycenter)
+            const oldPosition = this.canvas3d.camera.position.clone()
+            const oldTarget = this.canvas3d.cameraControls.target.clone()
+            const newPosition = barycenter.clone().add(new THREE.Vector3(1, 1, 1).multiplyScalar(maxDistance))
+            const newTarget = barycenter.clone()
+            const startTime = new Date().getTime()
+
+            const duration = 500
+
+            const updateCamera = t => {
+                const lerpedPos = oldPosition.clone().lerp(newPosition, t)
+                const lerpedTarget = oldTarget.clone().lerp(newTarget, t)
+                this.canvas3d.moveCamera(lerpedPos, lerpedTarget)
+            }
+
+            const animate = () => {
+                const t = new Date().getTime() - startTime
+                updateCamera(t / duration)
+                if (t < duration) {
+                    requestAnimationFrame(animate)
+                }
+            }
+
+            requestAnimationFrame(animate)
+
+            // this.canvas3d.moveCamera(cameraPosition, cameraTarget)
         }
 
         this.canvas3d.requestRender()

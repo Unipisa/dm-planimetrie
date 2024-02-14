@@ -25,6 +25,8 @@ export class Canvas3D extends THREE.EventDispatcher {
         this.cameraControls = this.#createCameraControls(this.el, this.camera)
         this.camera.layers.enableAll()
 
+        window.camera = this.camera
+
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
     }
 
@@ -58,6 +60,13 @@ export class Canvas3D extends THREE.EventDispatcher {
         })
 
         return cameraControls
+    }
+
+    moveCamera(position, target) {
+        this.cameraControls.object.position.copy(position)
+        this.cameraControls.target.copy(target)
+
+        this.requestRender()
     }
 
     requestRender() {

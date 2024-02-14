@@ -44,6 +44,7 @@ const loadModelDM = cb => {
 
         dm.zoomToCursor = true
 
+        // sketchup model alignment (plz don't change this)
         dm.position.x = -90
         dm.position.y = 2
         dm.position.z = -20
