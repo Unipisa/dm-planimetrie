@@ -325,6 +325,10 @@ code {
                     opacity: 1;
                     transform: translate(0, 0);
                 }
+
+                padding: 0.5rem;
+
+                @extend .text;
             }
         }
 
@@ -342,6 +346,57 @@ code {
             display: flex;
             align-items: center;
             gap: 0.25rem;
+        }
+    }
+}
+
+//
+// Typography
+//
+
+.text {
+    // Sass Headings
+
+    $base-font-size: 16px;
+    $heading-scale: 1.61;
+
+    font-size: 18px;
+
+    p + p {
+        margin-top: 0.5rem;
+    }
+
+    ul,
+    ol {
+        padding-left: 1.5rem;
+
+        li + li {
+            margin-top: 0.5rem;
+        }
+    }
+
+    @function pow($number, $exponent) {
+        $value: 1;
+
+        @if $exponent > 0 {
+            @for $i from 1 through $exponent {
+                $value: $value * $number;
+            }
+        }
+
+        @return $value;
+    }
+
+    @for $i from 1 through 4 {
+        h#{$i} {
+            $factor: pow($heading-scale, 4 - $i);
+            font-size: $base-font-size * $factor;
+
+            margin-bottom: 0.5rem;
+        }
+
+        p + h#{$i} {
+            margin-top: 0.5rem;
         }
     }
 }

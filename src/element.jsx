@@ -11,23 +11,7 @@ import { clsx, useFuse, useToggle } from './lib/utils.js'
 import { createObjectMapper } from './lib/mapper.js'
 import { render } from 'preact'
 import { Search } from './components/Search.jsx'
-
-// const HighlightedText = ({ indices, value }) => {
-//     const parts = []
-//     let lastIndex = 0
-
-//     for (const [start, end] of indices) {
-//         parts.push({ text: value.slice(lastIndex, start), highlight: false })
-//         parts.push({ text: value.slice(start, end + 1), highlight: true })
-//         lastIndex = end + 1
-//     }
-
-//     parts.push({ text: value.slice(lastIndex), highlight: false })
-
-//     return parts.map(({ text, highlight }) => (
-//         <span class={highlight ? 'highlight' : ''}>{text}</span>
-//     ))
-// }
+import { Sidebar } from './components/Sidebar.jsx'
 
 const Canvas3D = memo(({ planimetrieRef }) => {
     return (
@@ -122,16 +106,10 @@ export const Planimetrie = ({}) => {
                         selectId={selectId}
                     />
                     <div className="sidebar-container">
-                        <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden','m-2')}>
-                            {rooms.filter(({_id})=>selection.has(_id)).map(room => <div key={room._id}>
-                                <h2>Stanza n. {room.number} {room.notes && `(${room.notes.split('\n')[0]})`}</h2>
-                                Edificio: <b>{{A: 'A', B: 'B', X: 'ex-Albergo'}[room.building] || room.building || '---'}</b>
-                                <br />
-                                Piano: <b>{room.floor || '---'}</b>
-                                <br />
-                                {room.assignments?.map(assignment => <pre key={assignment._id}>{JSON.stringify(assignment)}</pre>)}
-                            </div>)}
-                        </div>
+                        <Sidebar
+                            class={clsx(selection.size > 0 ? 'shown' : 'hidden')}
+                            rooms={rooms.filter(({ _id }) => selection.has(_id))}
+                        />
                     </div>
                     <div class="layer-switcher">
                         <div class="title">
