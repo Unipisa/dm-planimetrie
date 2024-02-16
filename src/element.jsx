@@ -35,6 +35,10 @@ export const Planimetrie = ({ selectedRooms }) => {
     /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
 
+    const selectId = id => {
+        planimetrieRef.current.toggleRoomSelection(id, true)
+    }
+
     useEffect(async () => {
         const { data: rooms } = await manageApiPublic.rooms.get()
 
@@ -45,6 +49,12 @@ export const Planimetrie = ({ selectedRooms }) => {
                 )
                 .filter(room => room.polygon)
         )
+
+        // TODO: Optimize this without repeatedly calling selectedId (add a
+        // function in PlanimetrieViewer)
+        for (const id of selection) {
+            selectId(id)
+        }
     }, [])
 
     useEffect(() => {
@@ -89,10 +99,6 @@ export const Planimetrie = ({ selectedRooms }) => {
     const [exdmaFloor1Visible, toggleExdmaFloor1Visible] = useToggle(true)
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible] = useToggle(true)
     const [exdmaFloor3Visible, toggleExdmaFloor3Visible] = useToggle(true)
-
-    const selectId = id => {
-        planimetrieRef.current.toggleRoomSelection(id, true)
-    }
 
     return (
         <>
