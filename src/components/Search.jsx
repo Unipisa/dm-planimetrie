@@ -26,7 +26,12 @@ export const Search = ({ rooms, selectId, ...rest }) => {
     const [results, query, setQuery] = useFuse(rooms, {
         includeScore: true,
         includeMatches: true,
-        keys: ['code', 'notes'],
+        keys: [
+            'code',
+            'notes',
+            'roomAssignments.person.firstName',
+            'roomAssignments.person.lastName',
+        ],
     })
 
     return (
