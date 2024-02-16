@@ -314,7 +314,9 @@ code {
 
                 overflow: auto;
 
-                transition: all 150ms ease-in;
+                transition: opacity 150ms ease-in, transform 150ms ease-in;
+
+                padding: 1rem 0.5rem;
 
                 &.hidden {
                     opacity: 0;
@@ -325,8 +327,6 @@ code {
                     opacity: 1;
                     transform: translate(0, 0);
                 }
-
-                padding: 0.5rem;
 
                 @extend .text;
             }
@@ -361,6 +361,11 @@ code {
     $heading-scale: 1.61;
 
     font-size: 18px;
+    line-height: 1;
+
+    p {
+        line-height: 1.25;
+    }
 
     p + p {
         margin-top: 0.5rem;

@@ -96,7 +96,6 @@ export const Planimetrie = ({}) => {
 
     return (
         <>
-            <style>{styles}</style>
             <div class="dm-planimetrie">
                 <Canvas3D planimetrieRef={planimetrieRef} />
                 <div class="overlay">
@@ -223,6 +222,10 @@ export class PlanimetrieElement extends HTMLElement {
         this.style.height = '720px'
         this.style.maxHeight = '100%'
         this.attachShadow({ mode: 'open' })
+
+        const $styles = document.createElement('style')
+        $styles.innerHTML = styles
+        this.shadowRoot.appendChild($styles)
     }
 
     connectedCallback() {
