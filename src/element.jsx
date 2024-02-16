@@ -27,10 +27,10 @@ const Canvas3D = memo(({ planimetrieRef }) => {
     )
 })
 
-export const Planimetrie = ({}) => {
+export const Planimetrie = ({ selectedRooms }) => {
     const manageApiPublic = createObjectMapper(process.env.MANAGE_API_URL + '/public/')
     const [rooms, setRooms] = useState([])
-    const [selection, setSelection] = useState(new Set())
+    const [selection, setSelection] = useState(new Set(selectedRooms ?? []))
 
     /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
