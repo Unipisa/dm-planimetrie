@@ -10,23 +10,24 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import { clsx, useFuse, useToggle } from './lib/utils.js'
 import { createObjectMapper } from './lib/mapper.js'
 import { render } from 'preact'
+import { Search } from './components/Search.jsx'
 
-const HighlightedText = ({ indices, value }) => {
-    const parts = []
-    let lastIndex = 0
+// const HighlightedText = ({ indices, value }) => {
+//     const parts = []
+//     let lastIndex = 0
 
-    for (const [start, end] of indices) {
-        parts.push({ text: value.slice(lastIndex, start), highlight: false })
-        parts.push({ text: value.slice(start, end + 1), highlight: true })
-        lastIndex = end + 1
-    }
+//     for (const [start, end] of indices) {
+//         parts.push({ text: value.slice(lastIndex, start), highlight: false })
+//         parts.push({ text: value.slice(start, end + 1), highlight: true })
+//         lastIndex = end + 1
+//     }
 
-    parts.push({ text: value.slice(lastIndex), highlight: false })
+//     parts.push({ text: value.slice(lastIndex), highlight: false })
 
-    return parts.map(({ text, highlight }) => (
-        <span class={highlight ? 'highlight' : ''}>{text}</span>
-    ))
-}
+//     return parts.map(({ text, highlight }) => (
+//         <span class={highlight ? 'highlight' : ''}>{text}</span>
+//     ))
+// }
 
 const Canvas3D = memo(({ planimetrieRef }) => {
     return (
@@ -105,12 +106,6 @@ export const Planimetrie = ({}) => {
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible] = useToggle(true)
     const [exdmaFloor3Visible, toggleExdmaFloor3Visible] = useToggle(true)
 
-    const [results, query, setQuery] = useFuse(rooms, {
-        includeScore: true,
-        includeMatches: true,
-        keys: ['code', 'notes'],
-    })
-
     const selectId = id => {
         planimetrieRef.current.toggleRoomSelection(id, true)
     }
@@ -121,56 +116,11 @@ export const Planimetrie = ({}) => {
             <div class="dm-planimetrie">
                 <Canvas3D planimetrieRef={planimetrieRef} />
                 <div class="overlay">
-                    <div class={clsx('search', selection.size > 0 ? 'contracted' : 'expanded')}>
-                        <div class="search-field">
-                            <input
-                                type="text"
-                                value={query}
-                                onInput={e => setQuery(e.target.value)}
-                            />
-                            <div class="icon">
-                                <LuSearch />
-                            </div>
-                        </div>
-                        {query.trim().length > 0 && (
-                            <div class="search-results">
-                                {results
-                                    .slice(0, 5)
-                                    .map(({ item: { _id: id, code, notes }, matches }) => {
-                                        const codeIndices = matches.find(
-                                            ({ key }) => key === 'code'
-                                        )?.indices
-                                        const notesIndices = matches.find(
-                                            ({ key }) => key === 'notes'
-                                        )?.indices
-                                        return (
-                                            <div class="result" onClick={() => selectId(id)}>
-                                                <div class="code">
-                                                    {codeIndices ? (
-                                                        <HighlightedText
-                                                            indices={codeIndices}
-                                                            value={code}
-                                                        />
-                                                    ) : (
-                                                        code
-                                                    )}
-                                                </div>
-                                                <div class="notes">
-                                                    {notesIndices ? (
-                                                        <HighlightedText
-                                                            indices={notesIndices}
-                                                            value={notes}
-                                                        />
-                                                    ) : (
-                                                        notes
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
-                            </div>
-                        )}
-                    </div>
+                    <Search
+                        class={clsx(selection.size > 0 ? 'contracted' : 'expanded')}
+                        rooms={rooms}
+                        selectId={selectId}
+                    />
                     <div className="sidebar-container">
                         <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden')}>
                             <pre>

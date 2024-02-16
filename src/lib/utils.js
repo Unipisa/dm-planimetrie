@@ -55,6 +55,24 @@ export const useFuse = (items, options) => {
     return [results, query, setQuery]
 }
 
-export const clsx = (...args) => args.filter(Boolean).join(' ')
+export const clsx = (...args) =>
+    args
+        .filter(Boolean)
+        .flatMap(s => (typeof s === 'string' ? s.split(' ') : [s]))
+        .join(' ')
 
-export const clamp = (min, value, max) => Math.min(max, Math.min(value, max))
+export const clamp = (min, value, max) => Math.min(max, Math.max(value, min))
+
+export const bindValue = (obj, event, initialValue) => {
+    let ref = { value: initialValue }
+
+    const setter = newValue => (ref.value = newValue)
+
+    return {
+        ref,
+        bind: () => obj.addEventListener(event, setter),
+        unbind: () => obj.removeEventListener(event, setter),
+    }
+}
+
+export const useEventValue = (obj, event, initialValue) => {}
