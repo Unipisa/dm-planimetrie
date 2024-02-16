@@ -172,16 +172,15 @@ export const Planimetrie = ({}) => {
                         )}
                     </div>
                     <div className="sidebar-container">
-                        <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden')}>
-                            <pre>
-                                <code>
-                                    {JSON.stringify(
-                                        rooms.filter(({ _id }) => selection.has(_id)),
-                                        null,
-                                        2
-                                    )}
-                                </code>
-                            </pre>
+                        <div class={clsx('sidebar', selection.size > 0 ? 'shown' : 'hidden','m-2')}>
+                            {rooms.filter(({_id})=>selection.has(_id)).map(room => <div key={room._id}>
+                                <h2>Stanza n. {room.number} {room.notes && `(${room.notes.split('\n')[0]})`}</h2>
+                                Edificio: <b>{{A: 'A', B: 'B', X: 'ex-Albergo'}[room.building] || room.building || '---'}</b>
+                                <br />
+                                Piano: <b>{room.floor || '---'}</b>
+                                <br />
+                                {room.assignments?.map(assignment => <pre key={assignment._id}>{JSON.stringify(assignment)}</pre>)}
+                            </div>)}
                         </div>
                     </div>
                     <div class="layer-switcher">
