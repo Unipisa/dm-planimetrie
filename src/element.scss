@@ -209,8 +209,16 @@ code {
 
                         user-select: all;
                     }
-                    // .notes {
-                    // }
+
+                    // .notes{}
+
+                    .assignments {
+                        display: flex;
+                        align-items: center;
+
+                        font-size: 14px;
+                        color: #aaa;
+                    }
                 }
             }
 
@@ -318,6 +326,11 @@ code {
 
                 padding: 1rem 0.5rem;
 
+                display: flex;
+                flex-direction: column;
+
+                gap: 1rem;
+
                 &.hidden {
                     opacity: 0;
                     transform: translate(100%, 0);
@@ -328,7 +341,9 @@ code {
                     transform: translate(0, 0);
                 }
 
-                @extend .text;
+                .room {
+                    @extend .text;
+                }
             }
         }
 
@@ -362,6 +377,15 @@ code {
 
     font-size: 18px;
     line-height: 1;
+
+    a {
+        color: var(--unipi-500);
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 
     p {
         line-height: 1.25;

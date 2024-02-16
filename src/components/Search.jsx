@@ -44,21 +44,33 @@ export const Search = ({ rooms, selectId, ...rest }) => {
             </div>
             {query.trim().length > 0 && (
                 <div class="search-results">
-                    {results.slice(0, 5).map(({ item: { _id: id, code, notes }, matches }) => {
-                        const codeIndices = matches.find(({ key }) => key === 'code')?.indices
-                        const notesIndices = matches.find(({ key }) => key === 'notes')?.indices
+                    {results
+                        .slice(0, 5)
+                        .map(({ item: { _id: id, code, notes, roomAssignments }, matches }) => {
+                            const codeIndices = matches.find(({ key }) => key === 'code')?.indices
+                            const notesIndices = matches.find(({ key }) => key === 'notes')?.indices
 
-                        return (
-                            <div class="result" onClick={() => selectId(id)}>
-                                <div class="code">
-                                    <HighlightedText indices={codeIndices} value={code} />
+                            return (
+                                <div class="result" onClick={() => selectId(id)}>
+                                    <div class="code">
+                                        <HighlightedText indices={codeIndices} value={code} />
+                                    </div>
+                                    <div class="notes">
+                                        <HighlightedText indices={notesIndices} value={notes} />
+                                    </div>
+                                    {roomAssignments.length > 0 && (
+                                        <div class="assignments">
+                                            {roomAssignments
+                                                .map(
+                                                    assignment =>
+                                                        `${assignment.person.firstName} ${assignment.person.lastName}`
+                                                )
+                                                .join(', ')}
+                                        </div>
+                                    )}
                                 </div>
-                                <div class="notes">
-                                    <HighlightedText indices={notesIndices} value={notes} />
-                                </div>
-                            </div>
-                        )
-                    })}
+                            )
+                        })}
                 </div>
             )}
         </div>

@@ -17,9 +17,9 @@ export const Sidebar = ({ rooms, ...rest }) => {
     return (
         <div class={clsx('sidebar', rest?.class)}>
             {rooms.map(room => (
-                <div key={room._id}>
+                <div class="room">
                     <h2>
-                        <a href={`${process.env.MANAGE_URL}/room/${room._id}`}>
+                        <a target="_blank" href={`${process.env.MANAGE_URL}/room/${room._id}`}>
                             Stanza "{room.number}"
                         </a>
                     </h2>
@@ -38,7 +38,13 @@ export const Sidebar = ({ rooms, ...rest }) => {
                             <ul>
                                 {room.roomAssignments.map(assignment => (
                                     <li>
-                                        {assignment.person.firstName} {assignment.person.lastName}
+                                        <a
+                                            target="_blank"
+                                            href={`https://www.dm.unipi.it/scheda-personale/?person_id=${assignment.person._id}`}
+                                        >
+                                            {assignment.person.firstName}{' '}
+                                            {assignment.person.lastName}
+                                        </a>
                                     </li>
                                 ))}
                             </ul>
