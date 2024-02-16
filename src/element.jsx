@@ -238,6 +238,8 @@ export class PlanimetrieElement extends HTMLElement {
         const url = new URL(location.href)
         const initialSelection = url.searchParams.getAll('sel')
 
+        console.log('Initial Room Selection:', initialSelection)
+
         this.#render({ selectedIds: initialSelection })
     }
 
