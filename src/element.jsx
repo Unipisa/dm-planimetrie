@@ -221,6 +221,7 @@ export class PlanimetrieElement extends HTMLElement {
         this.style.display = 'block'
         this.style.height = '720px'
         this.style.maxHeight = '100%'
+
         this.attachShadow({ mode: 'open' })
 
         const $styles = document.createElement('style')
@@ -229,9 +230,13 @@ export class PlanimetrieElement extends HTMLElement {
     }
 
     connectedCallback() {
-        // initial selection is passed as query string as ?s=<id1>&s=<id2>&...
+        // WARNING: Pare che "?s=<...>" è già usato da WordPress e fa
+        // automaticamente dei redirect quindi ho optato per "?sel=..." per
+        // aggiungere automaticamente selezioni all'avvio
+
+        // initial selection is passed as query string as ?sel=<id1>&sel=<id2>&...
         const url = new URL(location.href)
-        const initialSelection = url.searchParams.getAll('s')
+        const initialSelection = url.searchParams.getAll('sel')
 
         this.#render({ selectedIds: initialSelection })
     }

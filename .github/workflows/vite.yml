@@ -23,6 +23,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             BASE_URL: https://unipisa.github.io/dm-planimetrie
+            MANAGE_URL: https://manage.dm.unipi.it
             MANAGE_API_URL: https://manage.dm.unipi.it/api/v0
         steps:
             - name: Checkout

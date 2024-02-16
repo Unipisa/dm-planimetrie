@@ -18,11 +18,16 @@ export default defineConfig(({ mode, command }) => {
         process.env.MANAGE_API_URL || 'https://manage.develop.lb.cs.dm.unipi.it/api/v0'
     console.log(`[Vite] Manage API: ${MANAGE_API_URL}`)
 
+    // url to the planimetrie service (no trailing slash)
+    const MANAGE_URL = process.env.MANAGE_URL || 'https://manage.develop.lb.cs.dm.unipi.it'
+    console.log(`[Vite] Manage: ${MANAGE_URL}`)
+
     return {
         base: BASE_URL + '/',
         define: {
             'process.env.NODE_ENV': JSON.stringify(mode),
             'process.env.BASE_URL': JSON.stringify(BASE_URL),
+            'process.env.MANAGE_URL': JSON.stringify(MANAGE_URL),
             'process.env.MANAGE_API_URL': JSON.stringify(MANAGE_API_URL),
         },
         build: {
