@@ -56,7 +56,7 @@ export const Planimetrie = ({ selectedRooms }) => {
     }
 
     useEffect(() => {
-        loadRooms()
+        loadRooms().then(rooms => setRooms(rooms))
     }, [])
 
     useEffect(() => {
