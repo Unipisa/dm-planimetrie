@@ -44,12 +44,12 @@ const loadModelDM = cb => {
 export class PlanimetrieModel extends THREE.Object3D {
     geometries = null
 
-    constructor() {
+    constructor({ onLoad } = {}) {
         super()
 
         loadModelDM(dm => {
             this.add(dm)
-            this.dispatchEvent({ type: 'load' })
+            onLoad?.(dm)
 
             this.geometries = recursivelyFlattenGeometry(dm)
         })

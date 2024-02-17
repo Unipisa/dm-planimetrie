@@ -103,3 +103,13 @@ export const updateRaycasterFromMouseEvent = (raycaster, mouseEvent, camera) => 
 
     raycaster.setFromCamera(pointer, camera)
 }
+
+/**
+ *
+ * @param {THREE.Object3D} object3d
+ * @param {() => THREE.Object3D[]} buildChildren
+ */
+export const construct = (object3d, buildChildren) => {
+    object3d.add(...buildChildren(object3d).flat())
+    return object3d
+}

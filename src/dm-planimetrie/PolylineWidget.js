@@ -9,8 +9,6 @@ import { makeRenderOnTop, updateRaycasterFromMouseEvent } from '../lib/three-uti
  * vertex is clicked. The event contains the index of the vertex in the polyline
  * and the intersection object.
  *
- * @fires vertex-clicked - when a vertex is clicked
- *
  * @extends THREE.Object3D
  *
  * @param {HTMLElement} el - the element to bind mouse events to, e.g the canvas

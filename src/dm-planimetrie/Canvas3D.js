@@ -86,10 +86,11 @@ export class Canvas3D extends THREE.EventDispatcher {
 
         const animate = () => {
             const t = clamp(0, (new Date().getTime() - startTime) / duration, 1)
+            const s = easeOut2(t)
 
             this.moveCamera(
-                oldPosition.clone().lerp(position, easeOut2(t)),
-                target ? oldTarget.clone().lerp(target, easeOut2(t)) : oldTarget
+                oldPosition.clone().lerp(position, s),
+                target ? oldTarget.clone().lerp(target, s) : oldTarget
             )
 
             if (t < 1) {

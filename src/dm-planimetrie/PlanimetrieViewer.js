@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-import { updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
+import { construct, updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
 
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { Canvas3D } from './Canvas3D.js'
@@ -13,25 +13,24 @@ const computeBarycenter = roomObj => {
 }
 
 export class PlanimetrieViewer extends THREE.EventDispatcher {
-    /** @type {THREE.Group} */
-    #roomsGroup = null
-
+    // State
     #selectedRooms = new Set()
+
+    // Handles
+    #roomsGroup = new THREE.Group()
 
     constructor(el) {
         super()
-
-        this.raycaster = new THREE.Raycaster()
-        this.scene = this.#createScene()
 
         // Create renderer
         this.canvas3d = new Canvas3D(el)
         this.canvas3d.addEventListener('click', ({ event }) => this.#onCanvasClick(event))
 
-        const updateRaycast = throttle(e => {
-            updateRaycasterFromMouseEvent(this.raycaster, e, this.canvas3d.camera)
+        const updateRaycast = throttle(() => {
+            const intersections = this.canvas3d.raycastObjectsAtMouse(this.#roomsGroup.children, {
+                recursive: false,
+            })
 
-            const intersections = this.raycaster.intersectObjects(this.#roomsGroup.children, false)
             if (intersections.length > 0) {
                 const [{ object: roomObj }] = intersections
                 this.#roomsGroup.children.forEach(
@@ -49,30 +48,28 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
 
         this.canvas3d.camera.position.set(-0.3, 5.5, -7)
 
-        this.canvas3d.setScene(this.scene)
+        this.canvas3d.setScene(
+            construct(new THREE.Scene(), scene => {
+                scene.background = new THREE.Color(0xffffff)
+
+                return [
+                    new PlanimetrieModel({
+                        onLoad: () => {
+                            this.canvas3d.requestRender()
+                        },
+                    }),
+                    this.#roomsGroup,
+                ]
+            })
+        )
         this.canvas3d.requestRender()
     }
 
-    #createScene() {
-        const scene = new THREE.Scene()
-        scene.background = new THREE.Color(0xffffff)
-
-        const model = new PlanimetrieModel()
-        model.addEventListener('load', () => {
-            this.canvas3d.requestRender()
+    #onCanvasClick() {
+        const intersections = this.canvas3d.raycastObjectsAtMouse(this.#roomsGroup.children, {
+            recursive: false,
         })
-        scene.add(model)
 
-        this.#roomsGroup = new THREE.Group()
-        scene.add(this.#roomsGroup)
-
-        return scene
-    }
-
-    #onCanvasClick(e) {
-        updateRaycasterFromMouseEvent(this.raycaster, e, this.canvas3d.camera)
-
-        const intersections = this.raycaster.intersectObjects(this.#roomsGroup.children, false)
         if (intersections.length > 0) {
             const [{ object: roomObj }] = intersections
             this.toggleRoomSelection(roomObj.room._id)
@@ -168,7 +165,8 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
     }
 }
 
-class PlanimetriaRoom extends THREE.Object3D {
+// TODO: Replace visible and selected with a single state field with three states
+export class PlanimetriaRoom extends THREE.Object3D {
     /**@type {THREE.Mesh} */
     #mesh = null
 
@@ -214,14 +212,14 @@ class PlanimetriaRoom extends THREE.Object3D {
         this.position.set(x0, y0, z0)
     }
 
+    // By default raycaster is a noop, but we need it so this is an
+    // implementation that falls back to raycast on `#mesh`
     raycast(raycaster, intersects) {
         this.#mesh.raycast(raycaster, intersects)
 
         if (intersects.length > 0) {
-            intersects.forEach(inter => {
-                if (inter.object === this.#mesh) {
-                    inter.object = this
-                }
+            intersects.forEach(intersection => {
+                if (intersection.object === this.#mesh) intersection.object = this
             })
         }
     }
