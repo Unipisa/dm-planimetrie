@@ -2,7 +2,7 @@ import { memo } from 'preact/compat'
 
 import { LuHelpCircle, LuInfo, LuLayers, LuSearch } from 'react-icons/lu'
 
-import { PlanimetrieViewer } from './dm-planimetria/PlanimetrieViewer.js'
+import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 
 import styles from './element.scss?inline'
 

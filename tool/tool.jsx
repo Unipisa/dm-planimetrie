@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 
 import './styles.scss'
 
-import { PlanimetrieTool } from '../src/dm-planimetria/PlanimetrieTool.js'
+import { PlanimetrieTool } from '../src/dm-planimetrie/PlanimetrieTool.js'
 import { createObjectMapper } from '../src/lib/mapper.js'
 
 import { LuCheck, LuPencil, LuTrash, LuX } from 'react-icons/lu'
