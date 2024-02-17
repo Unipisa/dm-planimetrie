@@ -1,6 +1,3 @@
-import Fuse from 'fuse.js'
-import { useEffect, useState } from 'preact/hooks'
-
 /**
  * Helper to throttle a function. The `fn` function will be called at most once
  * every `delay` milliseconds.
@@ -32,29 +29,6 @@ export const onMouseDownWhileStill = (el, onStillClick) => {
     el.addEventListener('pointerup', e => isMouseStill && onStillClick(e))
 }
 
-export const useToggle = initialState => {
-    const [value, setValue] = useState(initialState)
-    return [value, () => setValue(v => !v)]
-}
-
-export const useFuse = (items, options) => {
-    const [fuse] = useState(() => new Fuse(items, options))
-    const [query, setQuery] = useState('')
-    const [results, setResults] = useState([])
-
-    useEffect(() => {
-        if (fuse) {
-            fuse.setCollection(items)
-        }
-    }, [items])
-
-    useEffect(() => {
-        setResults(fuse.search(query))
-    }, [query])
-
-    return [results, query, setQuery]
-}
-
 export const clsx = (...args) =>
     args
         .filter(Boolean)
@@ -74,5 +48,3 @@ export const bindValue = (obj, event, initialValue) => {
         unbind: () => obj.removeEventListener(event, setter),
     }
 }
-
-export const useEventValue = (obj, event, initialValue) => {}

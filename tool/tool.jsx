@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'preact/hooks'
 import './styles.scss'
 
 import { PlanimetrieTool } from '../src/dm-planimetrie/PlanimetrieTool.js'
-import { createObjectMapper } from '../src/lib/mapper.js'
+import { createApiProxy } from '../src/lib/mapper.js'
 
 import { LuCheck, LuPencil, LuTrash, LuX } from 'react-icons/lu'
 
@@ -30,14 +30,11 @@ const useEndpointRef = key => {
 
     // when the key changes, update the endpoint object mapper
     useEffect(() => {
-        endpointRef.current = createObjectMapper(
-            process.env.MANAGE_API_URL + '/process/planimetrie/',
-            {
-                headers: {
-                    ['Authorization']: `Bearer ${key}`,
-                },
-            }
-        )
+        endpointRef.current = createApiProxy(process.env.MANAGE_API_URL + '/process/planimetrie/', {
+            headers: {
+                ['Authorization']: `Bearer ${key}`,
+            },
+        })
     }, [key])
 
     return endpointRef

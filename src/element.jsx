@@ -1,19 +1,20 @@
 import { memo } from 'preact/compat'
 
-import { LuHelpCircle, LuInfo, LuLayers, LuSearch } from 'react-icons/lu'
+import { LuHelpCircle, LuLayers } from 'react-icons/lu'
 
 import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 
 import styles from './element.scss?inline'
 
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import { clsx, useFuse, useToggle } from './lib/utils.js'
-import { createObjectMapper } from './lib/mapper.js'
+import { clsx } from './lib/utils.js'
+import { useEventCallback, useToggle } from './lib/hooks.js'
+import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
 import { Search } from './components/Search.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
 
-const Canvas3D = memo(({ planimetrieRef }) => {
+const Canvas3D = memo(({ planimetrieRef, onMount }) => {
     return (
         <canvas
             ref={$canvas => {
@@ -22,13 +23,28 @@ const Canvas3D = memo(({ planimetrieRef }) => {
                 planimetrieRef.current = new PlanimetrieViewer($canvas)
                 window.planimetrie = planimetrieRef.current
                 // }, 0)
+
+                onMount?.(planimetrieRef.current)
             }}
         />
     )
 })
 
+const manageApiPublic = createApiProxy(process.env.MANAGE_API_URL + '/public/')
+
+const loadRooms = async () => {
+    const { data: rooms } = await manageApiPublic.rooms.get()
+
+    // Per ora il formato di room.polygon è una stringa json che potenzialmente
+    // può essere null quindi prima filtriamo rispetto alle stanze con un campo
+    // polygon e lo convertiamo in oggetto vero e poi controlliamo che non fosse
+    // null.
+    return rooms
+        .flatMap(room => (room.polygon ? [{ ...room, polygon: JSON.parse(room.polygon) }] : []))
+        .filter(room => room.polygon)
+}
+
 export const Planimetrie = ({ selectedRooms }) => {
-    const manageApiPublic = createObjectMapper(process.env.MANAGE_API_URL + '/public/')
     const [rooms, setRooms] = useState([])
     const [selection, setSelection] = useState(new Set(selectedRooms ?? []))
 
@@ -39,19 +55,12 @@ export const Planimetrie = ({ selectedRooms }) => {
         planimetrieRef.current.toggleRoomSelection(id, true)
     }
 
-    useEffect(async () => {
-        const { data: rooms } = await manageApiPublic.rooms.get()
-
-        setRooms(
-            rooms
-                .flatMap(room =>
-                    room.polygon ? [{ ...room, polygon: JSON.parse(room.polygon) }] : []
-                )
-                .filter(room => room.polygon)
-        )
+    useEffect(() => {
+        loadRooms()
     }, [])
 
     useEffect(() => {
+        // waits for "planimetriaRef.current" and "rooms" to be loaded
         if (planimetrieRef.current && rooms && rooms.length > 0) {
             planimetrieRef.current.setRooms(rooms)
 
@@ -63,32 +72,15 @@ export const Planimetrie = ({ selectedRooms }) => {
         }
     }, [rooms, planimetrieRef.current])
 
-    const onSelectionChanged = useCallback(({ ids }) => {
+    useEventCallback(planimetrieRef.current, 'selection-changed', ({ ids }) => {
         setSelection(new Set(ids))
-    }, [])
+    })
 
-    useEffect(() => {
+    useEventCallback(document, 'keydown', e => {
         if (planimetrieRef.current) {
-            planimetrieRef.current.addEventListener('selection-changed', onSelectionChanged)
-            return () => {
-                planimetrieRef.current.removeEventListener('selection-changed', onSelectionChanged)
-            }
+            if (e.key === 'Escape') planimetrieRef.current.clearSelection()
         }
-    }, [planimetrieRef.current, onSelectionChanged])
-
-    useEffect(() => {
-        if (planimetrieRef.current) {
-            const listener = e => {
-                if (e.key === 'Escape') {
-                    planimetrieRef.current.clearSelection()
-                }
-            }
-            document.addEventListener('keydown', listener)
-            return () => {
-                document.removeEventListener('keydown', listener)
-            }
-        }
-    }, [planimetrieRef.current])
+    })
 
     const [dipVisible, toggleDipVisible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible] = useToggle(true)

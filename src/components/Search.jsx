@@ -1,5 +1,6 @@
 import { LuSearch } from 'react-icons/lu'
-import { clsx, useFuse } from '../lib/utils.js'
+import { clsx } from '../lib/utils.js'
+import { useFuse } from '../lib/hooks.js'
 
 const HighlightedText = ({ indices, value }) => {
     if (!indices) {
