@@ -49,17 +49,17 @@ export const Planimetrie = ({ selectedRooms }) => {
                 )
                 .filter(room => room.polygon)
         )
-
-        // TODO: Optimize this without repeatedly calling selectedId (add a
-        // function in PlanimetrieViewer)
-        for (const id of selection) {
-            selectId(id)
-        }
     }, [])
 
     useEffect(() => {
         if (planimetrieRef.current && rooms && rooms.length > 0) {
             planimetrieRef.current.setRooms(rooms)
+
+            // TODO: Optimize this without repeatedly calling selectedId (add a
+            // function in PlanimetrieViewer)
+            for (const id of selection) {
+                selectId(id)
+            }
         }
     }, [rooms, planimetrieRef.current])
 
