@@ -5,7 +5,13 @@ import { Cursor3D } from './Cursor3D.js'
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { PolylineWidget } from './PolylineWidget.js'
 
-import { construct, nearestVertexInGeometries } from '../lib/three-utils.js'
+import {
+    construct,
+    layerFromIndices,
+    nearestVertexInGeometries,
+    recursivelyRemoveLineSegments,
+    recursivelyTraverse,
+} from '../lib/three-utils.js'
 import { onMouseDownWhileStill, throttle } from '../lib/utils.js'
 
 export class PlanimetrieTool extends THREE.EventDispatcher {
@@ -13,6 +19,9 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
     drawState = 'none'
     /** @type {THREE.Vector3[]} */
     polygon = []
+
+    /** @type {PlanimetrieModel} */
+    #model = null
 
     constructor(el) {
         super()
@@ -24,7 +33,8 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
         this.scene = construct(new THREE.Scene(), scene => {
             scene.background = new THREE.Color(0xffffff)
 
-            const model = new PlanimetrieModel({
+            this.#model = new PlanimetrieModel({
+                removeLines: true,
                 onLoad: () => {
                     this.canvas3d.requestRender()
                 },
@@ -35,11 +45,15 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
                 new THREE.MeshBasicMaterial({ color: 0xff0000 })
             )
 
-            this.cursorWidget = new Cursor3D(el, this.canvas3d.camera, scene.children)
+            this.cursorWidget = new Cursor3D(el, this.canvas3d, this.#model.children)
 
             const updateSnapping = throttle(() => {
-                if (!model.geometries) return
-                this.snap = nearestVertexInGeometries(model.geometries, this.cursorWidget.position)
+                if (!this.#model.geometries) return
+                this.snap = nearestVertexInGeometries(
+                    this.#model.geometries,
+                    this.cursorWidget.position
+                )
+                console.log(this.snap)
 
                 snappingVertexSphere.visible = this.snap.distance < 0.1
                 snappingVertexSphere.position.copy(this.snap.point)
@@ -52,14 +66,14 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
             })
 
             // Polyline
-            this.polylineWidget = new PolylineWidget(this.canvas3d.camera)
-            this.polylineWidget.addEventListener('updated', () => {
-                this.canvas3d.requestRender()
-            })
+            const polylineLayerMask = new THREE.Layers()
+            polylineLayerMask.set(1)
+
+            this.polylineWidget = new PolylineWidget(this.canvas3d)
 
             onMouseDownWhileStill(el, this.onCanvasClick.bind(this))
 
-            return [model, snappingVertexSphere, this.cursorWidget, this.polylineWidget]
+            return [this.#model, snappingVertexSphere, this.cursorWidget, this.polylineWidget]
         })
 
         this.canvas3d.camera.position.set(5, 5, 3.5)
@@ -77,9 +91,14 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
                 cursorPosition: this.cursorWidget.position,
                 snap: this.snap,
                 castIntersection: () => {
-                    const intersections = this.canvas3d.raycastObjectsAtMouse(this.scene.children, {
-                        recursive: true,
-                    })
+                    const intersections = this.canvas3d.raycastObjectsAtMouse(
+                        this.#model.children,
+                        {
+                            layers: layerFromIndices(0),
+                            recursive: true,
+                        }
+                    )
+
                     return intersections.length > 0 ? intersections[0] : false
                 },
                 isPolylineVertexClicked: () => {
@@ -104,7 +123,7 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
     }
 
     /**
-     * @param {PlanimetriaState} state
+     * @param {PlanimetrieState} state
      */
     #updateState({ drawState, polygon }) {
         if (drawState !== undefined) this.drawState = drawState
@@ -140,7 +159,7 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
 }
 
 /**
- * @typedef {{ drawState: 'none' | 'open' | 'closed', polygon: THREE.Vector3[] }} PlanimetriaState
+ * @typedef {{ drawState: 'none' | 'open' | 'closed', polygon: THREE.Vector3[] }} PlanimetrieState
  */
 
 /**
@@ -149,10 +168,10 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
  * ritorna un nuovo stato che contiene tutte le informazioni necessarie a
  * disegnare questo componente.
  *
- * @param {PlanimetriaState} state
+ * @param {PlanimetrieState} state
  * @param {any} extra
  *
- * @returns {PlanimetriaState}
+ * @returns {PlanimetrieState}
  */
 const mouseClickReducer = (
     { drawState, polygon },
@@ -160,6 +179,8 @@ const mouseClickReducer = (
 ) => {
     if (drawState === 'open') {
         const result = isPolylineVertexClicked()
+        console.log(result, snap, cursorPosition)
+
         return result
             ? result.index === 0 // check if the first vertex was clicked
                 ? { drawState: 'closed', polygon }

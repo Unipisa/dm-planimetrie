@@ -1,7 +1,11 @@
 import * as THREE from 'three'
 
 import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js'
-import { recursivelyFlattenGeometry, recursivelyTraverse } from '../lib/three-utils.js'
+import {
+    recursivelyFlattenGeometry,
+    recursivelyRemoveLineSegments,
+    recursivelyTraverse,
+} from '../lib/three-utils.js'
 
 const loadModelDM = cb => {
     const loader = new ColladaLoader()
@@ -44,14 +48,19 @@ const loadModelDM = cb => {
 export class PlanimetrieModel extends THREE.Object3D {
     geometries = null
 
-    constructor({ onLoad } = {}) {
+    constructor({ removeLines, onLoad } = {}) {
         super()
 
+        removeLines ??= false
+
         loadModelDM(dm => {
-            this.add(dm)
-            onLoad?.(dm)
+            if (removeLines) {
+                recursivelyRemoveLineSegments(dm)
+            }
 
             this.geometries = recursivelyFlattenGeometry(dm)
+            this.add(dm)
+            onLoad?.(dm)
         })
 
         const light = new THREE.AmbientLight(0xdddddd) // soft white light

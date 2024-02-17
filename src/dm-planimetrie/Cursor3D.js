@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
+import { layerFromIndices, updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
+import { Canvas3D } from './Canvas3D.js'
 
 /**
  * A 3D cursor that follows the mouse pointer and uses a raycaster to detect
@@ -9,21 +10,20 @@ import { updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
  *
  * @fires move - when the cursor is moved
  *
- * @param {HTMLElement} el - the element to listen for mouse events, generally the canvas
- * @param {THREE.Camera} camera - the camera used to project the mouse pointer
- * @param {THREE.Object3D[]} objects - the objects to select from when the cursor is moved over them
- *
  * @extends THREE.Object3D
  */
 export class Cursor3D extends THREE.Object3D {
-    constructor(el, camera, objects) {
+    /**
+     * @param {HTMLElement} el - the element to listen for mouse events, generally the canvas
+     * @param {Canvas3D} canvas3d - the camera used to project the mouse pointer
+     * @param {THREE.Object3D[]} objects - the objects to select from when the cursor is moved over them
+     */
+    constructor(el, canvas3d, objects) {
         super()
 
-        this.camera = camera
         this.el = el
+        this.canvas3d = canvas3d
         this.objects = objects
-
-        this.raycaster = new THREE.Raycaster()
 
         this.setupObjects()
         this.setupEvents()
@@ -41,10 +41,12 @@ export class Cursor3D extends THREE.Object3D {
     }
 
     setupEvents() {
-        this.el.addEventListener('pointermove', e => {
-            updateRaycasterFromMouseEvent(this.raycaster, e, this.camera)
+        this.el.addEventListener('pointermove', () => {
+            const intersections = this.canvas3d.raycastObjectsAtMouse(this.objects, {
+                layers: layerFromIndices(0),
+                recursive: true,
+            })
 
-            const intersections = this.raycaster.intersectObjects(this.objects, true)
             if (intersections.length > 0) {
                 const intersection = intersections[0]
 

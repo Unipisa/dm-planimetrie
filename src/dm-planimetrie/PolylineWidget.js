@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 
-import { makeRenderOnTop, updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
+import { ALL_LAYERS, layerFromIndices, setRenderOnTop } from '../lib/three-utils.js'
+import { Canvas3D } from './Canvas3D.js'
 
 /**
  * A polyline widget that can be used to draw polylines on a 3D scene. Each
@@ -11,27 +12,29 @@ import { makeRenderOnTop, updateRaycasterFromMouseEvent } from '../lib/three-uti
  *
  * @extends THREE.Object3D
  *
- * @param {HTMLElement} el - the element to bind mouse events to, e.g the canvas
- * @param {THREE.Camera} camera - the camera used to project the mouse pointer
+ * @param {Canvas3D} canvas3d - the canvas
+ * @param {any} options - some optional parameters
  */
 export class PolylineWidget extends THREE.Object3D {
-    constructor(camera) {
+    constructor(canvas3d, { vertexLayer, lineLayer } = {}) {
         super()
 
-        this.camera = camera
-        this.raycaster = new THREE.Raycaster()
-        this.raycaster.layers.set(1)
+        /** @type {Canvas3D} */
+        this.canvas3d = canvas3d
+
+        this.vertexLayer = vertexLayer ?? layerFromIndices(1)
+        this.lineLayer = lineLayer ?? layerFromIndices(2)
     }
 
     /**
-     * @param {MouseEvent} e
-     *
      * @returns {{ index: number, intersection: THREE.Intersection<THREE.Object3D<THREE.Object3DEventMap>> } | false}
      */
-    onMouseClick(e) {
-        updateRaycasterFromMouseEvent(this.raycaster, e, this.camera)
+    onMouseClick() {
+        const intersections = this.canvas3d.raycastObjectsAtMouse(this.children, {
+            layers: this.vertexLayer,
+            recursive: true,
+        })
 
-        const intersections = this.raycaster.intersectObjects(this.children, true)
         if (intersections.length > 0) {
             const intersection = intersections[0]
 
@@ -58,10 +61,10 @@ export class PolylineWidget extends THREE.Object3D {
             this.add(this.#createPolyline(vertices, closed))
         }
         if (vertices.length > 0) {
-            this.add(...vertices.map((v, i) => PolylineWidget.#createIndexedSphere(v, i)))
+            this.add(...vertices.map((v, i) => this.#createIndexedSphere(v, i)))
         }
 
-        this.dispatchEvent({ type: 'updated' })
+        this.canvas3d.requestRender()
     }
 
     /**
@@ -71,14 +74,14 @@ export class PolylineWidget extends THREE.Object3D {
      * sphere instances in an array globally and having to search for the sphere
      * in the array when the sphere is clicked.
      */
-    static #createIndexedSphere(vector, index) {
+    #createIndexedSphere(vector, index) {
         const sphere = new THREE.Mesh(
             new THREE.SphereGeometry(0.01),
             new THREE.MeshBasicMaterial({ color: 0xffff00 })
         )
 
-        makeRenderOnTop(sphere)
-        sphere.layers.set(1)
+        setRenderOnTop(sphere)
+        sphere.layers.mask = this.vertexLayer.mask
         sphere.position.copy(vector)
         sphere.userData.index = index
 
@@ -91,8 +94,8 @@ export class PolylineWidget extends THREE.Object3D {
             new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 5 })
         )
 
-        makeRenderOnTop(polyline)
-        polyline.layers.set(2)
+        setRenderOnTop(polyline)
+        polyline.layers.mask = this.lineLayer.mask
 
         const coordsBuf = vertices.map(({ x, y, z }) => [x, y, z]).flat()
         if (closed) {

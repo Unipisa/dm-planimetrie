@@ -20,6 +20,21 @@ export const recursivelyFlattenGeometry = object3d => {
 }
 
 /**
+ * Recursively remove all line segments from the given object.
+ *
+ * @param {THREE.Object3D} object3d
+ */
+export const recursivelyRemoveLineSegments = object3d => {
+    if (object3d.isLineSegments) {
+        object3d.parent.remove(object3d)
+    } else {
+        object3d.children.forEach(child => {
+            recursivelyRemoveLineSegments(child)
+        })
+    }
+}
+
+/**
  * Recursively traverse all objects
  *
  * @param {THREE.Object3D} object3d
@@ -85,7 +100,12 @@ export const nearestVertexInGeometries = (geometries, cursorPoint) => {
     return { point: minPoint, distance: minDistance }
 }
 
-export const makeRenderOnTop = object => {
+/**
+ * Sets `depthTest` to `false` and `renderOrder` to `1`
+ *
+ * @param {THREE.Object3D} object
+ */
+export const setRenderOnTop = object => {
     object.material.depthTest = false
     object.renderOrder = 1
 }
@@ -113,3 +133,17 @@ export const construct = (object3d, buildChildren) => {
     object3d.add(...buildChildren(object3d).flat())
     return object3d
 }
+
+export const layerFromIndices = (...layers) => {
+    const layer = new THREE.Layers()
+    layer.disableAll()
+
+    layers.forEach(i => layer.enable(i))
+
+    return layer
+}
+
+const allLayersMask = new THREE.Layers()
+allLayersMask.enableAll()
+
+export const ALL_LAYERS = allLayersMask
