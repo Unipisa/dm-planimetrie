@@ -5,7 +5,7 @@ import { Cursor3D } from './Cursor3D.js'
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { PolylineWidget } from './PolylineWidget.js'
 
-import { nearestVertexInGeometries } from '../lib/three-utils.js'
+import { construct, nearestVertexInGeometries } from '../lib/three-utils.js'
 import { onMouseDownWhileStill, throttle } from '../lib/utils.js'
 
 export class PlanimetrieTool extends THREE.EventDispatcher {
@@ -21,7 +21,46 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
         this.canvas3d = new Canvas3D(el)
 
         // Create object graph
-        this.scene = this.#createScene(el, this.canvas3d.camera)
+        this.scene = construct(new THREE.Scene(), scene => {
+            scene.background = new THREE.Color(0xffffff)
+
+            const model = new PlanimetrieModel({
+                onLoad: () => {
+                    this.canvas3d.requestRender()
+                },
+            })
+
+            const snappingVertexSphere = new THREE.Mesh(
+                new THREE.SphereGeometry(0.005),
+                new THREE.MeshBasicMaterial({ color: 0xff0000 })
+            )
+
+            this.cursorWidget = new Cursor3D(el, this.canvas3d.camera, scene.children)
+
+            const updateSnapping = throttle(() => {
+                if (!model.geometries) return
+                this.snap = nearestVertexInGeometries(model.geometries, this.cursorWidget.position)
+
+                snappingVertexSphere.visible = this.snap.distance < 0.1
+                snappingVertexSphere.position.copy(this.snap.point)
+            }, 100)
+
+            this.cursorWidget.layers.set(2)
+            this.cursorWidget.addEventListener('move', () => {
+                updateSnapping()
+                this.canvas3d.requestRender()
+            })
+
+            // Polyline
+            this.polylineWidget = new PolylineWidget(this.canvas3d.camera)
+            this.polylineWidget.addEventListener('updated', () => {
+                this.canvas3d.requestRender()
+            })
+
+            onMouseDownWhileStill(el, this.onCanvasClick.bind(this))
+
+            return [model, snappingVertexSphere, this.cursorWidget, this.polylineWidget]
+        })
 
         this.canvas3d.camera.position.set(5, 5, 3.5)
 
@@ -57,52 +96,6 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
         }
 
         this.#updateState({ drawState, polygon })
-    }
-
-    #createScene(el, camera) {
-        const scene = new THREE.Scene()
-        scene.background = new THREE.Color(0xffffff)
-
-        const model = new PlanimetrieModel()
-        model.addEventListener('load', () => this.canvas3d.requestRender())
-
-        scene.add(model)
-
-        const snappingVertexSphere = new THREE.Mesh(
-            new THREE.SphereGeometry(0.005),
-            new THREE.MeshBasicMaterial({ color: 0xff0000 })
-        )
-        scene.add(snappingVertexSphere)
-
-        this.cursorWidget = new Cursor3D(el, camera, scene.children)
-
-        const updateSnapping = throttle(() => {
-            if (!model.geometries) return
-            this.snap = nearestVertexInGeometries(model.geometries, this.cursorWidget.position)
-
-            snappingVertexSphere.visible = this.snap.distance < 0.1
-            snappingVertexSphere.position.copy(this.snap.point)
-        }, 100)
-
-        this.cursorWidget.layers.set(2)
-        this.cursorWidget.addEventListener('move', () => {
-            updateSnapping()
-            this.canvas3d.requestRender()
-        })
-
-        scene.add(this.cursorWidget)
-
-        // Polyline
-        this.polylineWidget = new PolylineWidget(camera)
-        this.polylineWidget.addEventListener('updated', () => {
-            this.canvas3d.requestRender()
-        })
-
-        scene.add(this.polylineWidget)
-
-        onMouseDownWhileStill(el, this.onCanvasClick.bind(this))
-
-        return scene
     }
 
     #render() {
@@ -151,7 +144,14 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
  */
 
 /**
+ * Questa funzione è un po' densa ma gestisce tutti i casi in cui qualcosa viene
+ * cliccato e bisogna aggiornare il poligono che viene disegnato. Alla fine
+ * ritorna un nuovo stato che contiene tutte le informazioni necessarie a
+ * disegnare questo componente.
+ *
  * @param {PlanimetriaState} state
+ * @param {any} extra
+ *
  * @returns {PlanimetriaState}
  */
 const mouseClickReducer = (
