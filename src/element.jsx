@@ -7,7 +7,7 @@ import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 import styles from './element.scss?inline'
 
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import { clsx } from './lib/utils.js'
+import { clsx, dedup } from './lib/utils.js'
 import { useEventCallback, useToggle } from './lib/hooks.js'
 import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
@@ -18,11 +18,8 @@ const Canvas3D = memo(({ planimetrieRef, onMount }) => {
     return (
         <canvas
             ref={$canvas => {
-                // FIX: A bit too much time-to-interactive
-                // setTimeout(() => {
                 planimetrieRef.current = new PlanimetrieViewer($canvas)
                 window.planimetrie = planimetrieRef.current
-                // }, 0)
 
                 onMount?.(planimetrieRef.current)
             }}
@@ -35,10 +32,10 @@ const manageApiPublic = createApiProxy(process.env.MANAGE_API_URL + '/public/')
 const loadRooms = async () => {
     const { data: rooms } = await manageApiPublic.rooms.get()
 
-    // Per ora il formato di room.polygon è una stringa json che potenzialmente
-    // può essere null quindi prima filtriamo rispetto alle stanze con un campo
-    // polygon e lo convertiamo in oggetto vero e poi controlliamo che non fosse
-    // null.
+    // Per ora il formato di "room.polygon" è una stringa json che
+    // potenzialmente può essere "null" quindi prima filtriamo rispetto alle
+    // stanze con un campo polygon e lo convertiamo in oggetto vero e poi
+    // controlliamo che non fosse "null".
     return rooms
         .flatMap(room => (room.polygon ? [{ ...room, polygon: JSON.parse(room.polygon) }] : []))
         .filter(room => room.polygon)
@@ -46,13 +43,14 @@ const loadRooms = async () => {
 
 export const Planimetrie = ({ selectedRooms }) => {
     const [rooms, setRooms] = useState([])
-    const [selection, setSelection] = useState(new Set(selectedRooms ?? []))
+    const [selection, setSelection] = useState(dedup(selectedRooms ?? []))
 
     /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
 
     const selectId = id => {
-        planimetrieRef.current.toggleRoomSelection(id, true)
+        // planimetrieRef.current.toggleRoomSelection(id, true)
+        setSelection(sel => dedup([...sel, id]))
     }
 
     useEffect(() => {

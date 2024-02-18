@@ -36,3 +36,17 @@ export const clsx = (...args) =>
         .join(' ')
 
 export const clamp = (min, value, max) => Math.min(max, Math.max(value, min))
+
+export const dedup = iterable => {
+    const result = []
+    const alreadyPresent = new Set()
+
+    for (const item of iterable) {
+        if (!alreadyPresent.has(item)) {
+            result.push(item)
+            alreadyPresent.add(item)
+        }
+    }
+
+    return result
+}
