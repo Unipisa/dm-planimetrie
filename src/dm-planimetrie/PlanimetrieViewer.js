@@ -1,16 +1,24 @@
 import * as THREE from 'three'
 
-import { construct, updateRaycasterFromMouseEvent } from '../lib/three-utils.js'
-
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { Canvas3D } from './Canvas3D.js'
 import { throttle } from '../lib/utils.js'
 import { PlanimetrieRoom } from './PlanimetrieRoom.js'
+import { recursivelyTraverseInBoundingBox } from '../lib/three-utils.js'
 
 const computeBarycenter = roomObj => {
     const box = new THREE.Box3().setFromPoints(roomObj.room.polygon)
     const barycenter = new THREE.Vector3()
     return box.getCenter(barycenter)
+}
+
+const FLOOR_REGIONS = {
+    'dm-floor-0': new THREE.Box3(new THREE.Vector3(-5.8, 0.1, -6), new THREE.Vector3(4.9, 0.7, 0.5)),
+    'dm-floor-1': new THREE.Box3(new THREE.Vector3(-5.8, 1.8, -6), new THREE.Vector3(4.9, 2.5, 0.5)),
+    'dm-floor-2': new THREE.Box3(new THREE.Vector3(-5.8, 2.8, -6), new THREE.Vector3(4.9, 3.5, 0.5)),
+    'exdma-floor-0': null,
+    'exdma-floor-1': null,
+    'exdma-floor-2': null,
 }
 
 export class PlanimetrieViewer extends THREE.EventDispatcher {
@@ -20,6 +28,8 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
     #hoverRoom = null
 
     #selection = new Set()
+
+    #model = null
 
     constructor(el) {
         super()
@@ -47,8 +57,26 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         const scene = this.canvas3d.scene
         scene.background = new THREE.Color(0xffffff)
 
-        scene.add(new PlanimetrieModel(this.canvas3d))
+        this.#model = new PlanimetrieModel(this.canvas3d)
+        scene.add(this.#model)
+
+        const light = new THREE.AmbientLight(0xdddddd) // soft white light
+        scene.add(light)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+        directionalLight.position.set(1, 2, 3).normalize()
+        scene.add(directionalLight)
+
         scene.add(this.#roomsGroup)
+    }
+
+    toggleRegion(name, visible) {
+        const region = FLOOR_REGIONS[name]
+
+        recursivelyTraverseInBoundingBox(this.#model, region, object3d => {
+            object3d.visible = visible
+        })
+
+        this.canvas3d.requestRender()
     }
 
     setRooms(rooms) {

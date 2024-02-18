@@ -1,115 +1,48 @@
+import { useId } from 'preact/hooks'
 import { LuLayers } from 'react-icons/lu'
 
-export const Buttons = ({
-    layerToggles: {
-        dipVisible,
-        toggleDipVisible,
-        dipFloor1Visible,
-        toggleDipFloor1Visible,
-        dipFloor2Visible,
-        toggleDipFloor2Visible,
-        dipFloor3Visible,
-        toggleDipFloor3Visible,
-        exdmaVisible,
-        toggleExdmaVisible,
-        exdmaFloor1Visible,
-        toggleExdmaFloor1Visible,
-        exdmaFloor2Visible,
-        toggleExdmaFloor2Visible,
-        exdmaFloor3Visible,
-        toggleExdmaFloor3Visible,
-    },
-}) => {
+const FLOOR_LABELS = ['Piano Terra', '1° Piano', '2° Piano']
+const GROUP_LABELS = [
+    'Dipartimento di Matematica, Edifici A e B',
+    'Dipartimento di Matematica, Edificio ex-Albergo',
+]
+
+const LayerGroup = ({ label, data: { group, toggleGroup, floors } }) => {
+    return (
+        <div class="layer">
+            <div class="row">
+                <input type="checkbox" checked={group} onInput={toggleGroup} />
+                <label>{label}</label>
+            </div>
+            <div class="children">
+                {floors.map((floor, i) => (
+                    <LayerFloor label={FLOOR_LABELS[i]} data={floor} enabled={group} />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+const LayerFloor = ({ label, enabled, data: { visible, toggle } }) => {
+    const floorId = useId()
+
+    return (
+        <div class="row">
+            <input type="checkbox" id={floorId} checked={visible} onInput={toggle} disabled={!enabled} />
+            <label for={floorId}>{label}</label>
+        </div>
+    )
+}
+
+export const Buttons = ({ layerToggles: { dip, exdma } }) => {
     return (
         <div class="layer-switcher">
             <div class="title">
                 <LuLayers />
                 Livelli
             </div>
-            <div class="layer">
-                <div class="row">
-                    <input
-                        type="checkbox"
-                        id="building-dm"
-                        checked={dipVisible}
-                        onInput={() => toggleDipVisible()}
-                    />
-                    <label for="building-dm">Dipartimento di Matematica, Edifici A e B</label>
-                </div>
-                <div class="children">
-                    {[
-                        {
-                            text: 'Piano Terra',
-                            value: dipFloor1Visible,
-                            toggle: toggleDipFloor1Visible,
-                        },
-                        {
-                            text: '1° Piano',
-                            value: dipFloor2Visible,
-                            toggle: toggleDipFloor2Visible,
-                        },
-                        {
-                            text: '2° Piano',
-                            value: dipFloor3Visible,
-                            toggle: toggleDipFloor3Visible,
-                        },
-                    ].map(({ text, value, toggle }, i) => (
-                        <div class="row">
-                            <input
-                                type="checkbox"
-                                id={`dm-floor-${i + 1}`}
-                                checked={value}
-                                onInput={() => toggle()}
-                                disabled={!dipVisible}
-                            />
-                            <label for={`dm-floor-${i + 1}`}>{text}</label>
-                        </div>
-                    ))}
-                </div>
-            </div>
-            <div class="layer">
-                <div class="row">
-                    <input
-                        type="checkbox"
-                        id="building-exdma"
-                        checked={exdmaVisible}
-                        onInput={() => toggleExdmaVisible()}
-                    />
-                    <label for="building-exdma">
-                        Dipartimento di Matematica, Edificio ex-Albergo
-                    </label>
-                </div>
-                <div class="children">
-                    {[
-                        {
-                            text: 'Piano Terra',
-                            value: exdmaFloor1Visible,
-                            toggle: toggleExdmaFloor1Visible,
-                        },
-                        {
-                            text: '1° Piano',
-                            value: exdmaFloor2Visible,
-                            toggle: toggleExdmaFloor2Visible,
-                        },
-                        {
-                            text: '2° Piano',
-                            value: exdmaFloor3Visible,
-                            toggle: toggleExdmaFloor3Visible,
-                        },
-                    ].map(({ text, value, toggle }, i) => (
-                        <div class="row">
-                            <input
-                                type="checkbox"
-                                id={`exdma-floor-${i + 1}`}
-                                checked={value}
-                                onInput={() => toggle()}
-                                disabled={!exdmaVisible}
-                            />
-                            <label for={`exdma-floor-${i + 1}`}>{text}</label>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <LayerGroup label={GROUP_LABELS[0]} data={dip} />
+            <LayerGroup label={GROUP_LABELS[1]} data={exdma} />
         </div>
     )
 }

@@ -63,26 +63,5 @@ export class PlanimetrieModel extends THREE.Object3D {
 
             canvas3d.requestRender()
         })
-
-        const light = new THREE.AmbientLight(0xdddddd) // soft white light
-        this.add(light)
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
-        directionalLight.position.set(1, 2, 3).normalize()
-        this.add(directionalLight)
-
-        // Extra lights
-
-        // const light1 = new THREE.DirectionalLight(0xffffff, 1)
-        // light1.position.set(0, 200, 0)
-        // this.add(light1)
-
-        // const light2 = new THREE.DirectionalLight(0xffffff, 1)
-        // light2.position.set(100, 200, 100)
-        // this.add(light2)
-
-        // const light3 = new THREE.DirectionalLight(0xffffff, 1)
-        // light3.position.set(-100, -200, -100)
-        // this.add(light3)
     }
 }

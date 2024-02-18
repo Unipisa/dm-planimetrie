@@ -67,6 +67,12 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
         this.canvas3d.scene.add(this.cursorWidget)
         this.canvas3d.scene.add(this.polylineWidget)
 
+        const light = new THREE.AmbientLight(0xdddddd) // soft white light
+        this.canvas3d.scene.add(light)
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5)
+        directionalLight.position.set(1, 2, 3).normalize()
+        this.canvas3d.scene.add(directionalLight)
+
         this.canvas3d.camera.position.set(5, 5, 3.5)
     }
 
@@ -176,10 +182,10 @@ const mouseClickReducer = (
                 ? { drawState: 'closed', polygon }
                 : { drawState, polygon } // if any other vertex is clicked do nothing
             : snap.distance < 0.1 // the mouse clicked near a vertex, apply snapping
-            ? snap.point.equals(polygon[0]) // the first vertex was snapped to
-                ? { drawState: 'closed', polygon }
-                : { drawState, polygon: [...polygon, snap.point] } // snap to vertex on mesh and add it
-            : { drawState, polygon: [...polygon, cursorPosition] } // a point on the surface of the mesh was clicked, add it
+                ? snap.point.equals(polygon[0]) // the first vertex was snapped to
+                    ? { drawState: 'closed', polygon }
+                    : { drawState, polygon: [...polygon, snap.point] } // snap to vertex on mesh and add it
+                : { drawState, polygon: [...polygon, cursorPosition] } // a point on the surface of the mesh was clicked, add it
     }
     if (drawState === 'closed') {
         // check if the model was clicked and add the intersection point to the new polygon

@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import { MapControls } from 'three/addons/controls/MapControls.js'
 import { clamp, onMouseDownWhileStill } from '../lib/utils.js'
 
+const FOV = 80
+
 export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
 
@@ -21,7 +23,7 @@ export class Canvas3D extends THREE.EventDispatcher {
 
         const { offsetWidth: width, offsetHeight: height } = el
 
-        this.camera = new THREE.PerspectiveCamera(90, width / height, 0.01, 1000)
+        this.camera = new THREE.PerspectiveCamera(FOV, width / height, 0.01, 1000)
         this.cameraControls = this.#createCameraControls(this.el, this.camera)
         this.camera.layers.enableAll()
 

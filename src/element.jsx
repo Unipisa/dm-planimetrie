@@ -78,14 +78,30 @@ export const Planimetrie = ({ selectedRooms }) => {
     }, [planimetrieRef.current, selection])
 
     const [dipVisible, toggleDipVisible] = useToggle(true)
+    const [dipFloor0Visible, toggleDipFloor0Visible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible] = useToggle(true)
     const [dipFloor2Visible, toggleDipFloor2Visible] = useToggle(true)
-    const [dipFloor3Visible, toggleDipFloor3Visible] = useToggle(true)
 
     const [exdmaVisible, toggleExdmaVisible] = useToggle(true)
+    const [exdmaFloor0Visible, toggleExdmaFloor0Visible] = useToggle(true)
     const [exdmaFloor1Visible, toggleExdmaFloor1Visible] = useToggle(true)
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible] = useToggle(true)
-    const [exdmaFloor3Visible, toggleExdmaFloor3Visible] = useToggle(true)
+
+    useEffect(() => {
+        if (planimetrieRef.current) {
+            planimetrieRef.current.toggleRegion('dm-floor-0', dipFloor0Visible)
+        }
+    }, [dipFloor0Visible])
+    useEffect(() => {
+        if (planimetrieRef.current) {
+            planimetrieRef.current.toggleRegion('dm-floor-1', dipFloor1Visible)
+        }
+    }, [dipFloor1Visible])
+    useEffect(() => {
+        if (planimetrieRef.current) {
+            planimetrieRef.current.toggleRegion('dm-floor-2', dipFloor2Visible)
+        }
+    }, [dipFloor2Visible])
 
     return (
         <>
@@ -105,29 +121,32 @@ export const Planimetrie = ({ selectedRooms }) => {
                     </div>
                     <Buttons
                         layerToggles={{
-                            dipVisible,
-                            toggleDipVisible,
-                            dipFloor1Visible,
-                            toggleDipFloor1Visible,
-                            dipFloor2Visible,
-                            toggleDipFloor2Visible,
-                            dipFloor3Visible,
-                            toggleDipFloor3Visible,
-                            exdmaVisible,
-                            toggleExdmaVisible,
-                            exdmaFloor1Visible,
-                            toggleExdmaFloor1Visible,
-                            exdmaFloor2Visible,
-                            toggleExdmaFloor2Visible,
-                            exdmaFloor3Visible,
-                            toggleExdmaFloor3Visible,
+                            dip: {
+                                group: dipVisible,
+                                toggleGroup: toggleDipVisible,
+                                floors: [
+                                    { visible: dipFloor0Visible, toggle: toggleDipFloor0Visible },
+                                    { visible: dipFloor1Visible, toggle: toggleDipFloor1Visible },
+                                    { visible: dipFloor2Visible, toggle: toggleDipFloor2Visible },
+                                ],
+                            },
+
+                            exdma: {
+                                group: exdmaVisible,
+                                toggleGroup: toggleExdmaVisible,
+                                floors: [
+                                    { visible: exdmaFloor0Visible, toggle: toggleExdmaFloor0Visible },
+                                    { visible: exdmaFloor1Visible, toggle: toggleExdmaFloor1Visible },
+                                    { visible: exdmaFloor2Visible, toggle: toggleExdmaFloor2Visible },
+                                ],
+                            },
                         }}
                     />
                     <div className="help-message">
                         <LuHelpCircle />
                         <span>
-                            Clicca e trascina per spostarti, trascina col tasto destro per orbitare
-                            e usa la rotellina del mouse per zoomare.
+                            Clicca e trascina per spostarti, trascina col tasto destro per orbitare e usa la
+                            rotellina del mouse per zoomare.
                         </span>
                     </div>
                 </div>
