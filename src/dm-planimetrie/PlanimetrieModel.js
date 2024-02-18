@@ -48,7 +48,7 @@ const loadModelDM = cb => {
 export class PlanimetrieModel extends THREE.Object3D {
     geometries = null
 
-    constructor({ removeLines, onLoad } = {}) {
+    constructor(canvas3d, { removeLines } = {}) {
         super()
 
         removeLines ??= false
@@ -60,7 +60,8 @@ export class PlanimetrieModel extends THREE.Object3D {
 
             this.geometries = recursivelyFlattenGeometry(dm)
             this.add(dm)
-            onLoad?.(dm)
+
+            canvas3d.requestRender()
         })
 
         const light = new THREE.AmbientLight(0xdddddd) // soft white light

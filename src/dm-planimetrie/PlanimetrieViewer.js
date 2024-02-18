@@ -19,51 +19,49 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
 
     #hoverRoom = null
 
-    constructor(el, getSelection, setSelection) {
-        super()
+    #selection = new Set()
 
-        this.getSelection = getSelection
-        this.setSelection = setSelection
+    constructor(el) {
+        super()
 
         // Create renderer
         this.canvas3d = new Canvas3D(el)
         this.canvas3d.addEventListener('click', ({ event }) => this.#onCanvasClick(event))
 
+        // The hover effect is throttled to avoid too many raycast, for now it runs at ~25fps
         const updateRaycast = throttle(() => {
             const intersections = this.canvas3d.raycastObjectsAtMouse(this.#roomsGroup.children, {
                 recursive: false,
             })
 
-            if (intersections.length > 0) {
-                const [{ object: roomObj }] = intersections
-                this.#hoverRoom = roomObj
-            } else {
-                this.#roomsGroup.children.forEach(child => (child.visible = child.selected))
-            }
-        }, 1000 / 10)
+            this.#hoverRoom = intersections.length > 0 ? intersections[0].object : null
+            this.render()
+        }, 1000 / 25)
 
         el.addEventListener('mousemove', e => {
             updateRaycast(e)
-            this.canvas3d.requestRender()
         })
 
         this.canvas3d.camera.position.set(-0.3, 5.5, -7)
 
-        this.canvas3d.setScene(
-            construct(new THREE.Scene(), scene => {
-                scene.background = new THREE.Color(0xffffff)
+        const scene = this.canvas3d.scene
+        scene.background = new THREE.Color(0xffffff)
 
-                return [
-                    new PlanimetrieModel({
-                        onLoad: () => {
-                            this.canvas3d.requestRender()
-                        },
-                    }),
-                    this.#roomsGroup,
-                ]
-            })
-        )
+        scene.add(new PlanimetrieModel(this.canvas3d))
+        scene.add(this.#roomsGroup)
+    }
+
+    setRooms(rooms) {
+        this.#roomsGroup.clear()
+        this.#roomsGroup.add(...rooms.map(room => new PlanimetrieRoom(room)))
         this.canvas3d.requestRender()
+    }
+
+    setSelection(selection) {
+        this.#selection = new Set(selection)
+        this.render()
+
+        this.#onSelectionChanged()
     }
 
     #onCanvasClick() {
@@ -72,25 +70,18 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         })
 
         if (intersections.length > 0) {
-            const [{ object: roomObj }] = intersections
-            this.setSelection(selection => [...selection, roomObj.room._id])
+            const roomObj = intersections[0].object
+
+            this.dispatchEvent({
+                type: 'room-click',
+                id: roomObj.room._id,
+            })
         }
-
-        this.canvas3d.requestRender()
-    }
-
-    setRooms(rooms) {
-        this.#roomsGroup.clear()
-        this.#roomsGroup.add(...rooms.map(room => new PlanimetrieRoom(room)))
-
-        this.canvas3d.requestRender()
     }
 
     render() {
-        const selection = new Set(getSelection())
-
         this.#roomsGroup.children.forEach(roomObj => {
-            if (selection.has(roomObj.room._id)) {
+            if (this.#selection.has(roomObj.room._id)) {
                 roomObj.setActiveStyle()
             } else if (roomObj === this.#hoverRoom) {
                 roomObj.setHoverStyle()
@@ -102,17 +93,15 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         this.canvas3d.requestRender()
     }
 
-    onSelectionChanged() {
-        const selection = new Set(this.getSelection())
-
-        if (selection.size > 0) {
+    #onSelectionChanged() {
+        if (this.#selection.size > 0) {
             const selectedRooms = this.#roomsGroup.children.filter(roomObj =>
-                selection.has(roomObj.room._id)
+                this.#selection.has(roomObj.room._id)
             )
 
-            let barycenter = new THREE.Vector3()
+            const barycenter = new THREE.Vector3()
             selectedRooms.forEach(roomObj => barycenter.add(computeBarycenter(roomObj)))
-            barycenter.divideScalar(selection.size)
+            barycenter.divideScalar(this.#selection.size)
 
             const maxDistance = selectedRooms.reduce(
                 (max, roomObj) => Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),

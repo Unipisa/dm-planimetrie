@@ -5,14 +5,8 @@ import { Cursor3D } from './Cursor3D.js'
 import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { PolylineWidget } from './PolylineWidget.js'
 
-import {
-    construct,
-    layerFromIndices,
-    nearestVertexInGeometries,
-    recursivelyRemoveLineSegments,
-    recursivelyTraverse,
-} from '../lib/three-utils.js'
-import { onMouseDownWhileStill, throttle } from '../lib/utils.js'
+import { layerFromIndices, nearestVertexInGeometries } from '../lib/three-utils.js'
+import { throttle } from '../lib/utils.js'
 
 export class PlanimetrieTool extends THREE.EventDispatcher {
     /** @type {'none' | 'open' | 'closed'} */
@@ -28,58 +22,52 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
 
         // Create renderer
         this.canvas3d = new Canvas3D(el)
+        this.canvas3d.scene.background = new THREE.Color(0xffffff)
 
-        // Create object graph
-        this.scene = construct(new THREE.Scene(), scene => {
-            scene.background = new THREE.Color(0xffffff)
-
-            this.#model = new PlanimetrieModel({
-                removeLines: true,
-                onLoad: () => {
-                    this.canvas3d.requestRender()
-                },
-            })
-
-            const snappingVertexSphere = new THREE.Mesh(
-                new THREE.SphereGeometry(0.005),
-                new THREE.MeshBasicMaterial({ color: 0xff0000 })
-            )
-
-            this.cursorWidget = new Cursor3D(el, this.canvas3d, this.#model.children)
-
-            const updateSnapping = throttle(() => {
-                if (!this.#model.geometries) return
-                this.snap = nearestVertexInGeometries(
-                    this.#model.geometries,
-                    this.cursorWidget.position
-                )
-                console.log(this.snap)
-
-                snappingVertexSphere.visible = this.snap.distance < 0.1
-                snappingVertexSphere.position.copy(this.snap.point)
-            }, 100)
-
-            this.cursorWidget.layers.set(2)
-            this.cursorWidget.addEventListener('move', () => {
-                updateSnapping()
-                this.canvas3d.requestRender()
-            })
-
-            // Polyline
-            const polylineLayerMask = new THREE.Layers()
-            polylineLayerMask.set(1)
-
-            this.polylineWidget = new PolylineWidget(this.canvas3d)
-
-            onMouseDownWhileStill(el, this.onCanvasClick.bind(this))
-
-            return [this.#model, snappingVertexSphere, this.cursorWidget, this.polylineWidget]
+        this.#model = new PlanimetrieModel(this.canvas3d, {
+            removeLines: true,
         })
 
-        this.canvas3d.camera.position.set(5, 5, 3.5)
+        const snappingVertexSphere = new THREE.Mesh(
+            new THREE.SphereGeometry(0.005),
+            new THREE.MeshBasicMaterial({ color: 0xff0000 })
+        )
 
-        this.canvas3d.setScene(this.scene)
-        this.canvas3d.requestRender()
+        // the 3d cursor is raycasted only on the model
+        this.cursorWidget = new Cursor3D(this.canvas3d, this.#model.children)
+
+        const updateSnapping = throttle(() => {
+            if (!this.#model.geometries) return
+            this.snap = nearestVertexInGeometries(
+                this.#model.geometries,
+                this.cursorWidget.position
+            )
+
+            snappingVertexSphere.visible = this.snap.distance < 0.1
+            snappingVertexSphere.position.copy(this.snap.point)
+
+            this.canvas3d.requestRender()
+        }, 100)
+
+        this.cursorWidget.layers.set(2)
+        this.cursorWidget.addEventListener('move', () => {
+            updateSnapping()
+        })
+
+        // Polyline
+        const polylineLayerMask = new THREE.Layers()
+        polylineLayerMask.set(1)
+
+        this.polylineWidget = new PolylineWidget(this.canvas3d)
+
+        this.canvas3d.addEventListener('click', ({ event }) => this.onCanvasClick(event))
+
+        this.canvas3d.scene.add(this.#model)
+        this.canvas3d.scene.add(snappingVertexSphere)
+        this.canvas3d.scene.add(this.cursorWidget)
+        this.canvas3d.scene.add(this.polylineWidget)
+
+        this.canvas3d.camera.position.set(5, 5, 3.5)
     }
 
     onCanvasClick(e) {
@@ -106,6 +94,8 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
                 },
             }
         )
+
+        console.log(drawState, polygon)
 
         if (this.drawState === 'open' && drawState === 'closed') {
             this.dispatchEvent({

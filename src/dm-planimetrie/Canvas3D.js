@@ -6,7 +6,7 @@ import { clamp, onMouseDownWhileStill } from '../lib/utils.js'
 export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
 
-    #scene = null
+    #scene = new THREE.Scene()
 
     /** Is the mouse position inside the canvas container (from the top-left) */
     mousePosition = new THREE.Vector2()
@@ -28,6 +28,13 @@ export class Canvas3D extends THREE.EventDispatcher {
         window.camera = this.camera
 
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
+    }
+
+    /**
+     * Scene is readonly and owned by this class
+     */
+    get scene() {
+        return this.#scene
     }
 
     #renderCanvas() {
@@ -107,10 +114,6 @@ export class Canvas3D extends THREE.EventDispatcher {
     }
 
     requestRender() {
-        if (!this.#scene) {
-            throw new Error(`first you must set a scene`)
-        }
-
         if (!this.#renderRequested) {
             this.#renderRequested = true
 
@@ -119,14 +122,6 @@ export class Canvas3D extends THREE.EventDispatcher {
                 this.#renderRequested = false
             })
         }
-    }
-
-    // TODO: Is there a better way to organize this? For now this class owns the
-    // camera but the scene can also depend on it like in our situation where
-    // the scene depends on the camera because the Cursor3D needs it to raycast
-    // it's position from the camera viewpoint.
-    setScene(scene) {
-        this.#scene = scene
     }
 
     /**

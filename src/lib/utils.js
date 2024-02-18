@@ -14,6 +14,28 @@ export const throttle = (fn, delay) => {
     }
 }
 
+// const throttleMap = new WeakMap()
+
+// Throttle function that can be used directly at call-site
+// export const throttleCall =
+//     (fn, delay, ref) =>
+//     (...args) => {
+//         ref ??= fn
+
+//         const lastCallDate = throttleMap.get(ref)
+//         if (!lastCallDate) {
+//             throttleMap.set(ref, new Date())
+//             fn(...args)
+//         } else {
+//             const now = new Date()
+//             const delta = now.getTime() - lastCallDate.getTime()
+//             if (delta > delay) {
+//                 throttleMap.set(ref, now)
+//                 fn(...args)
+//             }
+//         }
+//     }
+
 /**
  * Helper to get a mouse click that is triggered only if not the start of a drag
  * event.
@@ -49,4 +71,38 @@ export const dedup = iterable => {
     }
 
     return result
+}
+
+//
+// Functional Set Operations
+//
+
+export const Sets = {
+    with: (set, ...items) => {
+        const result = new Set(set)
+        for (const item of items) {
+            result.add(item)
+        }
+
+        return result
+    },
+    without: (set, ...items) => {
+        const result = new Set(set)
+        for (const item of items) {
+            result.delete(item)
+        }
+
+        return result
+    },
+    toggle: (set, item) => {
+        const result = new Set(set)
+
+        if (result.has(item)) {
+            result.delete(item)
+        } else {
+            result.add(item)
+        }
+
+        return result
+    },
 }

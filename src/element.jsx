@@ -6,8 +6,8 @@ import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 
 import styles from './element.scss?inline'
 
-import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
-import { clsx, dedup } from './lib/utils.js'
+import { useEffect, useRef, useState } from 'preact/hooks'
+import { Sets, clsx, dedup } from './lib/utils.js'
 import { useEventCallback, useToggle } from './lib/hooks.js'
 import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
@@ -43,15 +43,10 @@ const loadRooms = async () => {
 
 export const Planimetrie = ({ selectedRooms }) => {
     const [rooms, setRooms] = useState([])
-    const [selection, setSelection] = useState(dedup(selectedRooms ?? []))
+    const [selection, setSelection] = useState(new Set(selectedRooms ?? []))
 
     /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
-
-    const selectId = id => {
-        // planimetrieRef.current.toggleRoomSelection(id, true)
-        setSelection(sel => dedup([...sel, id]))
-    }
 
     useEffect(() => {
         loadRooms().then(rooms => setRooms(rooms))
@@ -61,24 +56,28 @@ export const Planimetrie = ({ selectedRooms }) => {
         // waits for "planimetriaRef.current" and "rooms" to be loaded
         if (planimetrieRef.current && rooms && rooms.length > 0) {
             planimetrieRef.current.setRooms(rooms)
-
-            // TODO: Optimize this without repeatedly calling selectedId (add a
-            // function in PlanimetrieViewer)
-            for (const id of selection) {
-                selectId(id)
-            }
         }
     }, [rooms, planimetrieRef.current])
 
-    useEventCallback(planimetrieRef.current, 'selection-changed', ({ ids }) => {
-        setSelection(new Set(ids))
+    // useEventCallback(planimetrieRef.current, 'selection-changed', ({ ids }) => {
+    //     setSelection(new Set(ids))
+    // })
+    useEventCallback(planimetrieRef.current, 'room-click', ({ id }) => {
+        setSelection(sel => Sets.toggle(sel, id))
     })
 
     useEventCallback(document, 'keydown', e => {
         if (planimetrieRef.current) {
-            if (e.key === 'Escape') planimetrieRef.current.clearSelection()
+            if (e.key === 'Escape') setSelection(new Set())
         }
     })
+
+    // binds hooks state to PlanimetrieViewer state when selection is updated
+    useEffect(() => {
+        if (planimetrieRef.current) {
+            planimetrieRef.current.setSelection(selection)
+        }
+    }, [planimetrieRef.current, selection])
 
     const [dipVisible, toggleDipVisible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible] = useToggle(true)
@@ -98,7 +97,7 @@ export const Planimetrie = ({ selectedRooms }) => {
                     <Search
                         class={clsx(selection.size > 0 ? 'contracted' : 'expanded')}
                         rooms={rooms}
-                        selectId={selectId}
+                        selectId={id => setSelection(sel => Sets.with(sel, id))}
                     />
                     <div className="sidebar-container">
                         <Sidebar
@@ -210,6 +209,10 @@ export const Planimetrie = ({ selectedRooms }) => {
         </>
     )
 }
+
+//
+// Web Component
+//
 
 export class PlanimetrieElement extends HTMLElement {
     constructor() {

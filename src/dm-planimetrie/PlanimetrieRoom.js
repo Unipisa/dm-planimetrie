@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 const hoverMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
     side: THREE.DoubleSide,
@@ -14,11 +16,11 @@ const activeMaterial = new THREE.MeshBasicMaterial({
     depthTest: false,
 })
 
+const ROOM_HEIGHT = 0.1 // guessed
+
 export class PlanimetrieRoom extends THREE.Object3D {
     /**@type {THREE.Mesh} */
     #mesh = null
-
-    static ROOM_HEIGHT = 0.1 // guessed
 
     constructor(room) {
         super()
