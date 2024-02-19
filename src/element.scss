@@ -360,6 +360,7 @@ code {
 
                 .icon {
                     cursor: pointer;
+
                     background: var(--unipi-500);
 
                     z-index: 3;
@@ -367,6 +368,8 @@ code {
                 }
 
                 .label {
+                    cursor: pointer;
+
                     background: #042b4f;
                     height: 100%;
 
@@ -417,6 +420,8 @@ code {
                         }
                     }
                 }
+
+                // Corners by state
 
                 .icon,
                 .label,

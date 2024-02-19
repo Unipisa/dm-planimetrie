@@ -45,15 +45,20 @@ const CollapsibleIconPanel = ({ children }) => {
     const [layersPopup, toggleLayersPopup] = useToggle(false)
 
     // extracts jsx nodes from the "children" prop
-    const [iconJsx, layerJsx, contentJsx] = toChildArray(children)
+    const [iconJsx, labelJsx, contentJsx] = toChildArray(children)
 
     return (
         <div class={clsx('button-group', 'panel', layersPopup && 'expanded')}>
             <div class="icon" role="button" onClick={toggleLayersPopup}>
                 {iconJsx}
             </div>
-            <GridAnimation class="label-container" direction="horizontal" open={layersPopup}>
-                {layerJsx}
+            <GridAnimation
+                class="label-container"
+                direction="horizontal"
+                open={layersPopup}
+                onClick={toggleLayersPopup}
+            >
+                {labelJsx}
             </GridAnimation>
             <GridAnimation class="content-container" direction="vertical" open={layersPopup}>
                 {contentJsx}
@@ -64,15 +69,15 @@ const CollapsibleIconPanel = ({ children }) => {
 
 const CollapsibleIconButton = ({ onClick, children }) => {
     // extracts jsx nodes from the "children" prop
-    const [iconJsx, layerJsx] = toChildArray(children)
+    const [iconJsx, labelJsx] = toChildArray(children)
 
     return (
         <div class={clsx('button-group', 'simple')}>
             <div class="icon" role="button" onClick={onClick}>
                 {iconJsx}
             </div>
-            <GridAnimation class="label-container" direction="horizontal">
-                {layerJsx}
+            <GridAnimation class="label-container" direction="horizontal" onClick={onClick}>
+                {labelJsx}
             </GridAnimation>
         </div>
     )
