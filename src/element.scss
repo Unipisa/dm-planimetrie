@@ -66,9 +66,9 @@ input[type='checkbox'] {
 
         opacity: 0.3;
 
-        &:checked {
-            // background: rgb(112, 132, 195);
-        }
+        // &:checked {
+        //     background: rgb(112, 132, 195);
+        // }
 
         & + label {
             opacity: 0.6;
