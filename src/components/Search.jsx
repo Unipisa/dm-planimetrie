@@ -1,6 +1,6 @@
 import { LuSearch } from 'react-icons/lu'
 import { clsx } from '../lib/utils.js'
-import { useFuse } from '../lib/hooks.js'
+import { useEventCallback, useFuse } from '../lib/hooks.js'
 
 const HighlightedText = ({ indices, value }) => {
     if (!indices) {
@@ -32,6 +32,10 @@ export const Search = ({ rooms, selectId, ...rest }) => {
         setQuery('')
         selectId(id)
     }
+
+    useEventCallback(document, 'keydown', e => {
+        if (e.key === 'Escape') setQuery('')
+    })
 
     return (
         <div class={clsx('search', rest?.class)}>

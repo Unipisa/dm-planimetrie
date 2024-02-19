@@ -76,6 +76,10 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         // )
     }
 
+    animateCameraToViewpoint(_viewpointName) {
+        this.canvas3d.animateCamera(new THREE.Vector3(-0.3, 5.5, -7), new THREE.Vector3(0, 0, 0), 500)
+    }
+
     toggleRegion(name, visible) {
         const region = FLOOR_REGIONS[name]
 

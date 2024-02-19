@@ -112,6 +112,7 @@ export const Planimetrie = ({ selectedRooms }) => {
                         />
                     </div>
                     <Buttons
+                        planimetriaRef={planimetrieRef}
                         layerToggles={{
                             dip: {
                                 group: dipVisible,
