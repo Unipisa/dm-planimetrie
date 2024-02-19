@@ -373,6 +373,9 @@ code {
 
                     z-index: 3;
                     box-shadow: 0 0 1rem #00000020;
+
+                    width: 2.5rem;
+                    height: 2.5rem;
                 }
 
                 .label {
@@ -388,7 +391,7 @@ code {
                 }
 
                 .content {
-                    padding: 0.75rem;
+                    padding: 1rem;
                     padding-right: 3rem;
 
                     background: var(--unipi-500);
@@ -402,7 +405,7 @@ code {
                         align-items: center;
                         gap: 0.5rem;
 
-                        font-size: 16px;
+                        font-size: 17px;
                         font-weight: 600;
                     }
 
