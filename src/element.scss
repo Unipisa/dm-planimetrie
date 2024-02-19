@@ -305,10 +305,18 @@ code {
 
             justify-items: start;
 
+            pointer-events: none;
+
             .button-group {
                 display: grid;
 
                 text-wrap: nowrap;
+
+                .icon,
+                .label,
+                .content {
+                    pointer-events: auto;
+                }
 
                 // Layouts
 
