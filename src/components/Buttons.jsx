@@ -1,5 +1,7 @@
 import { useId } from 'preact/hooks'
-import { LuLayers } from 'react-icons/lu'
+import { LuHome, LuLayers } from 'react-icons/lu'
+import { useToggle } from '../lib/hooks.js'
+import { clsx } from '../lib/utils.js'
 
 const FLOOR_LABELS = ['Piano Terra', '1° Piano', '2° Piano']
 const GROUP_LABELS = [
@@ -34,15 +36,41 @@ const LayerFloor = ({ label, enabled, data: { visible, toggle } }) => {
     )
 }
 
+// <div class="layer-switcher">
+//     <div class="title">
+//         <LuLayers />
+//         Livelli
+//     </div>
+// </div>
+
 export const Buttons = ({ layerToggles: { dip, exdma } }) => {
+    const [layersPopup, toggleLayersPopup] = useToggle(false)
+
     return (
-        <div class="layer-switcher">
-            <div class="title">
-                <LuLayers />
-                Livelli
+        <div class="buttons">
+            <div class={clsx('button', layersPopup && 'expanded')}>
+                <div class="icon" onClick={toggleLayersPopup}>
+                    <LuLayers />
+                </div>
+                <div class="label">
+                    <div>Livelli</div>
+                </div>
+                <div class="content">
+                    <LayerGroup label={GROUP_LABELS[0]} data={dip} />
+                    <LayerGroup label={GROUP_LABELS[1]} data={exdma} />
+                </div>
             </div>
-            <LayerGroup label={GROUP_LABELS[0]} data={dip} />
-            <LayerGroup label={GROUP_LABELS[1]} data={exdma} />
+            <div class="button expanded">
+                <div class="icon">
+                    <LuHome />
+                </div>
+                <div class="label">
+                    <div>Reimposta Vista</div>
+                </div>
+                <div class="content">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Odit, ex.</p>
+                </div>
+            </div>
         </div>
     )
 }

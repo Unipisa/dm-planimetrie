@@ -42,7 +42,7 @@ export const recursivelyRemoveLineSegments = object3d => {
  * @param {(object3d: THREE.Object3D) => void} cb
  */
 export const recursivelyTraverseInBoundingBox = (object3d, box, cb) => {
-    if (box.containsBox(new THREE.Box3().setFromObject(object3d))) {
+    if (box.intersectsBox(new THREE.Box3().setFromObject(object3d))) {
         cb(object3d)
     }
     object3d.children.forEach(child => recursivelyTraverseInBoundingBox(child, box, cb))

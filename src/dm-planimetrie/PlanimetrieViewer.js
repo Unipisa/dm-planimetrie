@@ -67,14 +67,23 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
         scene.add(directionalLight)
 
         scene.add(this.#roomsGroup)
+
+        // debug view regions
+        // scene.add(
+        //     ...Object.values(FLOOR_REGIONS)
+        //         .filter(region => region !== null)
+        //         .map(region => new THREE.Box3Helper(region, 'orangered'))
+        // )
     }
 
     toggleRegion(name, visible) {
         const region = FLOOR_REGIONS[name]
 
+        console.time('toggleRegion')
         recursivelyTraverseInBoundingBox(this.#model, region, object3d => {
-            object3d.visible = visible
+            if (object3d.isMesh || object3d.isLineSegments) object3d.visible = visible
         })
+        console.timeEnd('toggleRegion')
 
         this.canvas3d.requestRender()
     }
