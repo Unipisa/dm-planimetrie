@@ -43,3 +43,11 @@ export const useEventCallback = (element, type, listener, deps = []) => {
         }
     }, [...deps, element])
 }
+
+export const useToggleRegion = (planimetrieRef, region, visible) => {
+    useEffect(() => {
+        if (planimetrieRef.current) {
+            planimetrieRef.current.toggleRegion(region, visible)
+        }
+    }, [visible])
+}
