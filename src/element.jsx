@@ -8,7 +8,7 @@ import styles from './element.scss?inline'
 
 import { useEffect, useRef, useState } from 'preact/hooks'
 import { Sets, clsx, dedup } from './lib/utils.js'
-import { useEventCallback, useToggle } from './lib/hooks.js'
+import { useEventCallback, useToggle, useToggleRegion } from './lib/hooks.js'
 import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
 import { Search } from './components/Search.jsx'
@@ -87,21 +87,13 @@ export const Planimetrie = ({ selectedRooms }) => {
     const [exdmaFloor1Visible, toggleExdmaFloor1Visible] = useToggle(true)
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible] = useToggle(true)
 
-    useEffect(() => {
-        if (planimetrieRef.current) {
-            planimetrieRef.current.toggleRegion('dm-floor-0', dipFloor0Visible)
-        }
-    }, [dipFloor0Visible])
-    useEffect(() => {
-        if (planimetrieRef.current) {
-            planimetrieRef.current.toggleRegion('dm-floor-1', dipFloor1Visible)
-        }
-    }, [dipFloor1Visible])
-    useEffect(() => {
-        if (planimetrieRef.current) {
-            planimetrieRef.current.toggleRegion('dm-floor-2', dipFloor2Visible)
-        }
-    }, [dipFloor2Visible])
+    useToggleRegion(planimetrieRef, 'dm-floor-0', dipVisible && dipFloor0Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-1', dipVisible && dipFloor1Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-2', dipVisible && dipFloor2Visible)
+
+    useToggleRegion(planimetrieRef, 'exdma-floor-0', exdmaVisible && exdmaFloor0Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-1', exdmaVisible && exdmaFloor1Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-2', exdmaVisible && exdmaFloor2Visible)
 
     return (
         <>

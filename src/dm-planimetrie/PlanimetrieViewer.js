@@ -4,7 +4,7 @@ import { PlanimetrieModel } from './PlanimetrieModel.js'
 import { Canvas3D } from './Canvas3D.js'
 import { throttle } from '../lib/utils.js'
 import { PlanimetrieRoom } from './PlanimetrieRoom.js'
-import { recursivelyTraverseInBoundingBox } from '../lib/three-utils.js'
+import { recursivelyTraverseInside, recursivelyTraverseIntersecting } from '../lib/three-utils.js'
 
 const computeBarycenter = roomObj => {
     const box = new THREE.Box3().setFromPoints(roomObj.room.polygon)
@@ -13,12 +13,12 @@ const computeBarycenter = roomObj => {
 }
 
 const FLOOR_REGIONS = {
-    'dm-floor-0': new THREE.Box3(new THREE.Vector3(-5.8, 0.1, -6), new THREE.Vector3(4.9, 0.7, 0.5)),
-    'dm-floor-1': new THREE.Box3(new THREE.Vector3(-5.8, 1.8, -6), new THREE.Vector3(4.9, 2.5, 0.5)),
-    'dm-floor-2': new THREE.Box3(new THREE.Vector3(-5.8, 2.8, -6), new THREE.Vector3(4.9, 3.5, 0.5)),
-    'exdma-floor-0': null,
-    'exdma-floor-1': null,
-    'exdma-floor-2': null,
+    'dm-floor-0': new THREE.Box3(new THREE.Vector3(-5.8, 0.1, -6.1), new THREE.Vector3(4.9, 0.7, 0.5)),
+    'dm-floor-1': new THREE.Box3(new THREE.Vector3(-5.8, 1.8, -6.1), new THREE.Vector3(4.9, 2.5, 0.5)),
+    'dm-floor-2': new THREE.Box3(new THREE.Vector3(-5.8, 2.8, -6.1), new THREE.Vector3(4.9, 3.5, 0.5)),
+    'exdma-floor-0': new THREE.Box3(new THREE.Vector3(-4, 0.1, 3.2), new THREE.Vector3(-0.3, 0.7, 5.1)),
+    'exdma-floor-1': new THREE.Box3(new THREE.Vector3(-4, 1.7, 3.2), new THREE.Vector3(-0.3, 2.4, 5.1)),
+    'exdma-floor-2': new THREE.Box3(new THREE.Vector3(-4, 2.7, 3.2), new THREE.Vector3(-0.3, 3.5, 5.1)),
 }
 
 export class PlanimetrieViewer extends THREE.EventDispatcher {
@@ -79,11 +79,17 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
     toggleRegion(name, visible) {
         const region = FLOOR_REGIONS[name]
 
-        console.time('toggleRegion')
-        recursivelyTraverseInBoundingBox(this.#model, region, object3d => {
-            if (object3d.isMesh || object3d.isLineSegments) object3d.visible = visible
-        })
-        console.timeEnd('toggleRegion')
+        if (name.endsWith(0)) {
+            recursivelyTraverseInside(this.#model, region, object3d => {
+                object3d.visible = visible
+            })
+        } else {
+            recursivelyTraverseIntersecting(this.#model, region, object3d => {
+                if (object3d.isMesh || object3d.isLineSegments) {
+                    object3d.visible = visible
+                }
+            })
+        }
 
         this.canvas3d.requestRender()
     }
