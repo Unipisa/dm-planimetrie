@@ -635,7 +635,8 @@ code {
             height: 100%;
 
             .sidebar {
-                pointer-events: all;
+                pointer-events: auto;
+                user-select: text;
 
                 width: 100%;
                 height: 100%;

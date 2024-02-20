@@ -27,6 +27,9 @@ export const Sidebar = ({ rooms, ...rest }) => {
                         {SIDEBAR_LABELS.buildings[room.building] ?? 'Ignoto'},{' '}
                         {SIDEBAR_LABELS.floors[room.floor] ?? 'Ignoto'}
                     </h3>
+                    <p>
+                        <strong>Codice:</strong> <code>{room.code}</code>
+                    </p>
                     {room.notes && (
                         <p>
                             <strong>Note:</strong> {room.notes}
@@ -42,8 +45,7 @@ export const Sidebar = ({ rooms, ...rest }) => {
                                             target="_blank"
                                             href={`https://www.dm.unipi.it/scheda-personale/?person_id=${assignment.person._id}`}
                                         >
-                                            {assignment.person.firstName}{' '}
-                                            {assignment.person.lastName}
+                                            {assignment.person.firstName} {assignment.person.lastName}
                                         </a>
                                     </li>
                                 ))}
