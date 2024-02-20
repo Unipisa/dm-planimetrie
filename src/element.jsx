@@ -64,6 +64,10 @@ export const Planimetrie = ({ selectedRooms }) => {
         setSelection(sel => Sets.toggle(sel, id))
     })
 
+    useEventCallback(planimetrieRef.current, 'room-unselect', ({ id }) => {
+        setSelection(sel => Sets.without(sel, id))
+    })
+
     useEventCallback(document, 'keydown', e => {
         if (planimetrieRef.current) {
             if (e.key === 'Escape') setSelection(new Set())

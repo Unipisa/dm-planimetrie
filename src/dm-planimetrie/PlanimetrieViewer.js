@@ -21,6 +21,10 @@ const FLOOR_REGIONS = {
     'exdma-floor-2': new THREE.Box3(new THREE.Vector3(-4, 2.7, 3.2), new THREE.Vector3(-0.3, 3.5, 5.1)),
 }
 
+/**
+ * @fires room-click
+ * @fires room-unselect
+ */
 export class PlanimetrieViewer extends THREE.EventDispatcher {
     // Handles
     #roomsGroup = new THREE.Group()
@@ -83,7 +87,7 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
     toggleRegion(name, visible) {
         const region = FLOOR_REGIONS[name]
 
-        if (name.endsWith(0)) {
+        if (name.endsWith('0')) {
             recursivelyTraverseInside(this.#model, region, object3d => {
                 object3d.visible = visible
             })
@@ -94,6 +98,21 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
                 }
             })
         }
+
+        this.#roomsGroup.children.forEach(roomObj => {
+            if (region.containsBox(new THREE.Box3().setFromObject(roomObj))) {
+                if (visible) {
+                    roomObj.layers.set(0)
+                } else {
+                    roomObj.layers.disableAll()
+
+                    this.dispatchEvent({
+                        type: 'room-unselect',
+                        id: roomObj.room._id,
+                    })
+                }
+            }
+        })
 
         this.canvas3d.requestRender()
     }

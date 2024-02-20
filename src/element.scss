@@ -363,6 +363,10 @@ code {
                 box-shadow: 0 0 1rem #00000000;
 
                 &.expanded {
+                    .icon {
+                        box-shadow: none;
+                    }
+
                     box-shadow: 0 0 1rem #00000020;
                 }
 
