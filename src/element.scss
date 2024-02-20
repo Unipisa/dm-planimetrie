@@ -695,9 +695,10 @@ code {
 // Typography
 //
 
-.fix-text {
-    transform: translate(0, 0.095em);
-}
+// Actually "Titillium Web" already has correct baselines
+// .fix-text {
+//     transform: translate(0, 0.095em);
+// }
 
 .text {
     // Sass Headings
