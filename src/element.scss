@@ -397,13 +397,15 @@ code {
 
                 .content {
                     padding: 1rem;
-                    padding-right: 3rem;
+                    padding-right: 1rem;
 
                     background: var(--unipi-500);
 
                     display: flex;
                     flex-direction: column;
                     gap: 0.25rem;
+
+                    min-width: 15rem;
 
                     .title {
                         display: flex;
@@ -425,6 +427,23 @@ code {
                             align-items: center;
                             gap: 0.5rem;
                             padding: 0.25rem 0;
+
+                            .hfill {
+                                flex-grow: 1;
+                            }
+                        }
+
+                        .icon {
+                            width: auto;
+                            height: auto;
+
+                            border-radius: 4px;
+
+                            padding: 3px 4px;
+
+                            &:hover {
+                                background: #fff5;
+                            }
                         }
 
                         .children {
@@ -432,7 +451,7 @@ code {
 
                             display: flex;
                             flex-direction: column;
-                            align-items: start;
+                            // align-items: start;
                         }
                     }
                 }

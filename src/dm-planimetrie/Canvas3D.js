@@ -5,6 +5,8 @@ import { clamp, onMouseDownWhileStill } from '../lib/utils.js'
 
 const FOV = 80
 
+window.THREE = THREE
+
 export class Canvas3D extends THREE.EventDispatcher {
     #renderRequested = false
 

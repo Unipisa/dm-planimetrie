@@ -21,6 +21,15 @@ const FLOOR_REGIONS = {
     'exdma-floor-2': new THREE.Box3(new THREE.Vector3(-4, 2.7, 3.2), new THREE.Vector3(-0.3, 3.5, 5.1)),
 }
 
+const TOP_VIEWS = {
+    'dm-floor-0': new THREE.Vector3(2.0721172777525476, 5.332940558444413, -2.302808612956343),
+    'dm-floor-1': new THREE.Vector3(-0.29483119907844724, 6.220079380019713, -2.67719523291053),
+    'dm-floor-2': new THREE.Vector3(1.9609028135448132, 4.343713415731448, -0.3524974840393172),
+    'exdma-floor-0': new THREE.Vector3(-2.2677862598842, 2.1177192458441767, 4.042522927889324),
+    'exdma-floor-1': new THREE.Vector3(-2.267296934281399, 3.3612018859940442, 4.096040314849455),
+    'exdma-floor-2': new THREE.Vector3(-2.402581472378879, 4.343867525159883, 4.174345258037002),
+}
+
 /**
  * @fires room-click
  * @fires room-unselect
@@ -82,6 +91,19 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
 
     animateCameraToViewpoint(_viewpointName) {
         this.canvas3d.animateCamera(new THREE.Vector3(-0.3, 5.5, -7), new THREE.Vector3(0, 0, 0), 500)
+    }
+
+    animateCameraToViewpoint2(viewpointName) {
+        const floorPos = TOP_VIEWS[viewpointName].clone()
+        floorPos.y = 0
+        floorPos.z += 0.0001
+
+        this.canvas3d.animateCamera(TOP_VIEWS[viewpointName], floorPos, 500)
+    }
+
+    showOnlyRegion(name) {
+        Object.keys(FLOOR_REGIONS).forEach(r => this.toggleRegion(r, false))
+        this.toggleRegion(name, true)
     }
 
     toggleRegion(name, visible) {

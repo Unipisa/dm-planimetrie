@@ -3,7 +3,7 @@ import { useEffect, useState } from 'preact/hooks'
 
 export const useToggle = initialState => {
     const [value, setValue] = useState(initialState)
-    return [value, () => setValue(v => !v)]
+    return [value, () => setValue(v => !v), setValue]
 }
 
 export const useFuse = (items, options) => {

@@ -82,14 +82,23 @@ export const Planimetrie = ({ selectedRooms }) => {
     }, [planimetrieRef.current, selection])
 
     const [dipVisible, toggleDipVisible] = useToggle(true)
-    const [dipFloor0Visible, toggleDipFloor0Visible] = useToggle(true)
-    const [dipFloor1Visible, toggleDipFloor1Visible] = useToggle(true)
-    const [dipFloor2Visible, toggleDipFloor2Visible] = useToggle(true)
+    const [dipFloor0Visible, toggleDipFloor0Visible, setDipFloor0Visible] = useToggle(true)
+    const [dipFloor1Visible, toggleDipFloor1Visible, setDipFloor1Visible] = useToggle(true)
+    const [dipFloor2Visible, toggleDipFloor2Visible, setDipFloor2Visible] = useToggle(true)
 
     const [exdmaVisible, toggleExdmaVisible] = useToggle(true)
-    const [exdmaFloor0Visible, toggleExdmaFloor0Visible] = useToggle(true)
-    const [exdmaFloor1Visible, toggleExdmaFloor1Visible] = useToggle(true)
-    const [exdmaFloor2Visible, toggleExdmaFloor2Visible] = useToggle(true)
+    const [exdmaFloor0Visible, toggleExdmaFloor0Visible, setExdmaFloor0Visible] = useToggle(true)
+    const [exdmaFloor1Visible, toggleExdmaFloor1Visible, setExdmaFloor1Visible] = useToggle(true)
+    const [exdmaFloor2Visible, toggleExdmaFloor2Visible, setExdmaFloor2Visible] = useToggle(true)
+
+    const layerSetters = {
+        'dm-floor-0': setDipFloor0Visible,
+        'dm-floor-1': setDipFloor1Visible,
+        'dm-floor-2': setDipFloor2Visible,
+        'exdma-floor-0': setExdmaFloor0Visible,
+        'exdma-floor-1': setExdmaFloor1Visible,
+        'exdma-floor-2': setExdmaFloor2Visible,
+    }
 
     useToggleRegion(planimetrieRef, 'dm-floor-0', dipVisible && dipFloor0Visible)
     useToggleRegion(planimetrieRef, 'dm-floor-1', dipVisible && dipFloor1Visible)
@@ -116,16 +125,35 @@ export const Planimetrie = ({ selectedRooms }) => {
                         />
                     </div>
                     <Buttons
-                        clearSelection={() => setSelection(Sets.empty())}
+                        showOnlyRegion={region => {
+                            Object.values(layerSetters).forEach(s => s(false))
+                            layerSetters[region](true)
+                        }}
+                        reset={() => {
+                            setSelection(Sets.empty())
+                            Object.values(layerSetters).forEach(s => s(true))
+                        }}
                         planimetriaRef={planimetrieRef}
                         layerToggles={{
                             dip: {
                                 group: dipVisible,
                                 toggleGroup: toggleDipVisible,
                                 floors: [
-                                    { visible: dipFloor0Visible, toggle: toggleDipFloor0Visible },
-                                    { visible: dipFloor1Visible, toggle: toggleDipFloor1Visible },
-                                    { visible: dipFloor2Visible, toggle: toggleDipFloor2Visible },
+                                    {
+                                        viewpoint: 'dm-floor-0',
+                                        visible: dipFloor0Visible,
+                                        toggle: toggleDipFloor0Visible,
+                                    },
+                                    {
+                                        viewpoint: 'dm-floor-1',
+                                        visible: dipFloor1Visible,
+                                        toggle: toggleDipFloor1Visible,
+                                    },
+                                    {
+                                        viewpoint: 'dm-floor-2',
+                                        visible: dipFloor2Visible,
+                                        toggle: toggleDipFloor2Visible,
+                                    },
                                 ],
                             },
 
@@ -133,9 +161,21 @@ export const Planimetrie = ({ selectedRooms }) => {
                                 group: exdmaVisible,
                                 toggleGroup: toggleExdmaVisible,
                                 floors: [
-                                    { visible: exdmaFloor0Visible, toggle: toggleExdmaFloor0Visible },
-                                    { visible: exdmaFloor1Visible, toggle: toggleExdmaFloor1Visible },
-                                    { visible: exdmaFloor2Visible, toggle: toggleExdmaFloor2Visible },
+                                    {
+                                        viewpoint: 'exdma-floor-0',
+                                        visible: exdmaFloor0Visible,
+                                        toggle: toggleExdmaFloor0Visible,
+                                    },
+                                    {
+                                        viewpoint: 'exdma-floor-1',
+                                        visible: exdmaFloor1Visible,
+                                        toggle: toggleExdmaFloor1Visible,
+                                    },
+                                    {
+                                        viewpoint: 'exdma-floor-2',
+                                        visible: exdmaFloor2Visible,
+                                        toggle: toggleExdmaFloor2Visible,
+                                    },
                                 ],
                             },
                         }}
