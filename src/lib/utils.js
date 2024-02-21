@@ -78,6 +78,9 @@ export const dedup = iterable => {
 //
 
 export const Sets = {
+    empty() {
+        return new Set()
+    },
     with: (set, ...items) => {
         const result = new Set(set)
         for (const item of items) {

@@ -116,6 +116,7 @@ export const Planimetrie = ({ selectedRooms }) => {
                         />
                     </div>
                     <Buttons
+                        clearSelection={() => setSelection(Sets.empty())}
                         planimetriaRef={planimetrieRef}
                         layerToggles={{
                             dip: {

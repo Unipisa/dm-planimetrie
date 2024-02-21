@@ -83,10 +83,11 @@ const CollapsibleIconButton = ({ onClick, children }) => {
     )
 }
 
-export const Buttons = ({ planimetriaRef, layerToggles: { dip, exdma } }) => {
+export const Buttons = ({ planimetriaRef, clearSelection, layerToggles: { dip, exdma } }) => {
     const onResetView = () => {
         if (planimetriaRef.current) {
             planimetriaRef.current.animateCameraToViewpoint('home')
+            clearSelection()
         }
     }
 
