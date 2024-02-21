@@ -18,11 +18,7 @@ export const Sidebar = ({ rooms, ...rest }) => {
         <div class={clsx('sidebar', rest?.class)}>
             {rooms.map(room => (
                 <div class="room">
-                    <h2>
-                        <a target="_blank" href={`${process.env.MANAGE_URL}/room/${room._id}`}>
-                            Stanza "{room.number}"
-                        </a>
-                    </h2>
+                    <h2>Stanza "{room.number}"</h2>
                     <h3>
                         {SIDEBAR_LABELS.buildings[room.building] ?? 'Ignoto'},{' '}
                         {SIDEBAR_LABELS.floors[room.floor] ?? 'Ignoto'}

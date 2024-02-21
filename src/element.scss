@@ -680,7 +680,7 @@ code {
                 display: flex;
                 flex-direction: column;
 
-                gap: 1rem;
+                gap: 1.5rem;
 
                 &.hidden {
                     opacity: 0;
@@ -694,6 +694,10 @@ code {
 
                 .room {
                     @extend .text;
+
+                    h2 {
+                        color: var(--unipi-500);
+                    }
                 }
             }
         }
@@ -794,7 +798,7 @@ code {
     }
 
     h3 {
-        font-weight: 600;
+        font-weight: 400;
     }
 }
 
