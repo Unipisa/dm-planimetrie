@@ -81,12 +81,12 @@ export const Planimetrie = ({ selectedRooms }) => {
         }
     }, [planimetrieRef.current, selection])
 
-    const [dipVisible, toggleDipVisible] = useToggle(true)
+    const [dipVisible, toggleDipVisible, setDipVisible] = useToggle(true)
     const [dipFloor0Visible, toggleDipFloor0Visible, setDipFloor0Visible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible, setDipFloor1Visible] = useToggle(true)
     const [dipFloor2Visible, toggleDipFloor2Visible, setDipFloor2Visible] = useToggle(true)
 
-    const [exdmaVisible, toggleExdmaVisible] = useToggle(true)
+    const [exdmaVisible, toggleExdmaVisible, setExdmaVisible] = useToggle(true)
     const [exdmaFloor0Visible, toggleExdmaFloor0Visible, setExdmaFloor0Visible] = useToggle(true)
     const [exdmaFloor1Visible, toggleExdmaFloor1Visible, setExdmaFloor1Visible] = useToggle(true)
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible, setExdmaFloor2Visible] = useToggle(true)
@@ -128,6 +128,13 @@ export const Planimetrie = ({ selectedRooms }) => {
                         showOnlyRegion={region => {
                             Object.values(layerSetters).forEach(s => s(false))
                             layerSetters[region](true)
+
+                            if (region.startsWith('dm')) {
+                                setDipVisible(true)
+                            }
+                            if (region.startsWith('exdma')) {
+                                setExdmaVisible(true)
+                            }
                         }}
                         reset={() => {
                             setSelection(Sets.empty())
