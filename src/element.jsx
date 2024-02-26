@@ -16,15 +16,33 @@ import { Sidebar } from './components/Sidebar.jsx'
 import { Buttons } from './components/Buttons.jsx'
 
 const Canvas3D = memo(({ planimetrieRef }) => {
-    return (
-        <canvas
-            ref={$canvas => {
-                planimetrieRef.current = new PlanimetrieViewer($canvas)
+    const canvasRef = useRef(null)
+    const tooltipRef = useRef(null)
 
-                // make this global for debugging purposes
-                window.planimetrie = planimetrieRef.current
-            }}
-        />
+    const onMountBoth = () => {
+        if (canvasRef.current && tooltipRef.current) {
+            planimetrieRef.current = new PlanimetrieViewer(canvasRef.current, tooltipRef.current)
+            // make this global for debugging purposes
+            window.planimetrie = planimetrieRef.current
+        }
+    }
+
+    return (
+        <>
+            <canvas
+                ref={$canvas => {
+                    canvasRef.current = $canvas
+                    onMountBoth()
+                }}
+            />
+            <div
+                class="tooltip"
+                ref={$tooltip => {
+                    tooltipRef.current = $tooltip
+                    onMountBoth()
+                }}
+            ></div>
+        </>
     )
 })
 

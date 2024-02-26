@@ -6,12 +6,6 @@ import { throttle } from '../lib/utils.js'
 import { PlanimetrieRoom } from './PlanimetrieRoom.js'
 import { recursivelyTraverseInside, recursivelyTraverseIntersecting } from '../lib/three-utils.js'
 
-const computeBarycenter = roomObj => {
-    const box = new THREE.Box3().setFromPoints(roomObj.room.polygon)
-    const barycenter = new THREE.Vector3()
-    return box.getCenter(barycenter)
-}
-
 const FLOOR_REGIONS = {
     'dm-floor-0': new THREE.Box3(new THREE.Vector3(-5.8, 0.1, -6.1), new THREE.Vector3(4.9, 0.7, 0.5)),
     'dm-floor-1': new THREE.Box3(new THREE.Vector3(-5.8, 1.8, -6.1), new THREE.Vector3(4.9, 2.5, 0.5)),
@@ -44,11 +38,11 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
 
     #model = null
 
-    constructor(el) {
+    constructor(el, tooltip) {
         super()
 
         // Create renderer
-        this.canvas3d = new Canvas3D(el)
+        this.canvas3d = new Canvas3D(el, tooltip)
         this.canvas3d.addEventListener('click', ({ event }) => this.#onCanvasClick(event))
 
         // The hover effect is throttled to avoid too many raycast, for now it runs at ~25fps
@@ -188,11 +182,11 @@ export class PlanimetrieViewer extends THREE.EventDispatcher {
             )
 
             const barycenter = new THREE.Vector3()
-            selectedRooms.forEach(roomObj => barycenter.add(computeBarycenter(roomObj)))
+            selectedRooms.forEach(roomObj => barycenter.add(roomObj.computeRoomBarycenter()))
             barycenter.divideScalar(this.#selection.size)
 
             const maxDistance = selectedRooms.reduce(
-                (max, roomObj) => Math.max(max, computeBarycenter(roomObj).distanceTo(barycenter)),
+                (max, roomObj) => Math.max(max, roomObj.computeRoomBarycenter().distanceTo(barycenter)),
                 1.0 // magic value, nearest distance to a room when zooming
             )
 

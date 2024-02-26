@@ -175,7 +175,31 @@ code {
         height: 100%;
     }
 
+    .tooltip {
+        position: absolute;
+        inset: 0;
+
+        width: 100%;
+        height: 100%;
+
+        pointer-events: none;
+        user-select: none;
+
+        .room-tooltip {
+            font-size: 14px;
+
+            background: var(--unipi-500);
+            color: #fff;
+
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.125rem;
+            box-shadow: 0 0 1rem #00000020;
+        }
+    }
+
     .overlay {
+        z-index: 10;
+
         position: absolute;
         inset: 0;
 
