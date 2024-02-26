@@ -1,13 +1,13 @@
 import { memo } from 'preact/compat'
 
-import { LuHelpCircle, LuLayers } from 'react-icons/lu'
+import { LuHelpCircle } from 'react-icons/lu'
 
 import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 
 import styles from './element.scss?inline'
 
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { Sets, clsx, dedup } from './lib/utils.js'
+import { Sets, clsx } from './lib/utils.js'
 import { useEventCallback, useToggle, useToggleRegion } from './lib/hooks.js'
 import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
@@ -108,6 +108,21 @@ export const Planimetrie = ({ selectedRooms }) => {
     useToggleRegion(planimetrieRef, 'exdma-floor-1', exdmaVisible && exdmaFloor1Visible)
     useToggleRegion(planimetrieRef, 'exdma-floor-2', exdmaVisible && exdmaFloor2Visible)
 
+    const selectId = id => {
+        const room = rooms.find(({ _id }) => _id === id)
+
+        if (room.building === 'A' || room.building === 'B') {
+            setDipVisible(true)
+            layerSetters[`dm-floor-${room.floor}`](true)
+        }
+        if (room.building === 'X') {
+            setExdmaVisible(true)
+            layerSetters[`exdma-floor-${room.floor}`](true)
+        }
+
+        setSelection(sel => Sets.with(sel, id))
+    }
+
     return (
         <>
             <div class="dm-planimetrie">
@@ -116,7 +131,7 @@ export const Planimetrie = ({ selectedRooms }) => {
                     <Search
                         class={clsx(selection.size > 0 ? 'contracted' : 'expanded')}
                         rooms={rooms}
-                        selectId={id => setSelection(sel => Sets.with(sel, id))}
+                        selectId={selectId}
                     />
                     <div className="sidebar-container">
                         <Sidebar
