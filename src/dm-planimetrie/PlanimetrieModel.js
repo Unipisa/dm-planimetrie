@@ -7,17 +7,34 @@ import {
     recursivelyTraverse,
 } from '../lib/three-utils.js'
 
+async function streamToText(stream) {
+    let result = ''
+    const reader = stream.pipeThrough(new TextDecoderStream()).getReader()
+    while (true) {
+        const { done, value } = await reader.read()
+        if (done) {
+            break
+        }
+
+        result += value
+    }
+    return result
+}
+
 const loadModelDM = async () => {
     const loader = new ColladaLoader()
 
-    const res = await fetch(`${process.env.BASE_URL}/dm.dae.gz`)
-    // const blob = await res.blob()
+    const res = await fetch(`${process.env.BASE_URL}/dm.dae.gz`, {
+        'Accept-Encoding': 'gzip;q=0,deflate;q=0',
+    })
 
-    // const ds = new DecompressionStream('gzip')
-    // const decompressedStream = blob.stream().pipeThrough(ds)
-    // const rawText = await streamToText(decompressedStream)
+    const blob = await res.blob()
 
-    const rawText = await res.text()
+    const ds = new DecompressionStream('gzip')
+    const decompressedStream = blob.stream().pipeThrough(ds)
+    const rawText = await streamToText(decompressedStream)
+
+    // const rawText = await res.text()
 
     // console.log(rawText)
 
