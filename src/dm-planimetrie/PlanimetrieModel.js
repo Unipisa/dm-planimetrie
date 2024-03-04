@@ -7,12 +7,10 @@ import {
     recursivelyTraverse,
 } from '../lib/three-utils.js'
 
-const DM_MODEL_PATH = `${process.env.BASE_URL}/dm.dae.gz`
-
 const loadModelDM = async () => {
     const loader = new ColladaLoader()
 
-    const res = await fetch(DM_MODEL_PATH)
+    const res = await fetch(`${process.env.BASE_URL}/dm.dae.gz`)
     // const blob = await res.blob()
 
     // const ds = new DecompressionStream('gzip')
@@ -23,7 +21,7 @@ const loadModelDM = async () => {
 
     // console.log(rawText)
 
-    const colladaModel = loader.parse(rawText, DM_MODEL_PATH)
+    const colladaModel = loader.parse(rawText, `${process.env.BASE_URL}/`)
 
     const dm = colladaModel.scene.children[0]
 

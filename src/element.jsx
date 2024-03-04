@@ -60,9 +60,9 @@ const loadRooms = async () => {
         .filter(room => room.polygon)
 }
 
-export const Planimetrie = ({ selectedRooms }) => {
+export const Planimetrie = ({ selectedRoom }) => {
     const [rooms, setRooms] = useState([])
-    const [selection, setSelection] = useState(new Set(selectedRooms ?? []))
+    const [selection, setSelection] = useState(selectedRoom ?? null)
 
     /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
@@ -79,23 +79,23 @@ export const Planimetrie = ({ selectedRooms }) => {
     }, [rooms, planimetrieRef.current])
 
     useEventCallback(planimetrieRef.current, 'room-click', ({ id }) => {
-        setSelection(sel => Sets.toggle(sel, id))
+        setSelection(selId => (selId === id ? null : id))
     })
 
-    useEventCallback(planimetrieRef.current, 'room-unselect', ({ id }) => {
-        setSelection(sel => Sets.without(sel, id))
+    useEventCallback(planimetrieRef.current, 'room-unselect', () => {
+        setSelection(null)
     })
 
     useEventCallback(document, 'keydown', e => {
         if (planimetrieRef.current) {
-            if (e.key === 'Escape') setSelection(new Set())
+            if (e.key === 'Escape') setSelection(null)
         }
     })
 
     // binds hooks state to PlanimetrieViewer state when selection is updated
     useEffect(() => {
         if (planimetrieRef.current) {
-            planimetrieRef.current.setSelection(selection)
+            planimetrieRef.current.setSelection(selection === null ? [] : [selection])
         }
     }, [planimetrieRef.current, selection])
 
@@ -138,7 +138,7 @@ export const Planimetrie = ({ selectedRooms }) => {
             layerSetters[`exdma-floor-${room.floor}`](true)
         }
 
-        setSelection(sel => Sets.with(sel, id))
+        setSelection(id)
     }
 
     return (
@@ -147,14 +147,14 @@ export const Planimetrie = ({ selectedRooms }) => {
                 <Canvas3D planimetrieRef={planimetrieRef} />
                 <div class="overlay">
                     <Search
-                        class={clsx(selection.size > 0 ? 'contracted' : 'expanded')}
+                        class={clsx(selection !== null ? 'contracted' : 'expanded')}
                         rooms={rooms}
                         selectId={selectId}
                     />
                     <div className="sidebar-container">
                         <Sidebar
-                            class={clsx(selection.size > 0 ? 'shown' : 'hidden')}
-                            rooms={rooms.filter(({ _id }) => selection.has(_id))}
+                            class={clsx(selection !== null ? 'shown' : 'hidden')}
+                            rooms={rooms.filter(({ _id }) => selection === _id)}
                         />
                     </div>
                     <Buttons
@@ -170,7 +170,7 @@ export const Planimetrie = ({ selectedRooms }) => {
                             // }
                         }}
                         reset={() => {
-                            setSelection(Sets.empty())
+                            setSelection(null)
                             Object.values(layerSetters).forEach(s => s(true))
                         }}
                         planimetriaRef={planimetrieRef}
@@ -254,23 +254,23 @@ export class PlanimetrieElement extends HTMLElement {
 
         // initial selection is passed as query string as ?sel=<id1>&sel=<id2>&...
         const url = new URL(location.href)
-        const initialSelection = url.searchParams.getAll('sel')
+        const initialSelection = url.searchParams.get('sel')
 
         console.log('Initial Room Selection:', initialSelection)
 
-        this.#render({ selectedIds: initialSelection })
+        this.#render({ selectedId: initialSelection })
     }
 
-    #render({ selectedIds }) {
-        render(<Planimetrie selectedRooms={selectedIds} />, this.shadowRoot)
+    #render({ selectedId }) {
+        render(<Planimetrie selectedRoom={selectedId} />, this.shadowRoot)
     }
 
     /**
-     * @param {string[]} selectedIds
+     * @param {string[]} selectedId
      * @returns {void}
      */
-    setSelection(selectedIds) {
-        this.#render({ selectedIds })
+    setSelection(selectedId) {
+        this.#render({ selectedId })
     }
 }
 
