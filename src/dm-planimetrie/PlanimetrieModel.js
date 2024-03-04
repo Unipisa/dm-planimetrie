@@ -7,42 +7,56 @@ import {
     recursivelyTraverse,
 } from '../lib/three-utils.js'
 
-const loadModelDM = cb => {
+const DM_MODEL_PATH = `${process.env.BASE_URL}/dm.dae.gz`
+
+const loadModelDM = async () => {
     const loader = new ColladaLoader()
-    loader.load(`${process.env.BASE_URL}/dm.dae`, collada => {
-        const dm = collada.scene.children[0]
 
-        // Makes all line segments in the model black
-        recursivelyTraverse(dm, object3d => {
-            if (object3d.isLineSegments) {
-                object3d.material = new THREE.LineBasicMaterial({ color: 0x000000 })
-            }
-        })
+    const res = await fetch(DM_MODEL_PATH)
+    // const blob = await res.blob()
 
-        //
-        // Model Alignment
-        //
+    // const ds = new DecompressionStream('gzip')
+    // const decompressedStream = blob.stream().pipeThrough(ds)
+    // const rawText = await streamToText(decompressedStream)
 
-        const INCH_TO_METER = 0.0254
+    const rawText = await res.text()
 
-        dm.rotation.x = -Math.PI / 2
-        dm.scale.set(INCH_TO_METER, INCH_TO_METER, INCH_TO_METER)
+    // console.log(rawText)
 
-        dm.zoomToCursor = true
+    const colladaModel = loader.parse(rawText, DM_MODEL_PATH)
 
-        // SketchUp model alignment (plz don't change this)
-        dm.position.x = -90
-        dm.position.y = 2
-        dm.position.z = -20
+    const dm = colladaModel.scene.children[0]
 
-        dm.updateMatrixWorld()
-
-        cb(dm)
-
-        // Expose for debugging
-        window.collada = collada
-        window.dm = dm
+    // Makes all line segments in the model black
+    recursivelyTraverse(dm, object3d => {
+        if (object3d.isLineSegments) {
+            object3d.material = new THREE.LineBasicMaterial({ color: 0x000000 })
+        }
     })
+
+    //
+    // Model Alignment
+    //
+
+    const INCH_TO_METER = 0.0254
+
+    dm.rotation.x = -Math.PI / 2
+    dm.scale.set(INCH_TO_METER, INCH_TO_METER, INCH_TO_METER)
+
+    dm.zoomToCursor = true
+
+    // SketchUp model alignment (plz don't change this)
+    dm.position.x = -90
+    dm.position.y = 2
+    dm.position.z = -20
+
+    dm.updateMatrixWorld()
+
+    // Expose for debugging
+    window.colladaModel = colladaModel
+    window.dm = dm
+
+    return dm
 }
 
 export class PlanimetrieModel extends THREE.Object3D {
@@ -53,7 +67,7 @@ export class PlanimetrieModel extends THREE.Object3D {
 
         removeLines ??= false
 
-        loadModelDM(dm => {
+        loadModelDM().then(dm => {
             if (removeLines) {
                 recursivelyRemoveLineSegments(dm)
             }
