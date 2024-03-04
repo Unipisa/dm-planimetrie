@@ -99,12 +99,12 @@ export const Planimetrie = ({ selectedRooms }) => {
         }
     }, [planimetrieRef.current, selection])
 
-    const [dipVisible, toggleDipVisible, setDipVisible] = useToggle(true)
+    // const [dipVisible, toggleDipVisible, setDipVisible] = useToggle(true)
     const [dipFloor0Visible, toggleDipFloor0Visible, setDipFloor0Visible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible, setDipFloor1Visible] = useToggle(true)
     const [dipFloor2Visible, toggleDipFloor2Visible, setDipFloor2Visible] = useToggle(true)
 
-    const [exdmaVisible, toggleExdmaVisible, setExdmaVisible] = useToggle(true)
+    // const [exdmaVisible, toggleExdmaVisible, setExdmaVisible] = useToggle(true)
     const [exdmaFloor0Visible, toggleExdmaFloor0Visible, setExdmaFloor0Visible] = useToggle(true)
     const [exdmaFloor1Visible, toggleExdmaFloor1Visible, setExdmaFloor1Visible] = useToggle(true)
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible, setExdmaFloor2Visible] = useToggle(true)
@@ -118,23 +118,23 @@ export const Planimetrie = ({ selectedRooms }) => {
         'exdma-floor-2': setExdmaFloor2Visible,
     }
 
-    useToggleRegion(planimetrieRef, 'dm-floor-0', dipVisible && dipFloor0Visible)
-    useToggleRegion(planimetrieRef, 'dm-floor-1', dipVisible && dipFloor1Visible)
-    useToggleRegion(planimetrieRef, 'dm-floor-2', dipVisible && dipFloor2Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-0', dipFloor0Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-1', dipFloor1Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-2', dipFloor2Visible)
 
-    useToggleRegion(planimetrieRef, 'exdma-floor-0', exdmaVisible && exdmaFloor0Visible)
-    useToggleRegion(planimetrieRef, 'exdma-floor-1', exdmaVisible && exdmaFloor1Visible)
-    useToggleRegion(planimetrieRef, 'exdma-floor-2', exdmaVisible && exdmaFloor2Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-0', exdmaFloor0Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-1', exdmaFloor1Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-2', exdmaFloor2Visible)
 
     const selectId = id => {
         const room = rooms.find(({ _id }) => _id === id)
 
         if (room.building === 'A' || room.building === 'B') {
-            setDipVisible(true)
+            // setDipVisible(true)
             layerSetters[`dm-floor-${room.floor}`](true)
         }
         if (room.building === 'X') {
-            setExdmaVisible(true)
+            // setExdmaVisible(true)
             layerSetters[`exdma-floor-${room.floor}`](true)
         }
 
@@ -159,15 +159,15 @@ export const Planimetrie = ({ selectedRooms }) => {
                     </div>
                     <Buttons
                         showOnlyRegion={region => {
-                            Object.values(layerSetters).forEach(s => s(false))
+                            Object.values(layerSetters).forEach(setter => setter(false))
                             layerSetters[region](true)
 
-                            if (region.startsWith('dm')) {
-                                setDipVisible(true)
-                            }
-                            if (region.startsWith('exdma')) {
-                                setExdmaVisible(true)
-                            }
+                            // if (region.startsWith('dm')) {
+                            //     setDipVisible(true)
+                            // }
+                            // if (region.startsWith('exdma')) {
+                            //     setExdmaVisible(true)
+                            // }
                         }}
                         reset={() => {
                             setSelection(Sets.empty())
@@ -176,8 +176,6 @@ export const Planimetrie = ({ selectedRooms }) => {
                         planimetriaRef={planimetrieRef}
                         layerToggles={{
                             dip: {
-                                group: dipVisible,
-                                toggleGroup: toggleDipVisible,
                                 floors: [
                                     {
                                         viewpoint: 'dm-floor-0',
@@ -198,8 +196,6 @@ export const Planimetrie = ({ selectedRooms }) => {
                             },
 
                             exdma: {
-                                group: exdmaVisible,
-                                toggleGroup: toggleExdmaVisible,
                                 floors: [
                                     {
                                         viewpoint: 'exdma-floor-0',
