@@ -1,13 +1,13 @@
 import { memo } from 'preact/compat'
 
-import { LuHelpCircle, LuLayers } from 'react-icons/lu'
+import { LuHelpCircle } from 'react-icons/lu'
 
 import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 
 import styles from './element.scss?inline'
 
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { Sets, clsx, dedup } from './lib/utils.js'
+import { Sets, clsx } from './lib/utils.js'
 import { useEventCallback, useToggle, useToggleRegion } from './lib/hooks.js'
 import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
@@ -16,15 +16,33 @@ import { Sidebar } from './components/Sidebar.jsx'
 import { Buttons } from './components/Buttons.jsx'
 
 const Canvas3D = memo(({ planimetrieRef }) => {
-    return (
-        <canvas
-            ref={$canvas => {
-                planimetrieRef.current = new PlanimetrieViewer($canvas)
+    const canvasRef = useRef(null)
+    const tooltipRef = useRef(null)
 
-                // make this global for debugging purposes
-                window.planimetrie = planimetrieRef.current
-            }}
-        />
+    const onMountBoth = () => {
+        if (canvasRef.current && tooltipRef.current) {
+            planimetrieRef.current = new PlanimetrieViewer(canvasRef.current, tooltipRef.current)
+            // make this global for debugging purposes
+            window.planimetrie = planimetrieRef.current
+        }
+    }
+
+    return (
+        <>
+            <canvas
+                ref={$canvas => {
+                    canvasRef.current = $canvas
+                    onMountBoth()
+                }}
+            />
+            <div
+                class="tooltip"
+                ref={$tooltip => {
+                    tooltipRef.current = $tooltip
+                    onMountBoth()
+                }}
+            ></div>
+        </>
     )
 })
 
@@ -42,9 +60,9 @@ const loadRooms = async () => {
         .filter(room => room.polygon)
 }
 
-export const Planimetrie = ({ selectedRooms }) => {
+export const Planimetrie = ({ selectedRoom }) => {
     const [rooms, setRooms] = useState([])
-    const [selection, setSelection] = useState(new Set(selectedRooms ?? []))
+    const [selection, setSelection] = useState(selectedRoom ?? null)
 
     /** @type {import('preact/hooks').MutableRef<PlanimetrieViewer>} */
     const planimetrieRef = useRef(null)
@@ -61,32 +79,32 @@ export const Planimetrie = ({ selectedRooms }) => {
     }, [rooms, planimetrieRef.current])
 
     useEventCallback(planimetrieRef.current, 'room-click', ({ id }) => {
-        setSelection(sel => Sets.toggle(sel, id))
+        setSelection(selId => (selId === id ? null : id))
     })
 
-    useEventCallback(planimetrieRef.current, 'room-unselect', ({ id }) => {
-        setSelection(sel => Sets.without(sel, id))
+    useEventCallback(planimetrieRef.current, 'room-unselect', () => {
+        setSelection(null)
     })
 
     useEventCallback(document, 'keydown', e => {
         if (planimetrieRef.current) {
-            if (e.key === 'Escape') setSelection(new Set())
+            if (e.key === 'Escape') setSelection(null)
         }
     })
 
     // binds hooks state to PlanimetrieViewer state when selection is updated
     useEffect(() => {
         if (planimetrieRef.current) {
-            planimetrieRef.current.setSelection(selection)
+            planimetrieRef.current.setSelection(selection === null ? [] : [selection])
         }
     }, [planimetrieRef.current, selection])
 
-    const [dipVisible, toggleDipVisible] = useToggle(true)
+    // const [dipVisible, toggleDipVisible, setDipVisible] = useToggle(true)
     const [dipFloor0Visible, toggleDipFloor0Visible, setDipFloor0Visible] = useToggle(true)
     const [dipFloor1Visible, toggleDipFloor1Visible, setDipFloor1Visible] = useToggle(true)
     const [dipFloor2Visible, toggleDipFloor2Visible, setDipFloor2Visible] = useToggle(true)
 
-    const [exdmaVisible, toggleExdmaVisible] = useToggle(true)
+    // const [exdmaVisible, toggleExdmaVisible, setExdmaVisible] = useToggle(true)
     const [exdmaFloor0Visible, toggleExdmaFloor0Visible, setExdmaFloor0Visible] = useToggle(true)
     const [exdmaFloor1Visible, toggleExdmaFloor1Visible, setExdmaFloor1Visible] = useToggle(true)
     const [exdmaFloor2Visible, toggleExdmaFloor2Visible, setExdmaFloor2Visible] = useToggle(true)
@@ -100,13 +118,28 @@ export const Planimetrie = ({ selectedRooms }) => {
         'exdma-floor-2': setExdmaFloor2Visible,
     }
 
-    useToggleRegion(planimetrieRef, 'dm-floor-0', dipVisible && dipFloor0Visible)
-    useToggleRegion(planimetrieRef, 'dm-floor-1', dipVisible && dipFloor1Visible)
-    useToggleRegion(planimetrieRef, 'dm-floor-2', dipVisible && dipFloor2Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-0', dipFloor0Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-1', dipFloor1Visible)
+    useToggleRegion(planimetrieRef, 'dm-floor-2', dipFloor2Visible)
 
-    useToggleRegion(planimetrieRef, 'exdma-floor-0', exdmaVisible && exdmaFloor0Visible)
-    useToggleRegion(planimetrieRef, 'exdma-floor-1', exdmaVisible && exdmaFloor1Visible)
-    useToggleRegion(planimetrieRef, 'exdma-floor-2', exdmaVisible && exdmaFloor2Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-0', exdmaFloor0Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-1', exdmaFloor1Visible)
+    useToggleRegion(planimetrieRef, 'exdma-floor-2', exdmaFloor2Visible)
+
+    const selectId = id => {
+        const room = rooms.find(({ _id }) => _id === id)
+
+        if (room.building === 'A' || room.building === 'B') {
+            // setDipVisible(true)
+            layerSetters[`dm-floor-${room.floor}`](true)
+        }
+        if (room.building === 'X') {
+            // setExdmaVisible(true)
+            layerSetters[`exdma-floor-${room.floor}`](true)
+        }
+
+        setSelection(id)
+    }
 
     return (
         <>
@@ -114,30 +147,35 @@ export const Planimetrie = ({ selectedRooms }) => {
                 <Canvas3D planimetrieRef={planimetrieRef} />
                 <div class="overlay">
                     <Search
-                        class={clsx(selection.size > 0 ? 'contracted' : 'expanded')}
+                        class={clsx(selection !== null ? 'contracted' : 'expanded')}
                         rooms={rooms}
-                        selectId={id => setSelection(sel => Sets.with(sel, id))}
+                        selectId={selectId}
                     />
                     <div className="sidebar-container">
                         <Sidebar
-                            class={clsx(selection.size > 0 ? 'shown' : 'hidden')}
-                            rooms={rooms.filter(({ _id }) => selection.has(_id))}
+                            class={clsx(selection !== null ? 'shown' : 'hidden')}
+                            rooms={rooms.filter(({ _id }) => selection === _id)}
                         />
                     </div>
                     <Buttons
                         showOnlyRegion={region => {
-                            Object.values(layerSetters).forEach(s => s(false))
+                            Object.values(layerSetters).forEach(setter => setter(false))
                             layerSetters[region](true)
+
+                            // if (region.startsWith('dm')) {
+                            //     setDipVisible(true)
+                            // }
+                            // if (region.startsWith('exdma')) {
+                            //     setExdmaVisible(true)
+                            // }
                         }}
                         reset={() => {
-                            setSelection(Sets.empty())
+                            setSelection(null)
                             Object.values(layerSetters).forEach(s => s(true))
                         }}
                         planimetriaRef={planimetrieRef}
                         layerToggles={{
                             dip: {
-                                group: dipVisible,
-                                toggleGroup: toggleDipVisible,
                                 floors: [
                                     {
                                         viewpoint: 'dm-floor-0',
@@ -158,8 +196,6 @@ export const Planimetrie = ({ selectedRooms }) => {
                             },
 
                             exdma: {
-                                group: exdmaVisible,
-                                toggleGroup: toggleExdmaVisible,
                                 floors: [
                                     {
                                         viewpoint: 'exdma-floor-0',
@@ -218,23 +254,23 @@ export class PlanimetrieElement extends HTMLElement {
 
         // initial selection is passed as query string as ?sel=<id1>&sel=<id2>&...
         const url = new URL(location.href)
-        const initialSelection = url.searchParams.getAll('sel')
+        const initialSelection = url.searchParams.get('sel')
 
         console.log('Initial Room Selection:', initialSelection)
 
-        this.#render({ selectedIds: initialSelection })
+        this.#render({ selectedId: initialSelection })
     }
 
-    #render({ selectedIds }) {
-        render(<Planimetrie selectedRooms={selectedIds} />, this.shadowRoot)
+    #render({ selectedId }) {
+        render(<Planimetrie selectedRoom={selectedId} />, this.shadowRoot)
     }
 
     /**
-     * @param {string[]} selectedIds
+     * @param {string[]} selectedId
      * @returns {void}
      */
-    setSelection(selectedIds) {
-        this.#render({ selectedIds })
+    setSelection(selectedId) {
+        this.#render({ selectedId })
     }
 }
 

@@ -38,10 +38,7 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
 
         const updateSnapping = throttle(() => {
             if (!this.#model.geometries) return
-            this.snap = nearestVertexInGeometries(
-                this.#model.geometries,
-                this.cursorWidget.position
-            )
+            this.snap = nearestVertexInGeometries(this.#model.geometries, this.cursorWidget.position)
 
             snappingVertexSphere.visible = this.snap.distance < 0.1
             snappingVertexSphere.position.copy(this.snap.point)
@@ -85,13 +82,10 @@ export class PlanimetrieTool extends THREE.EventDispatcher {
                 cursorPosition: this.cursorWidget.position,
                 snap: this.snap,
                 castIntersection: () => {
-                    const intersections = this.canvas3d.raycastObjectsAtMouse(
-                        this.#model.children,
-                        {
-                            layers: layerFromIndices(0),
-                            recursive: true,
-                        }
-                    )
+                    const intersections = this.canvas3d.raycastObjectsAtMouse(this.#model.children, {
+                        layers: layerFromIndices(0),
+                        recursive: true,
+                    })
 
                     return intersections.length > 0 ? intersections[0] : false
                 },
@@ -182,10 +176,10 @@ const mouseClickReducer = (
                 ? { drawState: 'closed', polygon }
                 : { drawState, polygon } // if any other vertex is clicked do nothing
             : snap.distance < 0.1 // the mouse clicked near a vertex, apply snapping
-                ? snap.point.equals(polygon[0]) // the first vertex was snapped to
-                    ? { drawState: 'closed', polygon }
-                    : { drawState, polygon: [...polygon, snap.point] } // snap to vertex on mesh and add it
-                : { drawState, polygon: [...polygon, cursorPosition] } // a point on the surface of the mesh was clicked, add it
+            ? snap.point.equals(polygon[0]) // the first vertex was snapped to
+                ? { drawState: 'closed', polygon }
+                : { drawState, polygon: [...polygon, snap.point] } // snap to vertex on mesh and add it
+            : { drawState, polygon: [...polygon, cursorPosition] } // a point on the surface of the mesh was clicked, add it
     }
     if (drawState === 'closed') {
         // check if the model was clicked and add the intersection point to the new polygon

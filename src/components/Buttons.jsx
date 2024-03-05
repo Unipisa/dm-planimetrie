@@ -8,42 +8,24 @@ import { toChildArray } from 'preact'
 const FLOOR_LABELS = ['Piano Terra', '1° Piano', '2° Piano']
 const GROUP_LABELS = ['Edifici A e B', 'Edificio ex-Albergo']
 
-const LayerFloor = ({ label, enabled, cameraToViewpoint, data: { viewpoint, visible, toggle } }) => {
-    const floorId = useId()
-
+const LayerFloor = ({ label, cameraToViewpoint, data: { viewpoint, visible, toggle } }) => {
     return (
         <div class="row">
-            <input type="checkbox" id={floorId} checked={visible} onInput={toggle} disabled={!enabled} />
-            <label for={floorId}>
-                <div class="fix-text">{label}</div>
-            </label>
-            <div class="hfill"></div>
             <div class="icon" role="button" onClick={() => cameraToViewpoint(viewpoint)}>
-                <LuVideo size={16} />
+                <LuEye size={16} />
             </div>
+            <div class="fix-text">{label}</div>
         </div>
     )
 }
 
-const LayerGroup = ({ label, data: { group, toggleGroup, floors }, cameraToViewpoint }) => {
-    const floorGroupId = useId()
-
+const LayerGroup = ({ label, data: { floors }, cameraToViewpoint }) => {
     return (
         <div class="layer">
-            <div class="row">
-                <input type="checkbox" id={floorGroupId} checked={group} onInput={toggleGroup} />
-                <label for={floorGroupId}>
-                    <div class="fix-text">{label}</div>
-                </label>
-            </div>
+            <div class="row">{label}</div>
             <div class="children">
                 {floors.map((floor, i) => (
-                    <LayerFloor
-                        cameraToViewpoint={cameraToViewpoint}
-                        label={FLOOR_LABELS[i]}
-                        data={floor}
-                        enabled={group}
-                    />
+                    <LayerFloor cameraToViewpoint={cameraToViewpoint} label={FLOOR_LABELS[i]} data={floor} />
                 ))}
             </div>
         </div>

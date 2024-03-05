@@ -40,44 +40,54 @@ export const Search = ({ rooms, selectId, ...rest }) => {
     return (
         <div class={clsx('search', rest?.class)}>
             <div class="search-field">
-                <input type="text" value={query} onInput={e => setQuery(e.target.value)} />
+                <input
+                    placeholder="Cerca il codice di una stanza o un professore..."
+                    type="text"
+                    value={query}
+                    onInput={e => setQuery(e.target.value)}
+                />
                 <div class="icon">
                     <LuSearch />
                 </div>
             </div>
-            {query.trim().length > 0 && (
-                <div class="search-results">
-                    {results
-                        .slice(0, 5)
-                        .map(({ item: { _id: id, code, notes, roomAssignments }, matches }) => {
-                            const codeIndices = matches.find(({ key }) => key === 'code')?.indices
-                            const notesIndices = matches.find(({ key }) => key === 'notes')?.indices
+            {query.trim().length > 0 &&
+                (results.length > 0 ? (
+                    <div class="search-results">
+                        {results
+                            .slice(0, 5)
+                            .map(({ item: { _id: id, code, notes, roomAssignments }, matches }) => {
+                                const codeIndices = matches.find(({ key }) => key === 'code')?.indices
+                                const notesIndices = matches.find(({ key }) => key === 'notes')?.indices
 
-                            return (
-                                <div class="result" onClick={() => onRoomSelected(id)}>
-                                    <div class="code">
-                                        <HighlightedText indices={codeIndices} value={code} />
+                                return (
+                                    <div class="result" onClick={() => onRoomSelected(id)}>
+                                        <div class="code">
+                                            <HighlightedText indices={codeIndices} value={code} />
+                                        </div>
+                                        {notes && (
+                                            <div class="notes">
+                                                <HighlightedText indices={notesIndices} value={notes} />
+                                            </div>
+                                        )}
+                                        {roomAssignments.length > 0 && (
+                                            <div class="assignments">
+                                                {roomAssignments
+                                                    .map(
+                                                        assignment =>
+                                                            `${assignment.person.firstName} ${assignment.person.lastName}`
+                                                    )
+                                                    .join(', ')}
+                                            </div>
+                                        )}
                                     </div>
-                                    {notes && (
-                                        <div class="notes">
-                                            <HighlightedText indices={notesIndices} value={notes} />
-                                        </div>
-                                    )}
-                                    {roomAssignments.length > 0 && (
-                                        <div class="assignments">
-                                            {roomAssignments
-                                                .map(
-                                                    assignment =>
-                                                        `${assignment.person.firstName} ${assignment.person.lastName}`
-                                                )
-                                                .join(', ')}
-                                        </div>
-                                    )}
-                                </div>
-                            )
-                        })}
-                </div>
-            )}
+                                )
+                            })}
+                    </div>
+                ) : (
+                    <div class="search-results">
+                        <div class="no-result">Nessun risultato...</div>
+                    </div>
+                ))}
         </div>
     )
 }

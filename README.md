@@ -1,5 +1,7 @@
 # DM-Planimetrie
 
+<a href="https://www.npmjs.com/package/dm-planimetrie"><img src="https://img.shields.io/npm/v/dm-planimetrie" alt="npm version"></a>
+
 This project is a JavaScript-based application that renders a planimetry of the
 Department of Mathematics in Pisa, and lets you interact with it by selecting
 rooms and querying a Database for various information about them.

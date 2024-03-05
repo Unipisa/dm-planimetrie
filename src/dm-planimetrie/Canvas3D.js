@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import { MapControls } from 'three/addons/controls/MapControls.js'
 import { clamp, onMouseDownWhileStill } from '../lib/utils.js'
+import { CSS2DRenderer } from 'three/addons/renderers/CSS2DRenderer.js'
 
 const FOV = 80
 
@@ -18,7 +19,7 @@ export class Canvas3D extends THREE.EventDispatcher {
     /** Is the rescaled mouse position in the range $[-1, +1]^2$ */
     #rescaledMousePosition = new THREE.Vector2()
 
-    constructor(el) {
+    constructor(el, tooltip) {
         super()
 
         this.el = el
@@ -32,6 +33,7 @@ export class Canvas3D extends THREE.EventDispatcher {
         window.camera = this.camera
 
         this.renderer = new THREE.WebGLRenderer({ canvas: this.el })
+        this.labelRenderer = new CSS2DRenderer({ element: tooltip })
     }
 
     /**
@@ -43,9 +45,11 @@ export class Canvas3D extends THREE.EventDispatcher {
 
     #renderCanvas() {
         this.renderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
+        this.labelRenderer.setSize(this.el.offsetWidth, this.el.offsetHeight)
         this.renderer.setPixelRatio(2) // for crispier rendering
         this.cameraControls.update()
         this.renderer.render(this.#scene, this.camera)
+        this.labelRenderer.render(this.#scene, this.camera)
     }
 
     #createCameraControls(el, camera) {

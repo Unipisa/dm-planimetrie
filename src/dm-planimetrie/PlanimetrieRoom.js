@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
+
 const hoverMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
     side: THREE.DoubleSide,
@@ -48,20 +50,40 @@ export class PlanimetrieRoom extends THREE.Object3D {
         this.rotateX(Math.PI / 2)
         this.scale.setZ(-1)
         this.position.set(x0, y0, z0)
+
+        const text = document.createElement('div')
+        text.classList.add('room-tooltip')
+        text.textContent = room.code
+        this.label = new CSS2DObject(text)
+        const barycenter = this.computeRoomBarycenter()
+        this.label.position.copy(
+            this.worldToLocal(barycenter.add(new THREE.Vector3(0, ROOM_HEIGHT * 1.25, 0)))
+        )
+        this.add(this.label)
     }
 
     setHiddenStyle() {
         this.visible = false
+        this.label.visible = false
     }
 
     setHoverStyle() {
         this.visible = true
+        // ?
+        this.label.visible = true
         this.#mesh.material = hoverMaterial
     }
 
     setActiveStyle() {
+        this.label.visible = true
         this.visible = true
         this.#mesh.material = activeMaterial
+    }
+
+    computeRoomBarycenter() {
+        const box = new THREE.Box3().setFromPoints(this.room.polygon)
+        const barycenter = new THREE.Vector3()
+        return box.getCenter(barycenter)
     }
 
     // By default raycaster is a noop, but we need it so this is an
