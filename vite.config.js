@@ -69,10 +69,12 @@ function rewriteHtmlLinksPlugin(baseUrl) {
     }
 }
 
-// vite automatically adds Content-Encoding: gzip to .gz files so the client
-// automatically decompresses the file (github pages instead just sends the
+// vite automatically adds "Content-Encoding: gzip" to .gz files so the client
+// automatically decompresses the file. GitHub pages instead just sends the
 // file without that header so an actually compressed file arrives to the
-// client)
+// client.
+// The following "gzipDevFix" vite plugin manually sends .gz files without that
+// header to correctly use this during development.
 
 /** @type {(baseUrl: string) => import('vite').Plugin} */
 function gzipDevFix() {
