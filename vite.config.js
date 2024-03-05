@@ -17,11 +17,12 @@ export default defineConfig(({ mode, command }) => {
     const plugins = [preactPlugin(), rewriteHtmlLinksPlugin(BASE_URL), gzipDevFix()]
 
     // url to the planimetrie service (no trailing slash)
-    const MANAGE_API_URL = process.env.MANAGE_API_URL || 'https://manage.develop.lb.cs.dm.unipi.it/api/v0'
+
+    const MANAGE_API_URL = process.env.MANAGE_API_URL || 'https://manage.dm.unipi.it/api/v0'
     console.log(`[Vite] Manage API: ${MANAGE_API_URL}`)
 
     // url to manage (no trailing slash)
-    const MANAGE_URL = process.env.MANAGE_URL || 'https://manage.develop.lb.cs.dm.unipi.it'
+    const MANAGE_URL = process.env.MANAGE_URL || 'https://manage.dm.unipi.it'
     console.log(`[Vite] Manage: ${MANAGE_URL}`)
 
     return {
