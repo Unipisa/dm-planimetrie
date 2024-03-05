@@ -1,5 +1,8 @@
 import { defineConfig } from 'vite'
 
+import path from 'path'
+import fs from 'fs'
+
 import preactPlugin from '@preact/preset-vite'
 import rollupPluginSizes from 'rollup-plugin-sizes'
 
@@ -11,11 +14,10 @@ export default defineConfig(({ mode, command }) => {
     const BASE_URL = process.env.BASE_URL || ''
     console.log(`[Vite] Base URL: ${BASE_URL}`)
 
-    const plugins = [preactPlugin(), rewriteHtmlLinksPlugin(BASE_URL)]
+    const plugins = [preactPlugin(), rewriteHtmlLinksPlugin(BASE_URL), gzipDevFix()]
 
     // url to the planimetrie service (no trailing slash)
-    const MANAGE_API_URL =
-        process.env.MANAGE_API_URL || 'https://manage.develop.lb.cs.dm.unipi.it/api/v0'
+    const MANAGE_API_URL = process.env.MANAGE_API_URL || 'https://manage.develop.lb.cs.dm.unipi.it/api/v0'
     console.log(`[Vite] Manage API: ${MANAGE_API_URL}`)
 
     // url to manage (no trailing slash)
@@ -60,6 +62,35 @@ function rewriteHtmlLinksPlugin(baseUrl) {
                     return match
                 } else {
                     return `<a href="${baseUrl}${p1}">`
+                }
+            })
+        },
+    }
+}
+
+// vite automatically adds Content-Encoding: gzip to .gz files so the client
+// automatically decompresses the file (github pages instead just sends the
+// file without that header so an actually compressed file arrives to the
+// client)
+
+/** @type {(baseUrl: string) => import('vite').Plugin} */
+function gzipDevFix() {
+    return {
+        configureServer(server) {
+            server.middlewares.use(async (req, res, next) => {
+                if (req.method === 'GET' && req.url.endsWith('.gz')) {
+                    const gzFilePath = path.join(__dirname, 'public', req.url)
+                    if (fs.existsSync(gzFilePath)) {
+                        const fileStream = fs.createReadStream(gzFilePath)
+                        res.writeHead(200, { 'Content-Type': 'application/gzip' })
+
+                        fileStream.pipe(res)
+                    } else {
+                        res.writeHead(404)
+                        res.end('File not found')
+                    }
+                } else {
+                    next()
                 }
             })
         },

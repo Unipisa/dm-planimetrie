@@ -24,19 +24,13 @@ async function streamToText(stream) {
 const loadModelDM = async () => {
     const loader = new ColladaLoader()
 
-    const res = await fetch(`${process.env.BASE_URL}/dm.dae.gz`, {
-        'Accept-Encoding': 'gzip;q=0,deflate;q=0',
-    })
+    const res = await fetch(`${process.env.BASE_URL}/dm.dae.gz`)
 
     const blob = await res.blob()
 
     const ds = new DecompressionStream('gzip')
     const decompressedStream = blob.stream().pipeThrough(ds)
     const rawText = await streamToText(decompressedStream)
-
-    // const rawText = await res.text()
-
-    // console.log(rawText)
 
     const colladaModel = loader.parse(rawText, `${process.env.BASE_URL}/`)
 
