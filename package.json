@@ -4,6 +4,11 @@
     "description": "Far partire un server web in questa directory. Ad esempio così:",
     "main": "index.html",
     "type": "module",
+    "exports": {
+        ".": "./src/dm-planimetrie/index.js",
+        "./*.js": "./src/dm-planimetrie/*.js",
+        "./lib/*.js": "./src/lib/*.js"
+    },
     "scripts": {
         "dev": "vite",
         "build": "npm run build:pages && npm run build:library",
