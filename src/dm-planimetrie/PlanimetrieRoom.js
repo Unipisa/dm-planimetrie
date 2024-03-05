@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js'
 
 const hoverMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
@@ -56,7 +56,9 @@ export class PlanimetrieRoom extends THREE.Object3D {
         text.textContent = room.code
         this.label = new CSS2DObject(text)
         const barycenter = this.computeRoomBarycenter()
-        this.label.position.copy(this.worldToLocal(barycenter.add(new THREE.Vector3(0, ROOM_HEIGHT * 1.25, 0))))
+        this.label.position.copy(
+            this.worldToLocal(barycenter.add(new THREE.Vector3(0, ROOM_HEIGHT * 1.25, 0)))
+        )
         this.add(this.label)
     }
 
@@ -77,7 +79,6 @@ export class PlanimetrieRoom extends THREE.Object3D {
         this.visible = true
         this.#mesh.material = activeMaterial
     }
-
 
     computeRoomBarycenter() {
         const box = new THREE.Box3().setFromPoints(this.room.polygon)
