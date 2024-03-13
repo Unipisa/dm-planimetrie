@@ -77,19 +77,19 @@ element.setSelection(['id1', 'id2', 'id3']);
 
 - Export the model from the SketchUp web app using the "Collada" exporter and set the following options
 
-    - \*Export two-sided faces: Yes
+    - **Export two-sided faces\***: Yes
 
-    - \*Export edges: Yes
+    - **Export edges\***: Yes
 
-    - \*Triangulate all faces: Yes
+    - **Triangulate all faces\***: Yes
 
-    - Export hidden geometry: No
+    - **Export hidden geometry**: No
 
-    - \*Preserve component hierarchy: Yes
+    - **Preserve component hierarchy\***: Yes
 
-    - \*Export texture maps: Yes
+    - **Export texture maps\***: Yes
 
-    - Preserve credits: No
+    - **Preserve credits**: No
 
     The one with \* are the important ones.
 
