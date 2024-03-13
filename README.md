@@ -73,6 +73,61 @@ const element = document.querySelector('dm-planimetrie');
 element.setSelection(['id1', 'id2', 'id3']);
 ```
 
+## SketchUp Model Export
+
+- Export the model from the SketchUp web app using the "Collada" exporter and set the following options
+
+    - \*Export two-sided faces: Yes
+
+    - \*Export edges: Yes
+
+    - \*Triangulate all faces: Yes
+
+    - Export hidden geometry: No
+
+    - \*Preserve component hierarchy: Yes
+
+    - \*Export texture maps: Yes
+
+    - Preserve credits: No
+
+    The one with \* are the important ones.
+
+- Extract the generated `.zip` file
+
+- This contains the main `.dae` file and a folder containing the embedded textures
+
+- Now edit main `.dae` file and fix the textures directory. `Ctrl+F` for "Wood_", one of the results will look like the following
+
+    ```xml
+    <init_from>643caea7-fcbc-458d-b235-41120140542b/Wood_Bamboo_Medium.jpg</init_from>
+    ```
+
+    and change it to just
+
+    ```xml
+    <init_from>Wood_Bamboo_Medium.jpg</init_from>
+    ```
+
+    or just run the following command
+
+    ```bash
+    sed 's#<init_from>[^\/]*/#<init_from># dm.dae > dm-patched.dae'
+    ```
+
+- Then gzip the file using
+
+    ```bash
+    gzip -9 -c dm-patched.dae > dm.dae.gz
+    ```
+
+- In the end put `dm.dae.gz` and all the textures inside `public/`
+
+
+
+rename the main `.dae` file to  
+
+<!--
 ## React Usage (dm-manager?)
 
 ```jsx
@@ -92,3 +147,5 @@ const PlanimetrieWrapper = () => {
 };
 
 ```
+
+-->
