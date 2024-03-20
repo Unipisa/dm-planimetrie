@@ -1,7 +1,5 @@
 import { memo } from 'preact/compat'
 
-import { LuHelpCircle } from 'react-icons/lu'
-
 import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 
 import styles from './element.scss?inline'
@@ -216,13 +214,6 @@ export const Planimetrie = ({ selectedRoom }) => {
                             },
                         }}
                     />
-                    <div className="help-message">
-                        <LuHelpCircle />
-                        <span>
-                            Clicca e trascina per spostarti, trascina col tasto destro per orbitare e usa la
-                            rotellina del mouse per zoomare.
-                        </span>
-                    </div>
                 </div>
             </div>
         </>

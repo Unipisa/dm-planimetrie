@@ -176,6 +176,7 @@ code {
     }
 
     .tooltip {
+        z-index: 5;
         position: absolute;
         inset: 0;
 
@@ -341,8 +342,8 @@ code {
 
             justify-items: start;
 
-            pointer-events: none;
-
+            pointer-events: auto;
+            max-width: calc(100vw - 2rem);
             .button-group {
                 display: grid;
 
@@ -442,6 +443,14 @@ code {
                     gap: 0.25rem;
 
                     min-width: 15rem;
+                    max-width: 20rem;
+
+                    text-wrap: wrap;
+                    line-height: 1.35;
+
+                    ul {
+                        padding-left: 1.25rem;
+                    }
 
                     .title {
                         display: flex;
@@ -737,22 +746,6 @@ code {
                 }
             }
         }
-
-        .help-message {
-            position: absolute;
-            top: 100%;
-            left: 0;
-
-            width: 100%;
-            padding: 0.25rem 0.125rem;
-
-            color: #444;
-            font-size: 19px;
-
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
     }
 }
 
@@ -882,10 +875,6 @@ code {
                         transform: translate(0, 0);
                     }
                 }
-            }
-
-            .help-message {
-                display: none;
             }
         }
     }

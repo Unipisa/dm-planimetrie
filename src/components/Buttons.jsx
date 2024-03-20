@@ -1,6 +1,5 @@
-import { useId } from 'preact/hooks'
-import { LuEye, LuHome, LuLayers, LuVideo } from 'react-icons/lu'
-import { useToggle } from '../lib/hooks.js'
+import { LuEye, LuHome, LuLayers, LuHelpCircle } from 'react-icons/lu'
+import { useState } from 'preact/hooks'
 import { clsx } from '../lib/utils.js'
 import { GridAnimation } from './Animations.jsx'
 import { toChildArray } from 'preact'
@@ -8,7 +7,7 @@ import { toChildArray } from 'preact'
 const FLOOR_LABELS = ['Piano Terra', '1° Piano', '2° Piano']
 const GROUP_LABELS = ['Edifici A e B', 'Edificio ex-Albergo']
 
-const LayerFloor = ({ label, cameraToViewpoint, data: { viewpoint, visible, toggle } }) => {
+const LayerFloor = ({ label, cameraToViewpoint, data: { viewpoint } }) => {
     return (
         <div class="row">
             <div class="icon" role="button" onClick={() => cameraToViewpoint(viewpoint)}>
@@ -32,9 +31,7 @@ const LayerGroup = ({ label, data: { floors }, cameraToViewpoint }) => {
     )
 }
 
-const CollapsibleIconPanel = ({ children }) => {
-    const [layersPopup, toggleLayersPopup] = useToggle(false)
-
+const CollapsibleIconPanel = ({ layersPopup, toggleLayersPopup, children }) => {
     // extracts jsx nodes from the "children" prop
     const [iconJsx, labelJsx, contentJsx] = toChildArray(children)
 
@@ -75,6 +72,11 @@ const CollapsibleIconButton = ({ onClick, children }) => {
 }
 
 export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, showOnlyRegion }) => {
+    // we only want to have one uncollapsed panel at a time
+    // so we need to keep track of which panel is open
+    // and close it when another one is opened
+    const [layersPopup, setLayersPopup] = useState(null)
+
     const onResetView = () => {
         if (planimetriaRef.current) {
             planimetriaRef.current.animateCameraToViewpoint('home')
@@ -89,7 +91,10 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
 
     return (
         <div class="buttons">
-            <CollapsibleIconPanel>
+            <CollapsibleIconPanel
+                layersPopup={layersPopup === 'layers'}
+                toggleLayersPopup={() => setLayersPopup(layersPopup === 'layers' ? null : 'layers')}
+            >
                 <LuLayers />
                 <div class="label">
                     <div class="fix-text">Livelli</div>
@@ -106,6 +111,30 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
                     <div class="fix-text">Reimposta Vista</div>
                 </div>
             </CollapsibleIconButton>
+            <CollapsibleIconPanel
+                layersPopup={layersPopup === 'help'}
+                toggleLayersPopup={() => setLayersPopup(layersPopup === 'help' ? null : 'help')}
+            >
+                <LuHelpCircle />
+                <div class="label">
+                    <div class="fix-text">Help</div>
+                </div>
+                <div class="content">
+                    <div class="title">Come navigare la mappa</div>
+                    <ul>
+                        <li>Per spostare la mappa, trascina con il mouse o con un dito.</li>
+                        <li>Per zoomare, usa la rotellina del mouse o i gesti di pinch-to-zoom.</li>
+                        <li>Per ruotare, clicca e trascina con il tasto destro del mouse o con due dita.</li>
+                        <li>
+                            Per selezionare un piano, clicca sull'icona dell'occhio corrispondente dentro il
+                            pannello <LuLayers />.
+                        </li>
+                        <li>
+                            Per tornare alla vista iniziale, clicca su <LuHome />.
+                        </li>
+                    </ul>
+                </div>
+            </CollapsibleIconPanel>
         </div>
     )
 }
