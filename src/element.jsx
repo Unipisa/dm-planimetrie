@@ -159,13 +159,6 @@ export const Planimetrie = ({ selectedRoom }) => {
                         showOnlyRegion={region => {
                             Object.values(layerSetters).forEach(setter => setter(false))
                             layerSetters[region](true)
-
-                            // if (region.startsWith('dm')) {
-                            //     setDipVisible(true)
-                            // }
-                            // if (region.startsWith('exdma')) {
-                            //     setExdmaVisible(true)
-                            // }
                         }}
                         reset={() => {
                             setSelection(null)

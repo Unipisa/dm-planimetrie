@@ -486,7 +486,8 @@ code {
 
                             padding: 3px 4px;
 
-                            &:hover {
+                            &:hover,
+                            &.active {
                                 background: #fff5;
                             }
                         }

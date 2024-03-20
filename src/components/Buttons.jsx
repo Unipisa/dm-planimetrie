@@ -7,10 +7,14 @@ import { toChildArray } from 'preact'
 const FLOOR_LABELS = ['Piano Terra', '1° Piano', '2° Piano']
 const GROUP_LABELS = ['Edifici A e B', 'Edificio ex-Albergo']
 
-const LayerFloor = ({ label, cameraToViewpoint, data: { viewpoint } }) => {
+const LayerFloor = ({ label, viewportName, cameraToViewpoint, data: { viewpoint } }) => {
     return (
         <div class="row">
-            <div class="icon" role="button" onClick={() => cameraToViewpoint(viewpoint)}>
+            <div
+                class={clsx('icon', viewportName == viewpoint && 'active')}
+                role="button"
+                onClick={() => cameraToViewpoint(viewpoint)}
+            >
                 <LuEye size={16} />
             </div>
             <div class="fix-text">{label}</div>
@@ -18,13 +22,18 @@ const LayerFloor = ({ label, cameraToViewpoint, data: { viewpoint } }) => {
     )
 }
 
-const LayerGroup = ({ label, data: { floors }, cameraToViewpoint }) => {
+const LayerGroup = ({ label, data: { floors }, viewportName, cameraToViewpoint }) => {
     return (
         <div class="layer">
             <div class="row">{label}</div>
             <div class="children">
                 {floors.map((floor, i) => (
-                    <LayerFloor cameraToViewpoint={cameraToViewpoint} label={FLOOR_LABELS[i]} data={floor} />
+                    <LayerFloor
+                        viewportName={viewportName}
+                        cameraToViewpoint={cameraToViewpoint}
+                        label={FLOOR_LABELS[i]}
+                        data={floor}
+                    />
                 ))}
             </div>
         </div>
@@ -72,10 +81,8 @@ const CollapsibleIconButton = ({ onClick, children }) => {
 }
 
 export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, showOnlyRegion }) => {
-    // we only want to have one uncollapsed panel at a time
-    // so we need to keep track of which panel is open
-    // and close it when another one is opened
     const [layersPopup, setLayersPopup] = useState(null)
+    const [viewportName, setViewportName] = useState(null)
 
     const onResetView = () => {
         if (planimetriaRef.current) {
@@ -87,6 +94,13 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
     const cameraToViewpoint = viewpoint => {
         planimetriaRef.current.animateCameraToViewpoint2(viewpoint)
         showOnlyRegion(viewpoint)
+        setViewportName(oldValue => {
+            if (oldValue === viewpoint) {
+                onResetView()
+                return null
+            }
+            return viewpoint
+        })
     }
 
     return (
@@ -101,8 +115,18 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
                 </div>
                 <div class="content">
                     <div class="title">Dipartimento di Matematica</div>
-                    <LayerGroup label={GROUP_LABELS[0]} data={dip} cameraToViewpoint={cameraToViewpoint} />
-                    <LayerGroup label={GROUP_LABELS[1]} data={exdma} cameraToViewpoint={cameraToViewpoint} />
+                    <LayerGroup
+                        label={GROUP_LABELS[0]}
+                        data={dip}
+                        viewportName={viewportName}
+                        cameraToViewpoint={cameraToViewpoint}
+                    />
+                    <LayerGroup
+                        label={GROUP_LABELS[1]}
+                        data={exdma}
+                        viewportName={viewportName}
+                        cameraToViewpoint={cameraToViewpoint}
+                    />
                 </div>
             </CollapsibleIconPanel>
             <CollapsibleIconButton onClick={onResetView}>
