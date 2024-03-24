@@ -1,6 +1,9 @@
 import { LuSearch } from 'react-icons/lu'
 import { clsx } from '../lib/utils.js'
 import { useEventCallback, useFuse } from '../lib/hooks.js'
+import { useContext } from 'preact/hooks'
+import { LangContext, LocalizedString, useLocalization } from './LocalizedString.jsx'
+import i18n from '../i18n.jsx'
 
 const HighlightedText = ({ indices, value }) => {
     if (!indices) {
@@ -37,11 +40,13 @@ export const Search = ({ rooms, selectId, ...rest }) => {
         if (e.key === 'Escape') setQuery('')
     })
 
+    const searchPlaceholder = useLocalization('search-placeholder')
+
     return (
         <div class={clsx('search', rest?.class)}>
             <div class="search-field">
                 <input
-                    placeholder="Cerca il codice di una stanza o un professore..."
+                    placeholder={searchPlaceholder}
                     type="text"
                     value={query}
                     onInput={e => setQuery(e.target.value)}
@@ -85,7 +90,9 @@ export const Search = ({ rooms, selectId, ...rest }) => {
                     </div>
                 ) : (
                     <div class="search-results">
-                        <div class="no-result">Nessun risultato...</div>
+                        <div class="no-result">
+                            <LocalizedString name="no-result" />
+                        </div>
                     </div>
                 ))}
         </div>

@@ -5,13 +5,14 @@ import { PlanimetrieViewer } from './dm-planimetrie/PlanimetrieViewer.js'
 import styles from './element.scss?inline'
 
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { Sets, clsx } from './lib/utils.js'
+import { clsx } from './lib/utils.js'
 import { useEventCallback, useToggle, useToggleRegion } from './lib/hooks.js'
 import { createApiProxy } from './lib/mapper.js'
 import { render } from 'preact'
 import { Search } from './components/Search.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
 import { Buttons } from './components/Buttons.jsx'
+import { LangContext } from './components/LocalizedString.jsx'
 
 const Canvas3D = memo(({ planimetrieRef }) => {
     const canvasRef = useRef(null)
@@ -58,7 +59,7 @@ const loadRooms = async () => {
         .filter(room => room.polygon)
 }
 
-export const Planimetrie = ({ selectedRoom }) => {
+export const Planimetrie = ({ selectedRoom, lang }) => {
     const [rooms, setRooms] = useState([])
     const [selection, setSelection] = useState(selectedRoom ?? null)
 
@@ -128,11 +129,9 @@ export const Planimetrie = ({ selectedRoom }) => {
         const room = rooms.find(({ _id }) => _id === id)
 
         if (room.building === 'A' || room.building === 'B') {
-            // setDipVisible(true)
             layerSetters[`dm-floor-${room.floor}`](true)
         }
         if (room.building === 'X') {
-            // setExdmaVisible(true)
             layerSetters[`exdma-floor-${room.floor}`](true)
         }
 
@@ -140,7 +139,7 @@ export const Planimetrie = ({ selectedRoom }) => {
     }
 
     return (
-        <>
+        <LangContext.Provider value={lang}>
             <div class="dm-planimetrie">
                 <Canvas3D planimetrieRef={planimetrieRef} />
                 <div class="overlay">
@@ -209,7 +208,7 @@ export const Planimetrie = ({ selectedRoom }) => {
                     />
                 </div>
             </div>
-        </>
+        </LangContext.Provider>
     )
 }
 
@@ -223,6 +222,7 @@ export class PlanimetrieElement extends HTMLElement {
         this.style.display = 'block'
         this.style.height = '720px'
         this.style.maxHeight = '100%'
+        this.lang = 'it'
 
         this.attachShadow({ mode: 'open' })
 
@@ -240,13 +240,16 @@ export class PlanimetrieElement extends HTMLElement {
         const url = new URL(location.href)
         const initialSelection = url.searchParams.get('sel')
 
+        const isEnglish = location.href.includes('/en')
+        if (isEnglish) this.lang = 'en'
+
         console.log('Initial Room Selection:', initialSelection)
 
-        this.#render({ selectedId: initialSelection })
+        this.#render({ selectedId: initialSelection, lang: this.lang })
     }
 
-    #render({ selectedId }) {
-        render(<Planimetrie selectedRoom={selectedId} />, this.shadowRoot)
+    #render({ selectedId, lang }) {
+        render(<Planimetrie selectedRoom={selectedId} lang={lang} />, this.shadowRoot)
     }
 
     /**
@@ -254,7 +257,7 @@ export class PlanimetrieElement extends HTMLElement {
      * @returns {void}
      */
     setSelection(selectedId) {
-        this.#render({ selectedId })
+        this.#render({ selectedId, lang: this.lang })
     }
 }
 

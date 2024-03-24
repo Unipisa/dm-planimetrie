@@ -1,39 +1,49 @@
 import { clsx } from '../lib/utils.js'
-
-const SIDEBAR_LABELS = {
-    buildings: {
-        ['A']: 'Edificio A',
-        ['B']: 'Edificio B',
-        ['X']: 'Ex-Albergo',
-    },
-    floors: {
-        ['0']: 'Piano terra',
-        ['1']: 'Primo piano',
-        ['2']: 'Secondo Piano',
-    },
-}
+import { LocalizedString } from './LocalizedString.jsx'
 
 export const Sidebar = ({ rooms, ...rest }) => {
+    const SIDEBAR_LABELS = {
+        buildings: {
+            ['A']: 'building-a',
+            ['B']: 'building-b',
+            ['X']: 'building-x',
+        },
+        floors: {
+            ['0']: 'ground-floor',
+            ['1']: 'first-floor',
+            ['2']: 'second-floor',
+        },
+    }
     return (
         <div class={clsx('sidebar', rest?.class)}>
             {rooms.map(room => (
                 <div class="room">
-                    <h2>Stanza "{room.number}"</h2>
+                    <h2>
+                        <LocalizedString name="room" /> "{room.number}"
+                    </h2>
                     <h3>
-                        {SIDEBAR_LABELS.buildings[room.building] ?? 'Ignoto'},{' '}
-                        {SIDEBAR_LABELS.floors[room.floor] ?? 'Ignoto'}
+                        <LocalizedString name={SIDEBAR_LABELS.buildings[room.building] ?? 'unknown'} />,{' '}
+                        <LocalizedString name={SIDEBAR_LABELS.floors[room.floor] ?? 'unknown'} />
                     </h3>
                     <p>
-                        <strong>Codice:</strong> <code>{room.code}</code>
+                        <strong>
+                            <LocalizedString name="code" />:
+                        </strong>{' '}
+                        <code>{room.code}</code>
                     </p>
                     {room.notes && (
                         <p>
-                            <strong>Note:</strong> {room.notes}
+                            <strong>
+                                <LocalizedString name="notes" />:
+                            </strong>{' '}
+                            {room.notes}
                         </p>
                     )}
                     {room.roomAssignments.length > 0 && (
                         <>
-                            <h3>Assegnazioni</h3>
+                            <h3>
+                                <LocalizedString name="assignments" />
+                            </h3>
                             <ul>
                                 {room.roomAssignments.map(assignment => (
                                     <li>

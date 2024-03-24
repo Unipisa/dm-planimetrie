@@ -3,9 +3,7 @@ import { useState } from 'preact/hooks'
 import { clsx } from '../lib/utils.js'
 import { GridAnimation } from './Animations.jsx'
 import { toChildArray } from 'preact'
-
-const FLOOR_LABELS = ['Piano Terra', '1° Piano', '2° Piano']
-const GROUP_LABELS = ['Edifici A e B', 'Edificio ex-Albergo']
+import { LocalizedString } from './LocalizedString.jsx'
 
 const LayerFloor = ({ label, viewportName, cameraToViewpoint, data: { viewpoint } }) => {
     return (
@@ -17,15 +15,20 @@ const LayerFloor = ({ label, viewportName, cameraToViewpoint, data: { viewpoint 
             >
                 <LuEye size={16} />
             </div>
-            <div class="fix-text">{label}</div>
+            <div class="fix-text">
+                <LocalizedString name={label} />
+            </div>
         </div>
     )
 }
 
 const LayerGroup = ({ label, data: { floors }, viewportName, cameraToViewpoint }) => {
+    const FLOOR_LABELS = ['ground-floor', 'first-floor', 'second-floor']
     return (
         <div class="layer">
-            <div class="row">{label}</div>
+            <div class="row">
+                <LocalizedString name={label} />
+            </div>
             <div class="children">
                 {floors.map((floor, i) => (
                     <LayerFloor
@@ -103,6 +106,8 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
         })
     }
 
+    const GROUP_LABELS = ['building-a-b', 'building-exdma']
+
     return (
         <div class="buttons">
             <CollapsibleIconPanel
@@ -111,10 +116,14 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
             >
                 <LuLayers />
                 <div class="label">
-                    <div class="fix-text">Livelli</div>
+                    <div class="fix-text">
+                        <LocalizedString name="floors" />
+                    </div>
                 </div>
                 <div class="content">
-                    <div class="title">Dipartimento di Matematica</div>
+                    <div class="title">
+                        <LocalizedString name="dip" />
+                    </div>
                     <LayerGroup
                         label={GROUP_LABELS[0]}
                         data={dip}
@@ -132,7 +141,9 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
             <CollapsibleIconButton onClick={onResetView}>
                 <LuHome />
                 <div class="label">
-                    <div class="fix-text">Reimposta Vista</div>
+                    <div class="fix-text">
+                        <LocalizedString name="reset-view" />
+                    </div>
                 </div>
             </CollapsibleIconButton>
             <CollapsibleIconPanel
@@ -144,19 +155,10 @@ export const Buttons = ({ planimetriaRef, reset, layerToggles: { dip, exdma }, s
                     <div class="fix-text">Help</div>
                 </div>
                 <div class="content">
-                    <div class="title">Come navigare la mappa</div>
-                    <ul>
-                        <li>Per spostare la mappa, trascina con il mouse o con un dito.</li>
-                        <li>Per zoomare, usa la rotellina del mouse o i gesti di pinch-to-zoom.</li>
-                        <li>Per ruotare, clicca e trascina con il tasto destro del mouse o con due dita.</li>
-                        <li>
-                            Per selezionare un piano, clicca sull'icona dell'occhio corrispondente dentro il
-                            pannello <LuLayers />.
-                        </li>
-                        <li>
-                            Per tornare alla vista iniziale, clicca su <LuHome />.
-                        </li>
-                    </ul>
+                    <div class="title">
+                        <LocalizedString name="help-title" />
+                    </div>
+                    <LocalizedString name="help-content" />
                 </div>
             </CollapsibleIconPanel>
         </div>
