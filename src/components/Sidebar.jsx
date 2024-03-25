@@ -25,12 +25,12 @@ export const Sidebar = ({ rooms, ...rest }) => {
                         <LocalizedString name={SIDEBAR_LABELS.buildings[room.building] ?? 'unknown'} />,{' '}
                         <LocalizedString name={SIDEBAR_LABELS.floors[room.floor] ?? 'unknown'} />
                     </h3>
-                    <p>
+                    {/* <p>
                         <strong>
                             <LocalizedString name="code" />:
                         </strong>{' '}
                         <code>{room.code}</code>
-                    </p>
+                    </p> */}
                     {room.notes && (
                         <p>
                             <strong>
@@ -41,9 +41,9 @@ export const Sidebar = ({ rooms, ...rest }) => {
                     )}
                     {room.roomAssignments.length > 0 && (
                         <>
-                            <h3>
+                            {/* <h3>
                                 <LocalizedString name="assignments" />
-                            </h3>
+                            </h3> */}
                             <ul>
                                 {room.roomAssignments.map(assignment => (
                                     <li>

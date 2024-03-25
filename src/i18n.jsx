@@ -57,8 +57,8 @@ export default {
         en: 'Notes',
     },
     'assignments': {
-        it: 'Assegnazioni',
-        en: 'Assignments',
+        it: 'Persone',
+        en: 'People',
     },
     'room': {
         it: 'Stanza',
