@@ -1,7 +1,8 @@
 import { clsx } from '../lib/utils.js'
-import { LocalizedString } from './LocalizedString.jsx'
+import { LocalizedString, useLang } from './LocalizedString.jsx'
 
 export const Sidebar = ({ rooms, ...rest }) => {
+    const lang = useLang()
     const SIDEBAR_LABELS = {
         buildings: {
             ['A']: 'building-a',
@@ -49,7 +50,7 @@ export const Sidebar = ({ rooms, ...rest }) => {
                                     <li>
                                         <a
                                             target="_blank"
-                                            href={`https://www.dm.unipi.it/scheda-personale/?person_id=${assignment.person._id}`}
+                                            href={`https://www.dm.unipi.it/${lang==='en'?'en/':''}scheda-personale/?person_id=${assignment.person._id}`}
                                         >
                                             {assignment.person.firstName} {assignment.person.lastName}
                                         </a>
