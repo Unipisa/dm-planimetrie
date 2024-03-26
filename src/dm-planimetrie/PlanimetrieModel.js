@@ -28,6 +28,10 @@ const loadModelDM = async () => {
 
     const blob = await res.blob()
 
+    if (!window.DecompressionStream) {
+        await import('compression-streams-polyfill')
+    }
+
     const ds = new DecompressionStream('gzip')
     const decompressedStream = blob.stream().pipeThrough(ds)
     const rawText = await streamToText(decompressedStream)
