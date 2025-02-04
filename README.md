@@ -30,7 +30,7 @@ $ git clone https://github.com/Unipisa/dm-planimetrie
 $ cd dm-planimetrie
 
 # Install the required dependencies
-$ npm install
+$ npm ci
 
 # Start the ViteJS development server
 $ npm run dev

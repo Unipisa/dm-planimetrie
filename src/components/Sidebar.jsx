@@ -1,5 +1,6 @@
 import { clsx } from '../lib/utils.js'
 import { LocalizedString, useLang } from './LocalizedString.jsx'
+import { LuShare2 } from 'react-icons/lu'
 
 export const Sidebar = ({ rooms, ...rest }) => {
     const lang = useLang()
@@ -15,6 +16,17 @@ export const Sidebar = ({ rooms, ...rest }) => {
             ['2']: 'second-floor',
         },
     }
+    const copyShareLink = (roomId) => {
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareLink = `${baseUrl}?sel=${roomId}`;
+        navigator.clipboard.writeText(shareLink).then(() => {
+            console.log('Link copied to clipboard');
+            alert('Link copiato nella clipboard');
+        }).catch(err => {
+            console.error('Could not copy text: ', err);
+        });
+    };
+
     return (
         <div class={clsx('sidebar', rest?.class)}>
             {rooms.map(room => (
@@ -57,6 +69,11 @@ export const Sidebar = ({ rooms, ...rest }) => {
                                     </li>
                                 ))}
                             </ul>
+                            <div className="mt-3" style={{ marginTop: "16px"}}>
+                                <a href="#" onClick={() => copyShareLink(room._id)}>
+                                    <LuShare2 size={16} />
+                                </a>
+                            </div>
                         </>
                     )}
                 </div>
