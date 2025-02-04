@@ -69,13 +69,13 @@ export const Sidebar = ({ rooms, ...rest }) => {
                                     </li>
                                 ))}
                             </ul>
-                            <div className="mt-3" style={{ marginTop: "16px"}}>
-                                <a href="#" onClick={() => copyShareLink(room._id)}>
-                                    <LuShare2 size={16} />
-                                </a>
-                            </div>
                         </>
                     )}
+                    <div className="mt-3" style={{ marginTop: "16px"}}>
+                        <a href="#" onClick={() => copyShareLink(room._id)}>
+                            <LuShare2 size={16} />
+                        </a>
+                    </div>
                 </div>
             ))}
         </div>
