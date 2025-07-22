@@ -52,9 +52,9 @@ export default {
         it: 'Codice',
         en: 'Code',
     },
-    'notes': {
-        it: 'Note',
-        en: 'Notes',
+    'description': {
+        it: 'Descrizione',
+        en: 'Description',
     },
     'assignments': {
         it: 'Persone',

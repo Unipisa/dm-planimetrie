@@ -1,6 +1,6 @@
 {
     "name": "dm-planimetrie",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "Far partire un server web in questa directory. Ad esempio così:",
     "main": "index.html",
     "type": "module",

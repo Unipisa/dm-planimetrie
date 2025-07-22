@@ -40,12 +40,12 @@ const useEndpointRef = key => {
     return endpointRef
 }
 
-const Room = ({ room: { notes, code, polygon }, edit }) => {
+const Room = ({ room: { description, code, polygon }, edit }) => {
     return (
         <div class="room">
             <div class="label">
                 <div class="code">{code}</div>
-                <div class="name">{notes}</div>
+                <div class="name">{description}</div>
             </div>
             <div class="buttons">
                 <button class="icon" onClick={edit}>
@@ -83,7 +83,7 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
     const handleOk = async () => {
         // call the API to save the room
         await endpointRef.current[editingRoom._id].post({
-            notes: editingRoom.notes,
+            description: editingRoom.description,
             polygon: JSON.stringify(editingRoom.polygon),
         })
         setRoom(editingRoom)
@@ -107,7 +107,7 @@ const RoomEditor = ({ planimetriaRef, room, setRoom, close, endpointRef }) => {
                     onInput={e => {
                         setEditingRoom(editingRoom => ({
                             ...editingRoom,
-                            notes: e.target.value,
+                            description: e.target.value,
                         }))
                     }}
                 />

@@ -44,12 +44,12 @@ export const Sidebar = ({ rooms, ...rest }) => {
                         </strong>{' '}
                         <code>{room.code}</code>
                     </p> */}
-                    {room.notes && (
+                    {room.description && <room className="description" /> && (
                         <p>
                             <strong>
-                                <LocalizedString name="notes" />:
+                                <LocalizedString name="description" />:
                             </strong>{' '}
-                            {room.notes}
+                            {room.description}
                         </p>
                     )}
                     {room.roomAssignments.length > 0 && (

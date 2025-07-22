@@ -28,7 +28,7 @@ export const Search = ({ rooms, selectId, ...rest }) => {
     const [results, query, setQuery] = useFuse(rooms, {
         includeScore: true,
         includeMatches: true,
-        keys: ['code', 'notes', 'roomAssignments.person.firstName', 'roomAssignments.person.lastName'],
+        keys: ['code', 'description', 'roomAssignments.person.firstName', 'roomAssignments.person.lastName'],
     })
 
     const onRoomSelected = id => {
@@ -60,18 +60,18 @@ export const Search = ({ rooms, selectId, ...rest }) => {
                     <div class="search-results">
                         {results
                             .slice(0, 5)
-                            .map(({ item: { _id: id, code, notes, roomAssignments }, matches }) => {
+                            .map(({ item: { _id: id, code, description, roomAssignments }, matches }) => {
                                 const codeIndices = matches.find(({ key }) => key === 'code')?.indices
-                                const notesIndices = matches.find(({ key }) => key === 'notes')?.indices
+                                const descriptionIndices = matches.find(({ key }) => key === 'description')?.indices
 
                                 return (
                                     <div class="result" onClick={() => onRoomSelected(id)}>
                                         <div class="code">
                                             <HighlightedText indices={codeIndices} value={code} />
                                         </div>
-                                        {notes && (
-                                            <div class="notes">
-                                                <HighlightedText indices={notesIndices} value={notes} />
+                                        {description && (
+                                            <div class="description">
+                                                <HighlightedText indices={descriptionIndices} value={description} />
                                             </div>
                                         )}
                                         {roomAssignments.length > 0 && (
